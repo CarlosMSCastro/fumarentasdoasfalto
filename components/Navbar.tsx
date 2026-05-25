@@ -32,7 +32,7 @@ export default function Navbar() {
         </Link>
 
         {/* Logo Mobile */}
-        <Link href="/" className="lg:hidden absolute left-4 top-1/12 -translate-y-1/2 z-10">
+        <Link href="/" className="lg:hidden absolute left-4 top-1/10 -translate-y-1/2 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={120} height={120} loading="eager"
             className="object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)]" />
         </Link>
