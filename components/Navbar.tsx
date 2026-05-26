@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart} from "lucide-react";
@@ -17,23 +17,36 @@ const links = [
   { href: "/contacto", label: "Contacto" },
 ];
 
+
+
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const cartCount = 0;
+  const [scrolled, setScrolled] = useState(false);
+
+useEffect(() => {
+  const handleScroll = () => setScrolled(window.scrollY > 50);
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
 
   return (
-    <nav className="w-full bg-[var(--surface)] border-b border-white/10 px-6 py-6 lg:py-7 overflow-visible">
+    <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 py-6 lg:py-7 overflow-visible transition-all duration-300 ${
+  scrolled ? "bg-black/25 backdrop-blur-sm border-b border-white/10" : "bg-transparent border-transparent"
+}`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
 
         {/* Logo Desktop */}
         <Link href="/" className="hidden lg:block shrink-0 z-10">
-          <Image src="/logo.png" alt="Fumarentas do Asfalto" width={140} height={140} loading="eager"
+          <Image src="/logo.png" alt="Fumarentas do Asfalto" width={170} height={170} loading="eager"
             className="object-contain transition-transform duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] -mb-25" />
         </Link>
 
         {/* Logo Mobile */}
-        <Link href="/" className="lg:hidden absolute left-4 top-1/10 -translate-y-1/2 z-10">
-          <Image src="/logo.png" alt="Fumarentas do Asfalto" width={120} height={120} loading="eager"
+        <Link href="/" className="lg:hidden absolute left-6 top-1/3 z-10">
+          <Image src="/logo.png" alt="Fumarentas do Asfalto" width={135} height={135} loading="eager"
             className="object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)]" />
         </Link>
         {/* Links Desktop */}
@@ -76,7 +89,7 @@ export default function Navbar() {
             <SheetTrigger className="lg:hidden p-0 text-[var(--foreground)] hover:text-[var(--primary)] transition-colors">
               <Menu size={32} />
             </SheetTrigger>
-            <SheetContent side="right" className="bg-[var(--surface)] border-white/10">
+            <SheetContent side="right" className="bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-[3]">
               <ul className="flex flex-col gap-5 mt-12 items-center">
                 {links.map((link) => (
                   <li key={link.href}>
