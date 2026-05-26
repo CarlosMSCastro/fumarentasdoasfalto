@@ -26,7 +26,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
 
         {/* Logo Desktop */}
-        <Link href="/" className="hidden lg:block shrink-0">
+        <Link href="/" className="hidden lg:block shrink-0 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={140} height={140} loading="eager"
             className="object-contain transition-transform duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] -mb-25" />
         </Link>
