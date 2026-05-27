@@ -68,10 +68,10 @@ useEffect(() => {
               {cartCount}
             </span>
           </Link>
-          <a href="https://facebook.com" target="_blank" className="hidden lg:block text-[var(--foreground)] hover:text-[var(--primary)] transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-[var(--foreground)] hover:text-[var(--primary)] transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
             <FaFacebook size={25} />
           </a>
-          <a href="https://instagram.com" target="_blank" className="hidden lg:block text-[var(--foreground)] hover:text-[var(--primary)] transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-[var(--foreground)] hover:text-[var(--primary)] transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
             <FaInstagram size={25} />
           </a>
           <Link href="/login" className="hidden lg:block">
@@ -79,10 +79,10 @@ useEffect(() => {
               Login
             </Button>
           </Link>
-          <a href="https://facebook.com" target="_blank" className="lg:hidden text-[var(--foreground)] hover:text-[var(--primary)] transition-all">
+          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-[var(--foreground)] hover:text-[var(--primary)] transition-all">
             <FaFacebook size={28} />
           </a>
-          <a href="https://instagram.com" target="_blank" className="lg:hidden text-[var(--foreground)] hover:text-[var(--primary)] transition-all">
+          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="lg:hidden text-[var(--foreground)] hover:text-[var(--primary)] transition-all">
             <FaInstagram size={28} />
           </a>
           <Sheet open={open} onOpenChange={setOpen}>
