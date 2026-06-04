@@ -27,11 +27,11 @@ export default function Home() {
           <p className="mt-4 text-lg text-white/80 max-w-lg">
             Uma associação de apaixonados por motorizadas, principalmente antigas. Aberta a novos sócios e criadora de eventos.
           </p>
-          <div className="md:pt-50 pt-30 flex md:-ml-64 self-center gap-8">
-            <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-4 py-3 md:w-55 text-center md:text-lg font-semibold text-white hover:bg-orange-600">
+          <div className="md:pt-50 pt-20 flex md:-ml-64 self-center gap-8">
+            <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-orange-600">
               Novo Sócio
             </a>
-            <a href="https://quolagest-wwit.quotagest.com/portal/login" className="rounded-full border border-white px-4 py-3 md:w-55 text-center md:text-lg font-semibold text-white hover:bg-white/10">
+            <a href="https://quolagest-wwit.quotagest.com/portal/login" className="rounded-full border border-white px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-white/10">
               Portal do Sócio
             </a>
           </div>
