@@ -14,8 +14,10 @@ export default function Home() {
           loop
           playsInline
         />
-        {/* Overlay */}
+        {/* Overlay horizontal */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/30" />
+        {/* Overlay vertical bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
         {/* Conteúdo */}
         <div className="relative z-10 flex h-full flex-col items-start justify-center text-left md:mt-18 mt-15 px-8 ml-0 md:ml-64 md:px-16">
           <p className="text-white/80 text-lg uppercase tracking-widest mb-2">Bem-vindo</p>
@@ -37,7 +39,7 @@ export default function Home() {
         {/* Scroll Indicator */}
         <button
           onClick={() => document.getElementById('sobre')?.scrollIntoView({ behavior: 'smooth' })}
-          className="absolute md:bottom-20 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center cursor-pointer bg-transparent border-none group"
+          className="absolute md:bottom-20 bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center cursor-pointer bg-transparent border-none group"
         >
           <svg className="w-8 h-8 text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.6)] group-hover:scale-125 group-hover:text-orange-500 transition-all duration-300 animate-bounce [animation-delay:0ms]" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
