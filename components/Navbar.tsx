@@ -12,7 +12,6 @@ const links = [
   { href: "/", label: "Início" },
   { href: "/sobre", label: "Sobre" },
   { href: "/eventos", label: "Eventos" },
-  { href: "/galeria", label: "Galeria" },
   { href: "/loja", label: "Loja" },
   { href: "/contacto", label: "Contacto" },
 ];
