@@ -49,7 +49,7 @@ export default function Home() {
           </svg>
         </button>
       </section>
-      <div id="sobre" className="h-screen bg-white/25" />
+      <div id="sobre" className="h-screen" />
     </main>
   );
 }
