@@ -15,7 +15,7 @@ export default function Home() {
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/30" />
         {/* Conteúdo */}
-        <div className="relative z-10 flex h-full flex-col items-start justify-center text-left mt-18 px-8 ml-0 md:ml-64 md:px-16">
+        <div className="relative z-10 flex h-full flex-col items-start justify-center text-left md:mt-18 mt-35 px-8 ml-0 md:ml-64 md:px-16">
           <p className="text-white/80 text-lg uppercase tracking-widest mb-2">Bem-vindo</p>
           <h1 className="text-5xl font-bold text-white md:text-6xl">
             FUMARENTAS DO ASFALTO
