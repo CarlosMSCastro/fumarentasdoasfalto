@@ -38,13 +38,13 @@ useEffect(() => {
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
 
         {/* Logo Desktop */}
-        <Link href="/" className="hidden lg:block shrink-0 z-10">
+        <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hidden lg:block shrink-0 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={170} height={170} loading="eager"
             className="object-contain transition-transform duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] -mb-25" />
         </Link>
 
         {/* Logo Mobile */}
-        <Link href="/" className="lg:hidden absolute left-6 top-1/3 z-10">
+        <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="lg:hidden absolute left-6 top-1/3 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={135} height={135} loading="eager"
             className="object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)]" />
         </Link>
@@ -52,7 +52,11 @@ useEffect(() => {
         <ul className="hidden lg:flex items-center gap-8 flex-1 justify-center">
           {links.map((link) => (
             <li key={link.href}>
-              <Link href={link.href} className="text-[var(--foreground)] hover:text-[var(--primary)] drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest">
+              <Link href={link.href}
+              onClick={() => {
+                if (link.href === "/") window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="text-[var(--foreground)] hover:text-[var(--primary)] drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest">
                 {link.label}
               </Link>
             </li>
