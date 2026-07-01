@@ -1,7 +1,9 @@
 "use client";
 
+
 export default function Home() {
   return (
+    
     <main className="flex flex-col">
       {/* HERO */}
       <section className="relative h-screen w-full overflow-hidden">
@@ -49,7 +51,50 @@ export default function Home() {
           </svg>
         </button>
       </section>
-      <div id="sobre" className="h-screen" />
+      {/* SOBRE */}
+      <section id="sobre" className="flex flex-col items-center justify-center min-h-screen px-8 py-30 gap-12 relative overflow-hidden">
+        <video
+          className="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"
+          src="/videos/smoke.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none" />
+        <div className="text-left mb-12 w-full pl-70 md:pl-115 relative z-10">
+          <p className="text-white/90 uppercase tracking-widest text-3xl mb-2">Nossos</p>
+          <h2 className="text-5xl md:text-7xl font-bold text-white/90 mb-4">Objetivos</h2>
+          <p className="text-white/50 text-xl max-w-2xl">
+            Somos uma associação dedicada a promover o amor pelas motorizadas através de eventos, encontros e passeios.
+          </p>
+        </div>
+        <div className="flex flex-col md:flex-row gap-1 w-full max-w-7xl">
+          {[
+            { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
+            { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/contacto", bg: "/mecanica.jpg" },
+            { title: "Workshops e Palestras", sub: "Aprende, ensina, evolui", href: "/eventos", bg: "/worksh.jpg" },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="group relative overflow-hidden flex-1 md:hover:flex-[2] transition-all duration-500 h-[40vh] flex flex-col justify-between p-6"
+              style={{ clipPath: "polygon(0 0, 95% 0, 100% 5%, 100% 100%, 5% 100%, 0 95%)" }}
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center brightness-[0.35] group-hover:brightness-50 transition-all duration-500"
+                style={{ backgroundImage: `url('${item.bg}')` }}
+              />
+              <h3 className="relative z-10 text-xl md:text-2xl font-bold text-white group-hover:text-orange-500 transition-all duration-300">{item.title}</h3>
+              <a
+                href={item.href}
+                className="relative z-10 self-start bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-widest text-sm px-6 py-3 transition-all duration-500 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0"
+              >
+                Saber mais
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
