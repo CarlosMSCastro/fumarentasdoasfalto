@@ -32,8 +32,8 @@ useEffect(() => {
 
 
   return (
-    <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 ${scrolled ? "pt-2 lg:pt-2" : "py-6 lg:py-7"} overflow-visible transition-all duration-300 ${
-  scrolled ? "bg-black/25 backdrop-blur-sm border-b border-white/10" : "bg-transparent border-transparent"
+    <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 ${scrolled ? "py-5 lg:pt-2" : "py-6 lg:py-7"} overflow-visible transition-all duration-300 ${
+  scrolled ? "bg-black/25 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.5)]" : "bg-transparent border-transparent"
 }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
 
