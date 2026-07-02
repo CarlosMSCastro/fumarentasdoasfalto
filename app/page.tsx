@@ -69,7 +69,7 @@ export default function Home() {
             Somos uma associação dedicada a promover o amor pelas motorizadas através de eventos, encontros e passeios.
           </p>
         </div>
-        <div className="flex flex-col md:flex-row gap-1 w-full max-w-7xl">
+        <div className="flex flex-col md:flex-row gap-1 w-full max-w-[1400px]">
           {[
             { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
             { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/contacto", bg: "/mecanica.jpg" },
@@ -77,13 +77,14 @@ export default function Home() {
           ].map((item, i) => (
             <div
               key={i}
-              className="group relative overflow-hidden flex-1 md:hover:flex-[2] transition-all duration-500 h-[40vh] flex flex-col justify-between p-6"
-              style={{ clipPath: "polygon(0 0, 95% 0, 100% 5%, 100% 100%, 5% 100%, 0 95%)" }}
+              className="group relative rounded-sm flex-1 md:hover:flex-[2] transition-all duration-500 h-[50vh] flex flex-col justify-between p-6"
             >
-              <div
-                className="absolute inset-0 bg-cover bg-center brightness-[0.35] group-hover:brightness-50 transition-all duration-500"
-                style={{ backgroundImage: `url('${item.bg}')` }}
-              />
+              <div className="absolute inset-0 overflow-hidden rounded-sm">
+                <div
+                  className="absolute inset-0 bg-cover bg-center brightness-[0.55] group-hover:brightness-70 group-hover:scale-130 transition-all duration-500"
+                  style={{ backgroundImage: `url('${item.bg}')` }}
+                />
+              </div>
               <h3 className="relative z-10 text-xl md:text-2xl font-bold text-white group-hover:text-orange-500 transition-all duration-300">{item.title}</h3>
               <a
                 href={item.href}
