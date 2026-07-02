@@ -52,7 +52,7 @@ export default function Home() {
         </button>
       </section>
       {/* SOBRE */}
-      <section id="sobre" className="flex flex-col items-center justify-center min-h-screen px-8 py-30 gap-12 relative overflow-hidden">
+      <section id="sobre" className="flex flex-col items-center justify-center min-h-screen py-30 gap-12 relative overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"
           src="/videos/smoke.mp4"
@@ -62,7 +62,7 @@ export default function Home() {
           playsInline
         />
         <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none" />
-        <div className="text-left mb-12 w-full md:pl-70 relative z-10">
+        <div className="text-left mb-12 w-full px-3 md:pl-70 relative z-10">
           <p className="text-white/90 uppercase tracking-widest text-3xl mb-2">Os nossos</p>
           <h2 className="text-5xl md:text-7xl font-bold text-white/90 mb-4">Objetivos</h2>
           <p className="text-white/50 text-xl max-w-2xl">
