@@ -54,7 +54,7 @@ export default function Home() {
       {/* SOBRE */}
       <section id="sobre" className="flex flex-col items-center justify-center min-h-screen py-30 gap-12 relative overflow-hidden">
         <video
-          className="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none"
           src="/videos/smoke.mp4"
           autoPlay
           muted
