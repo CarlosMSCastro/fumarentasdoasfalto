@@ -25,14 +25,14 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
 useEffect(() => {
-  const handleScroll = () => setScrolled(window.scrollY > 50);
+  const handleScroll = () => setScrolled(window.scrollY > 100);
   window.addEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
 }, []);
 
 
   return (
-    <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 py-6 lg:py-7 overflow-visible transition-all duration-300 ${
+    <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 ${scrolled ? "pt-2 lg:pt-2" : "py-6 lg:py-7"} overflow-visible transition-all duration-300 ${
   scrolled ? "bg-black/25 backdrop-blur-sm border-b border-white/10" : "bg-transparent border-transparent"
 }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
@@ -40,13 +40,13 @@ useEffect(() => {
         {/* Logo Desktop */}
         <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hidden lg:block shrink-0 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={170} height={170} loading="eager"
-            className="object-contain transition-transform duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] -mb-25" />
+            className={`object-contain transition-all duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] ${scrolled ? "mb-0 w-25 h-25" : "-mb-25"}`} />
         </Link>
 
         {/* Logo Mobile */}
         <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="lg:hidden absolute left-6 top-1/3 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={135} height={135} loading="eager"
-            className="object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)]" />
+            className={`object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] transition-all duration-300 ${scrolled ? "w-16 h-16" : ""}`}/>
         </Link>
         {/* Links Desktop */}
         <ul className="hidden lg:flex items-center gap-8 flex-1 justify-center">
