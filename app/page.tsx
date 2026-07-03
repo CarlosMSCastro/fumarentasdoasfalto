@@ -64,8 +64,8 @@ export default function Home() {
         <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none" />
         <div className="text-left mb-4 md:mb-12 w-full px-3 md:pl-65 relative z-10">
           <p className="text-white/90 uppercase tracking-widest text-3xl mb-2">Os nossos</p>
-          <h2 className="text-5xl md:text-7xl font-bold text-white/90 mb-4">Objetivos</h2>
-          <p className="text-white/50 text-xl max-w-2xl">
+          <h2 className="text-4xl md:text-7xl font-bold text-white/90 mb-4">Objetivos</h2>
+          <p className="text-white/50 text-lg md:text-xl max-w-2xl">
             Somos uma associação dedicada a promover o amor pelas motorizadas através de eventos, encontros e passeios.
           </p>
         </div>
