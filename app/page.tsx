@@ -53,7 +53,7 @@ export default function Home() {
         </button>
       </section>
       {/* SOBRE */}
-      <section id="sobre" className="flex flex-col items-center justify-center min-h-screen py-30 gap-12 relative overflow-hidden">
+      <section id="sobre" className="flex flex-col items-center justify-center min-h-screen pt-12 pb-22 md:py-30 gap-12 relative overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none"
           src="/videos/smoke.mp4"
