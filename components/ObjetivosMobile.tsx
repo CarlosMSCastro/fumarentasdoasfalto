@@ -36,20 +36,16 @@ export default function ObjetivosMobile() {
         className="relative w-full h-[50vh] rounded-sm overflow-hidden flex flex-col justify-between p-6"
         style={{
           transition: "transform 0.3s ease, opacity 0.3s ease",
-          transform: sliding === "left" ? "translateX(-40px) scale(0.95)" : sliding === "right" ? "translateX(40px) scale(0.95)" : "translateX(0) scale(1)",
+          transform: sliding === "left" ? "translateX(-40px)" : sliding === "right" ? "translateX(40px)" : "translateX(0)",
           opacity: sliding ? 0 : 1,
         }}
       >
         <div
           className="absolute inset-0 bg-cover bg-center brightness-[0.55]"
-          style={{
-            backgroundImage: `url('${cards[active].bg}')`,
-            transform: sliding ? "scale(1)" : "scale(1.08)",
-            transition: "transform 0.3s ease",
-          }}
+          style={{ backgroundImage: `url('${cards[active].bg}')` }}
         />
-        <h3 className="relative z-10 text-2xl font-bold text-white">{cards[active].title}</h3>
-        <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-3 py-2 rounded-full text-sm">
+        <h3 className="relative z-10 text-3xl font-bold text-white">{cards[active].title}</h3>
+        <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-5 py-4 rounded-full text-lg">
           →
         </div>
       </a>
