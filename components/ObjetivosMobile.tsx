@@ -10,25 +10,43 @@ const cards = [
 export default function ObjetivosMobile() {
   const [active, setActive] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
+  const [sliding, setSliding] = useState<"left" | "right" | null>(null);
+
+  const goTo = (next: number, dir: "left" | "right") => {
+    setSliding(dir);
+    setTimeout(() => {
+      setActive(next);
+      setSliding(null);
+    }, 300);
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.touches[0].clientX);
   const handleTouchEnd = (e: React.TouchEvent) => {
     const diff = touchStart - e.changedTouches[0].clientX;
-    if (diff > 50 && active < cards.length - 1) setActive(active + 1);
-    if (diff < -50 && active > 0) setActive(active - 1);
+    if (diff > 50 && active < cards.length - 1) goTo(active + 1, "left");
+    if (diff < -50 && active > 0) goTo(active - 1, "right");
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-4 md:hidden px-4">
+    <div className="w-full flex flex-col items-center gap-4 md:hidden px-6">
       <a
         href={cards[active].href}
-        className="relative w-full h-[55vh] rounded-sm overflow-hidden flex flex-col justify-between p-6"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        className="relative w-full h-[50vh] rounded-sm overflow-hidden flex flex-col justify-between p-6"
+        style={{
+          transition: "transform 0.3s ease, opacity 0.3s ease",
+          transform: sliding === "left" ? "translateX(-40px) scale(0.95)" : sliding === "right" ? "translateX(40px) scale(0.95)" : "translateX(0) scale(1)",
+          opacity: sliding ? 0 : 1,
+        }}
       >
         <div
           className="absolute inset-0 bg-cover bg-center brightness-[0.55]"
-          style={{ backgroundImage: `url('${cards[active].bg}')` }}
+          style={{
+            backgroundImage: `url('${cards[active].bg}')`,
+            transform: sliding ? "scale(1)" : "scale(1.08)",
+            transition: "transform 0.3s ease",
+          }}
         />
         <h3 className="relative z-10 text-2xl font-bold text-white">{cards[active].title}</h3>
         <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-3 py-2 rounded-full text-sm">
@@ -39,7 +57,7 @@ export default function ObjetivosMobile() {
         {cards.map((_, i) => (
           <button
             key={i}
-            onClick={() => setActive(i)}
+            onClick={() => goTo(i, i > active ? "left" : "right")}
             className={`h-3 rounded-full transition-all duration-300 ${i === active ? "bg-orange-500 w-6" : "bg-white/40 w-3"}`}
           />
         ))}
