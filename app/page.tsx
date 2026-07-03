@@ -78,7 +78,7 @@ export default function Home() {
           <a 
           key={i}
             href={item.href}
-            className="group relative rounded-sm flex-1 md:hover:flex-[2] transition-all duration-500 h-[50vh] flex flex-col justify-between p-6"
+            className="group relative rounded-sm flex-1 md:hover:flex-[2] transition-all duration-500 h-[60vh] md:h-[50vh] flex flex-col justify-between p-6"
           >
             <div className="absolute inset-0 overflow-hidden rounded-sm">
               <div
