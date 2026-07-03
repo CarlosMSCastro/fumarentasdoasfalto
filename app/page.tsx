@@ -62,37 +62,35 @@ export default function Home() {
           playsInline
         />
         <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none" />
-        <div className="text-left mb-12 w-full px-3 md:pl-70 relative z-10">
+        <div className="text-left mb-12 w-full px-3 md:pl-65 relative z-10">
           <p className="text-white/90 uppercase tracking-widest text-3xl mb-2">Os nossos</p>
           <h2 className="text-5xl md:text-7xl font-bold text-white/90 mb-4">Objetivos</h2>
           <p className="text-white/50 text-xl max-w-2xl">
             Somos uma associação dedicada a promover o amor pelas motorizadas através de eventos, encontros e passeios.
           </p>
         </div>
-        <div className="flex flex-col md:flex-row gap-1 w-full max-w-[1400px]">
+        <div className="flex flex-col md:flex-row gap-3 w-full max-w-[1400px]">
           {[
             { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
             { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/contacto", bg: "/mecanica.jpg" },
             { title: "Workshops e Palestras", sub: "Aprende, ensina, evolui", href: "/eventos", bg: "/worksh.jpg" },
           ].map((item, i) => (
-            <div
-              key={i}
-              className="group relative rounded-sm flex-1 md:hover:flex-[2] transition-all duration-500 h-[50vh] flex flex-col justify-between p-6"
-            >
-              <div className="absolute inset-0 overflow-hidden rounded-sm">
-                <div
-                  className="absolute inset-0 bg-cover bg-center brightness-[0.55] group-hover:brightness-70 group-hover:scale-130 transition-all duration-500"
-                  style={{ backgroundImage: `url('${item.bg}')` }}
-                />
-              </div>
-              <h3 className="relative z-10 text-xl md:text-2xl font-bold text-white group-hover:text-orange-500 transition-all duration-300">{item.title}</h3>
-              <a
-                href={item.href}
-                className="relative z-10 self-start bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-widest text-sm px-6 py-3 transition-all duration-500 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0"
-              >
-                Saber mais
-              </a>
+          <a 
+          key={i}
+            href={item.href}
+            className="group relative rounded-sm flex-1 md:hover:flex-[2] transition-all duration-500 h-[50vh] flex flex-col justify-between p-6"
+          >
+            <div className="absolute inset-0 overflow-hidden rounded-sm">
+              <div
+                className="absolute inset-0 bg-cover bg-center brightness-[0.55] group-hover:brightness-60 group-hover:scale-150 transition-all duration-500"
+                style={{ backgroundImage: `url('${item.bg}')` }}
+              />
             </div>
+            <h3 className="relative z-10 text-xl md:text-2xl font-bold text-white group-hover:text-2xl md:group-hover:text-3xl transition-all duration-300">{item.title}</h3>
+            <div className="relative z-10 self-end bg-white/40 group-hover:bg-orange-500 text-white font-bold px-4 py-3 rounded-full transition-all duration-500">
+              →
+            </div>
+          </a>
           ))}
         </div>
       </section>
