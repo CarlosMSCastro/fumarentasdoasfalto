@@ -9,12 +9,22 @@ const cards = [
 
 export default function ObjetivosMobile() {
   const [active, setActive] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.touches[0].clientX);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStart - e.changedTouches[0].clientX;
+    if (diff > 50 && active < cards.length - 1) setActive(active + 1);
+    if (diff < -50 && active > 0) setActive(active - 1);
+  };
 
   return (
-    <div className="w-full flex flex-col items-center gap-4 md:hidden">
+    <div className="w-full flex flex-col items-center gap-4 md:hidden px-4">
       <a
         href={cards[active].href}
-        className="relative w-full h-[60vh] rounded-sm overflow-hidden flex flex-col justify-between p-6"
+        className="relative w-full h-[55vh] rounded-sm overflow-hidden flex flex-col justify-between p-6"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <div
           className="absolute inset-0 bg-cover bg-center brightness-[0.55]"
@@ -30,7 +40,7 @@ export default function ObjetivosMobile() {
           <button
             key={i}
             onClick={() => setActive(i)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${i === active ? "bg-orange-500 w-6" : "bg-white/40"}`}
+            className={`h-3 rounded-full transition-all duration-300 ${i === active ? "bg-orange-500 w-6" : "bg-white/40 w-3"}`}
           />
         ))}
       </div>
