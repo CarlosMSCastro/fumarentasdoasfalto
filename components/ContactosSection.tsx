@@ -11,9 +11,9 @@ export default function ContactoSection() {
 
       {/* Grid + CTA */}
       <div className="flex md:pl-55 mx-auto w-full py-12 flex-col md:flex-row">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
-          {/* Horários */}
-          <div className="p-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 flex-1">
+          {/* Horários - ocupa 2 colunas no mobile */}
+          <div className="p-8 col-span-2 md:col-span-1">
             <p className="text-orange-500 uppercase tracking-widest text-base font-bold mb-6">Horário de Funcionamento</p>
             <div className="flex flex-col gap-3 text-white/70 text-lg">
               <div className="flex justify-between"><span className="font-bold text-white/90">Seg. a Sex.</span><span>10:30 às 18:00</span></div>
@@ -37,8 +37,8 @@ export default function ContactoSection() {
             </div>
           </div>
         </div>
-        {/* CTA */}
-        <div className="p-8 flex flex-col items-center justify-center gap-3 shrink-0 pr-70">
+        {/* CTA - no mobile fica ao lado do endereço via grid, no desktop à direita */}
+        <div className="p-8 flex flex-col items-center justify-center gap-3 shrink-0 pr-70 md:flex md:flex-col">
           <p className="text-white/90 text-2xl font-bold text-center">Quer ser membro?</p>
           <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-8 py-3 font-bold uppercase tracking-widest text-white hover:bg-orange-600 transition-all">
             Formulário
