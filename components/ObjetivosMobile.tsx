@@ -41,10 +41,10 @@ export default function ObjetivosMobile() {
         }}
       >
         <div
-          className="absolute inset-0 bg-cover bg-center brightness-[0.55]"
+          className="absolute inset-0 bg-cover bg-center brightness-[0.65]"
           style={{ backgroundImage: `url('${cards[active].bg}')` }}
         />
-        <h3 className="relative z-10 text-3xl font-bold text-white">{cards[active].title}</h3>
+        <h3 className="relative z-10 text-5xl font-bold text-white">{cards[active].title}</h3>
         <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-5 py-4 rounded-full text-lg">
           →
         </div>
