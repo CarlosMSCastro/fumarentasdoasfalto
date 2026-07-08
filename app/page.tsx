@@ -20,7 +20,7 @@ export default function Home() {
       <HeroSection />
       <main className="flex flex-col relative overflow-hidden">
         <video
-          className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none"
           src="/videos/smoke.mp4"
           autoPlay
           muted
@@ -29,8 +29,9 @@ export default function Home() {
         />
         <video
           ref={video2Ref}
-          className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-70 pointer-events-none scale-x-[-1] scale-y-[-1]"
+          className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none scale-x-[-1] scale-y-[-1]"
           src="/videos/smoke.mp4"
+          autoPlay
           muted
           loop
           playsInline
