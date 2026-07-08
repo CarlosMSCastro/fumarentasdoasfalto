@@ -17,7 +17,7 @@ export default function HeroSection() {
       {/* Overlay vertical bottom */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
       {/* Conteúdo */}
-      <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-[8%] md:px-[15%]">
+      <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-[8%] md:px-[15%] mt-15">
         <p className="text-white/80 text-lg uppercase tracking-widest mb-2">Bem-vindo</p>
         <h1 className="text-5xl font-bold text-white md:text-6xl">
           FUMARENTAS DO ASFALTO
@@ -25,7 +25,7 @@ export default function HeroSection() {
         <p className="mt-4 text-lg text-white/80 max-w-lg">
           Uma associação de apaixonados por motorizadas, principalmente antigas. Aberta a novos sócios e criadora de eventos.
         </p>
-        <div className="pt-20 md:pt-32 flex gap-8 self-center">
+        <div className="pt-20 md:pt-22 flex gap-8 self-center">
           <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-orange-600">
             Novo Sócio
           </a>

@@ -1,6 +1,6 @@
 export default function ObjetivosDesktop() {
   return (
-    <div className="hidden md:flex md:flex-row gap-3 w-full max-w-[1400px]">
+    <div className="hidden md:flex md:flex-row gap-3 w-full px-[8%] lg:px-[13%]">
       {[
         { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
         { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/contacto", bg: "/mecanica.jpg" },

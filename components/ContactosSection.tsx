@@ -5,12 +5,12 @@ export default function ContactoSection() {
     <section className="flex flex-col relative overflow-hidden">
 
       {/* Título */}
-      <div className="mx-auto w-full px-3 pl-7 md:pl-65 pt-16">
-        <h2 className="text-4xl md:text-6xl font-bold text-white/90">Contactos</h2>
+      <div className="mx-auto w-full px-[8%] lg:px-[15%] pt-16">
+        <h2 className="text-4xl lg:text-6xl font-bold text-white/90">Contactos</h2>
       </div>
 
       {/* Grid + CTA — desktop */}
-      <div className="hidden md:flex md:pl-57 mx-auto w-full py-12 flex-row">
+      <div className="hidden lg:flex lg:pl-[8%] xl:pl-[13%] mx-auto w-full py-12 flex-row">
         <div className="grid grid-cols-3 gap-6 flex-1">
           <div className="p-8">
             <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-6">Horário de Funcionamento</p>
@@ -43,7 +43,7 @@ export default function ContactoSection() {
       </div>
 
       {/* Mobile */}
-      <div className="flex flex-col md:hidden pl-2 px-3 py-8 gap-2">
+      <div className="flex flex-col lg:hidden pl-2 px-3 py-8 gap-2">
         <div className="p-6">
           <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Horário de Funcionamento</p>
           <div className="flex flex-col gap-3 text-white/70 text-xl">
