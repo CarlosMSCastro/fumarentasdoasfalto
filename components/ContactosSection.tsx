@@ -93,7 +93,7 @@ export default function ContactoSection() {
             </div>
           </div>
           <div className="p-6 flex-1 flex flex-col items-center justify-center gap-2 -mt-5">
-            <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-1">Quer ser membro?</p>
+            <p className="text-orange-500 uppercase tracking-widest text-sm font-bold mb-1">Quer ser membro?</p>
             <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-9 py-2 font-bold uppercase tracking-widest text-white text-sm hover:bg-orange-600 transition-all text-center">
               Formulário
             </a>
