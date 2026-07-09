@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useEffect } from "react";
+import Map from "@/components/Map";
 
 export default function ContactoSection() {
   const video2Ref = useRef<HTMLVideoElement>(null);
@@ -101,21 +102,14 @@ export default function ContactoSection() {
       </div>
 
       {/* Mapa */}
-      <div className="w-full h-[400px] relative z-10">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4279.333821468431!2d-8.59605679832368!3d41.37345599518911!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd245b9316299c15%3A0x209caad7f7d24c42!2sR.%20do%20Esp%C3%ADrito%20Santo%2C%20Fradelos%2C%20Portugal!5e0!3m2!1spt-BR!2sus!4v1783446363199!5m2!1spt-BR!2sus"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          className="grayscale brightness-[0.3]"
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="strict-origin-when-cross-origin"
-        />
+      <div className="w-full h-[350px] relative z-10 ">
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0d0d0d]/30 to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0d0d0d]/30 to-transparent z-10 pointer-events-none" />
+        <Map />
       </div>
 
       {/* Copyright */}
-      <div className="py-6 text-center text-white/40 text-sm border-t border-white/10 relative z-10">
+      <div className="py-6 text-center text-white/40 text-sm border-white/10 relative z-10">
         © {new Date().getFullYear()} Fumarentas do Asfalto. Todos os direitos reservados.
       </div>
 
