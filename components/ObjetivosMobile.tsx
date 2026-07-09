@@ -49,7 +49,7 @@ export default function ObjetivosMobile() {
           →
         </div>
       </a>
-      <div className="flex gap-3">
+      <div className="flex gap-3 relative z-10">
         {cards.map((_, i) => (
           <button
             key={i}

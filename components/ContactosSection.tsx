@@ -32,7 +32,7 @@ export default function ContactoSection() {
       />
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none" />
       {/* Título */}
-      <div className="mx-auto w-full px-[8%] lg:px-[13%] pt-16 relative z-10">
+      <div className="mx-auto w-full px-[8%] lg:px-[13%] mt-30 relative z-10">
         <h2 className="text-4xl lg:text-6xl font-bold text-white/90">Contactos</h2>
       </div>
 
