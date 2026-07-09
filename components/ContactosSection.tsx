@@ -1,16 +1,43 @@
 "use client";
+import { useRef, useEffect } from "react";
 
 export default function ContactoSection() {
+  const video2Ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = video2Ref.current;
+    if (v) {
+      v.currentTime = 3;
+      v.play();
+    }
+  }, []);
+
   return (
-    <section className="flex flex-col relative overflow-hidden" id="contactos">
+    <section className="flex flex-col relative overflow-hidden snap-start" id="contactos">
+      <video
+        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none"
+        src="/videos/smoke.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+      <video
+        ref={video2Ref}
+        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none scale-x-[-1] scale-y-[-1]"
+        src="/videos/smoke.mp4"
+        muted
+        loop
+        playsInline
+      />
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none" />
       {/* Título */}
-      <div className="mx-auto w-full px-[8%] lg:px-[13%] pt-16">
+      <div className="mx-auto w-full px-[8%] lg:px-[13%] pt-16 relative z-10">
         <h2 className="text-4xl lg:text-6xl font-bold text-white/90">Contactos</h2>
       </div>
 
       {/* Grid + CTA — desktop */}
-      <div className="hidden lg:flex lg:pl-[8%] xl:pl-[13%] pr-[8%] xl:pr-[13%] mx-auto w-full py-12">
+      <div className="hidden lg:flex lg:pl-[8%] xl:pl-[13%] pr-[8%] xl:pr-[13%] mx-auto w-full py-12 relative z-10">
         <div className="grid grid-cols-11 gap-4 w-full min-w-0">
           <div className="min-w-0 col-span-4">
             <p className="text-orange-500 uppercase tracking-widest text-base xl:text-lg font-bold mb-4">Horário de Funcionamento</p>
@@ -43,7 +70,7 @@ export default function ContactoSection() {
       </div>
 
       {/* Mobile */}
-      <div className="flex flex-col lg:hidden pl-2 px-3 py-8 gap-2">
+      <div className="flex flex-col lg:hidden pl-2 px-3 py-8 gap-2 relative z-10">
         <div className="p-6">
           <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Horário de Funcionamento</p>
           <div className="flex flex-col gap-3 text-white/70 text-xl">
@@ -74,7 +101,7 @@ export default function ContactoSection() {
       </div>
 
       {/* Mapa */}
-      <div className="w-full h-[400px]">
+      <div className="w-full h-[400px] relative z-10">
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4279.333821468431!2d-8.59605679832368!3d41.37345599518911!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd245b9316299c15%3A0x209caad7f7d24c42!2sR.%20do%20Esp%C3%ADrito%20Santo%2C%20Fradelos%2C%20Portugal!5e0!3m2!1spt-BR!2sus!4v1783446363199!5m2!1spt-BR!2sus"
           width="100%"
@@ -88,7 +115,7 @@ export default function ContactoSection() {
       </div>
 
       {/* Copyright */}
-      <div className="py-6 text-center text-white/40 text-sm border-t border-white/10">
+      <div className="py-6 text-center text-white/40 text-sm border-t border-white/10 relative z-10">
         © {new Date().getFullYear()} Fumarentas do Asfalto. Todos os direitos reservados.
       </div>
 

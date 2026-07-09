@@ -25,9 +25,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
 useEffect(() => {
-  const handleScroll = () => setScrolled(window.scrollY > 100);
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
+  const container = document.getElementById('snap-container');
+  if (!container) return;
+  const handleScroll = () => setScrolled(container.scrollTop > 100);
+  container.addEventListener("scroll", handleScroll);
+  return () => container.removeEventListener("scroll", handleScroll);
 }, []);
 
 

@@ -1,44 +1,14 @@
 "use client";
-import { useRef, useEffect } from "react";
 import HeroSection from "@/components/HeroSection";
 import ObjetivosSection from "@/components/ObjetivosSection";
 import ContactosSection from "@/components/ContactosSection";
 
 export default function Home() {
-  const video2Ref = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const v = video2Ref.current;
-    if (v) {
-      v.currentTime = 3;
-      v.play();
-    }
-  }, []);
-
   return (
-    <>
+    <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-screen">
       <HeroSection />
-      <main className="flex flex-col relative overflow-hidden">
-        <video
-          className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none"
-          src="/videos/smoke.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
-        <video
-          ref={video2Ref}
-          className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none scale-x-[-1] scale-y-[-1]"
-          src="/videos/smoke.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
-        <ObjetivosSection />
-        <ContactosSection />
-      </main>
-    </>
+      <ObjetivosSection />
+      <ContactosSection />
+    </div>
   );
 }

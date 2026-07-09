@@ -2,7 +2,7 @@
 
 export default function HeroSection() {
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative h-screen w-full overflow-hidden snap-start snap-always">
       {/* Vídeo */}
       <video
         className="absolute inset-0 h-full w-full object-cover"
