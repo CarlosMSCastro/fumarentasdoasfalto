@@ -87,7 +87,7 @@ export default function ContactoSection() {
         <div className="flex gap-2">
           <div className="p-6 flex-1">
             <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Endereço</p>
-            <div className="flex flex-col gap-2 text-white/70 text-xl">
+            <div className="flex flex-col gap-2 text-white/70 text-sm">
               <span>Rua do Espírito Santo</span>
               <span>4760-485 Fradelos VNF</span>
             </div>
