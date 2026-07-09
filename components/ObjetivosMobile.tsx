@@ -31,7 +31,7 @@ export default function ObjetivosMobile() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-4 md:hidden px-6">
+    <div className="w-full flex flex-col items-center gap-4 md:hidden px-6" style={{ touchAction: 'pan-x' }}>
       <a
         href={cards[active].href}
         onTouchStart={handleTouchStart}
