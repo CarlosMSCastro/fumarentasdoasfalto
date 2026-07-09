@@ -20,7 +20,10 @@ export default function ObjetivosMobile() {
     }, 300);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.touches[0].clientX);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
   const handleTouchEnd = (e: React.TouchEvent) => {
     const diff = touchStart - e.changedTouches[0].clientX;
     if (diff > 50 && active < cards.length - 1) goTo(active + 1, "left");
@@ -35,6 +38,7 @@ export default function ObjetivosMobile() {
         onTouchEnd={handleTouchEnd}
         className="relative w-full h-[50vh] rounded-sm overflow-hidden flex flex-col justify-between p-6"
         style={{
+          touchAction: 'pan-x',
           transition: "transform 0.3s ease, opacity 0.3s ease",
           transform: sliding === "left" ? "translateX(-40px)" : sliding === "right" ? "translateX(40px)" : "translateX(0)",
           opacity: sliding ? 0 : 1,
