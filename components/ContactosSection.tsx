@@ -16,7 +16,7 @@ export default function ContactoSection() {
   return (
     <section className="flex flex-col relative overflow-hidden snap-start" id="contactos">
       <video
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none"
+        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-20 pointer-events-none"
         src="/videos/smoke.mp4"
         autoPlay
         muted
@@ -25,7 +25,7 @@ export default function ContactoSection() {
       />
       <video
         ref={video2Ref}
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none scale-x-[-1] scale-y-[-1]"
+        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-20 pointer-events-none scale-x-[-1] scale-y-[-1]"
         src="/videos/smoke.mp4"
         muted
         loop
@@ -102,9 +102,9 @@ export default function ContactoSection() {
       </div>
 
       {/* Mapa */}
-      <div className="w-full h-[350px] relative z-10 ">
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0d0d0d]/30 to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0d0d0d]/30 to-transparent z-10 pointer-events-none" />
+      <div className="w-full h-[350px] relative z-10 overflow-hidden">
+      <div className="absolute inset-y-0 left-0 w-[500px] bg-gradient-to-r from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-[500px] bg-gradient-to-l from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
         <Map />
       </div>
 
