@@ -45,7 +45,7 @@ export default function ObjetivosSection() {
       <ObjetivosMobile />
       <button
         onClick={() => document.getElementById('contactos')?.scrollIntoView({ behavior: 'smooth' })}
-        className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer bg-transparent border-none group"
+        className="absolute bottom-[1vh] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer bg-transparent border-none group"
       >
         <svg className="w-8 h-8 text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.6)] group-hover:scale-125 group-hover:text-orange-500 transition-all duration-300 animate-bounce" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />

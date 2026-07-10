@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart} from "lucide-react";
@@ -16,22 +17,24 @@ const links = [
   { href: "/contacto", label: "Contacto" },
 ];
 
-
-
-
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const cartCount = 0;
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
-useEffect(() => {
-  const container = document.getElementById('snap-container');
-  if (!container) return;
-  const handleScroll = () => setScrolled(container.scrollTop > 100);
-  container.addEventListener("scroll", handleScroll);
-  return () => container.removeEventListener("scroll", handleScroll);
-}, []);
-
+  useEffect(() => {
+    setTimeout(() => setScrolled(false), 0);
+    const container = document.getElementById('snap-container');
+    if (!container) {
+      const handleScroll = () => setScrolled(window.scrollY > 100);
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+    const handleScroll = () => setScrolled(container.scrollTop > 100);
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [pathname]);
 
   return (
     <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 ${scrolled ? "py-3 lg:pt-2" : "py-6 lg:py-7"} overflow-visible transition-all duration-300 ${
@@ -50,6 +53,7 @@ useEffect(() => {
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={135} height={135} loading="eager"
             className={`object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] transition-all duration-300 ${scrolled ? "w-16 h-16" : ""}`}/>
         </Link>
+
         {/* Links Desktop */}
         <ul className="hidden lg:flex items-center gap-8 flex-1 justify-center">
           {links.map((link) => (

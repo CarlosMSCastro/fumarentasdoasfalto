@@ -72,7 +72,7 @@ export default function ContactoSection() {
 
       {/* Mobile */}
       <div className="flex flex-col lg:hidden pl-2 px-3 py-8 gap-2 relative z-10">
-        <div className="p-6">
+        <div className="p-3">
           <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Horário de Funcionamento</p>
           <div className="flex flex-col gap-3 text-white/70 text-xl">
             <div className="flex gap-12 pr-2"><span className="font-bold text-white/90">Seg. a Sex.</span><span>10:30 às 18:00</span></div>
@@ -80,19 +80,19 @@ export default function ContactoSection() {
             <div className="flex gap-35 pr-2"><span className="font-bold text-white/90">Dom.</span><span>Fechado</span></div>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-3">
           <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Email</p>
           <a href="mailto:fumarentasdoasfalto@gmail.com" className="text-white/70 text-xl hover:text-orange-500 transition-colors">fumarentasdoasfalto@gmail.com</a>
         </div>
         <div className="flex gap-2">
-          <div className="p-6 flex-1">
+          <div className="p-0 mx-3 flex-1">
             <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Endereço</p>
             <div className="flex flex-col gap-2 text-white/70 text-sm">
               <span>Rua do Espírito Santo</span>
               <span>4760-485 Fradelos VNF</span>
             </div>
           </div>
-          <div className="p-6 flex-1 flex flex-col items-center justify-center gap-2 -mt-5">
+          <div className="mx-2 p-0 flex-1 flex flex-col items-center justify-center gap-2 -mt-5">
             <p className="text-orange-500 uppercase tracking-widest text-sm font-bold mb-1">Quer ser membro?</p>
             <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-9 py-2 font-bold uppercase tracking-widest text-white text-sm hover:bg-orange-600 transition-all text-center">
               Formulário
