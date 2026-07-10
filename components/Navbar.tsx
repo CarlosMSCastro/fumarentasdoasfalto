@@ -43,13 +43,21 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
 
         {/* Logo Desktop */}
-        <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hidden lg:block shrink-0 z-10">
+        <Link href="/" onClick={() => {
+          const container = document.getElementById('snap-container');
+          if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+          else window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} className="hidden lg:block shrink-0 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={170} height={170} loading="eager"
             className={`object-contain transition-all duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] ${scrolled ? "mb-0 w-25 h-25" : "-mb-25"}`} />
         </Link>
 
         {/* Logo Mobile */}
-        <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="lg:hidden absolute left-6 top-1/3 z-10">
+        <Link href="/" onClick={() => {
+          const container = document.getElementById('snap-container');
+          if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+          else window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} className="lg:hidden absolute left-6 top-1/3 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={135} height={135} loading="eager"
             className={`object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] transition-all duration-300 ${scrolled ? "w-16 h-16" : ""}`}/>
         </Link>
@@ -60,7 +68,14 @@ export default function Navbar() {
             <li key={link.href}>
               <Link href={link.href}
               onClick={() => {
-                if (link.href === "/") window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (link.href === "/") {
+                  const container = document.getElementById('snap-container');
+                  if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+                  else window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                if (link.href === "#contactos") {
+                  document.getElementById('contactos')?.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
               className="text-foreground hover:text-primary drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest">
                 {link.label}
