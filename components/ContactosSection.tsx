@@ -8,7 +8,7 @@ export default function ContactoSection() {
   useEffect(() => {
     const v = video2Ref.current;
     if (v) {
-      v.currentTime = 3;
+      v.currentTime = 0;
       v.play();
     }
   }, []);
