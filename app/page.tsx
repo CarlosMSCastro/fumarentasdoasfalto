@@ -5,7 +5,7 @@ import ContactosSection from "@/components/ContactosSection";
 
 export default function Home() {
   return (
-    <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-[100dvh]">
+    <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <HeroSection />
       <ObjetivosSection />
       <ContactosSection />

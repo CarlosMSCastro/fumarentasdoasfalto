@@ -62,7 +62,7 @@ export default function Navbar() {
               onClick={() => {
                 if (link.href === "/") window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="text-[var(--foreground)] hover:text-[var(--primary)] drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest">
+              className="text-foreground hover:text-primary drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest">
                 {link.label}
               </Link>
             </li>
@@ -71,47 +71,47 @@ export default function Navbar() {
 
         {/* Direita: Carrinho + Login */}
         <div className="flex items-center lg:gap-8 gap-4 shrink-0 ml-auto lg:ml-0">
-          <Link href="/loja/carrinho" className="relative text-[var(--foreground)] hover:text-[var(--primary)] transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <Link href="/loja/carrinho" className="relative text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
             <ShoppingCart size={28} />
-            <span className="absolute -top-2 -right-2 bg-[var(--primary)] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               {cartCount}
             </span>
           </Link>
-          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-[var(--foreground)] hover:text-[var(--primary)] transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
             <FaFacebook size={25} />
           </a>
-          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-[var(--foreground)] hover:text-[var(--primary)] transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
             <FaInstagram size={25} />
           </a>
           <Link href="/login" className="hidden lg:block">
-            <Button variant="outline" size="sm" className="border-2 border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(255,107,0,0.8)] hover:shadow-[0_0_16px_rgba(255,107,0,3.8)] transition-all">
+            <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(255,107,0,0.8)] hover:shadow-[0_0_16px_rgba(255,107,0,3.8)] transition-all">
               Login
             </Button>
           </Link>
-          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-[var(--foreground)] hover:text-[var(--primary)] transition-all">
+          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-foreground hover:text-primary transition-all">
             <FaFacebook size={28} />
           </a>
-          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="lg:hidden text-[var(--foreground)] hover:text-[var(--primary)] transition-all">
+          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="lg:hidden text-foreground hover:text-primary transition-all">
             <FaInstagram size={28} />
           </a>
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger className="lg:hidden p-0 text-[var(--foreground)] hover:text-[var(--primary)] transition-colors">
+            <SheetTrigger className="lg:hidden p-0 text-foreground hover:text-primary transition-colors">
               <Menu size={32} />
             </SheetTrigger>
-            <SheetContent side="right" className="bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-[3]">
+            <SheetContent side="right" className="bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <SheetDescription className="sr-only">Menu de navegação</SheetDescription>
               <ul className="flex flex-col gap-5 mt-12 items-center">
                 {links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} onClick={() => setOpen(false)} className="text-[var(--foreground)] hover:text-[var(--primary)] drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest">
+                    <Link href={link.href} onClick={() => setOpen(false)} className="text-foreground hover:text-primary drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest">
                       {link.label}
                     </Link>
                   </li>
                 ))}
                 <li className="w-full px-6 mt-4">
                   <Link href="/login" onClick={() => setOpen(false)}>
-                    <Button className="w-full bg-transparent border-2 border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white font-bold uppercase tracking-widest text-sm py-6 shadow-[0_0_6px_rgba(255,107,0,0.2)] hover:shadow-[0_0_16px_rgba(255,107,0,0.8)] transition-all">
+                    <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm py-6 shadow-[0_0_6px_rgba(255,107,0,0.2)] hover:shadow-[0_0_16px_rgba(255,107,0,0.8)] transition-all">
                       Login
                     </Button>
                   </Link>

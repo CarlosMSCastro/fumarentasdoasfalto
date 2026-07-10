@@ -59,5 +59,5 @@ export default function Map() {
     document.head.appendChild(script);
   }, []);
 
-  return <div ref={mapRef} className="w-full h-[350px] brightness-[0.9] relative z-10 overflow-hidden" />;
+  return <div ref={mapRef} className="w-full h-87.5 brightness-[0.9] relative z-10 overflow-hidden" />;
 }

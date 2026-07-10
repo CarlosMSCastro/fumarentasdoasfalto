@@ -2,7 +2,7 @@
 
 export default function HeroSection() {
   return (
-    <section className="relative h-[100dvh] w-full overflow-hidden snap-start snap-always">
+    <section className="relative h-dvh w-full overflow-hidden snap-start snap-always">
       {/* Vídeo */}
       <video
         className="absolute inset-0 h-full w-full object-cover"
@@ -13,9 +13,9 @@ export default function HeroSection() {
         playsInline
       />
       {/* Overlay horizontal */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/30" />
+      <div className="absolute inset-0 bg-linear-to-r from-black/95 via-black/80 to-black/30" />
       {/* Overlay vertical bottom */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/90" />
       {/* Conteúdo */}
       <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-[8%] md:px-[15%] mt-15">
         <p className="text-white/80 text-lg uppercase tracking-widest mb-2">Bem-vindo</p>

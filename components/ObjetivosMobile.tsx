@@ -36,7 +36,7 @@ export default function ObjetivosMobile() {
         href={cards[active].href}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative w-full h-[40vh] max-h-[350px] rounded-sm overflow-hidden flex flex-col justify-between p-6"
+        className="relative w-full h-[40vh] max-h-87.5 rounded-sm overflow-hidden flex flex-col justify-between p-6"
         style={{
           touchAction: 'pan-x',
           transition: "transform 0.3s ease, opacity 0.3s ease",

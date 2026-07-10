@@ -31,7 +31,7 @@ export default function ContactoSection() {
         loop
         playsInline
       />
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-black to-transparent z-10 pointer-events-none" />
       {/* Título */}
       <div className="mx-auto w-full px-[8%] lg:px-[13%] mt-30 relative z-10">
         <h2 className="text-4xl lg:text-6xl font-bold text-white/90">Contactos</h2>
@@ -51,7 +51,7 @@ export default function ContactoSection() {
           <div className="min-w-0 col-span-3">
             <p className="text-orange-500 uppercase tracking-widest text-base xl:text-lg font-bold mb-4">Email</p>
             <div className="flex flex-col gap-2 text-white/70 text-base xl:text-xl">
-              <span className="break-words">fumarentasdoasfalto@gmail.com</span>
+              <span className="wrap-break-word">fumarentasdoasfalto@gmail.com</span>
             </div>
           </div>
           <div className="min-w-0 col-span-2">
@@ -102,9 +102,9 @@ export default function ContactoSection() {
       </div>
 
       {/* Mapa */}
-      <div className="w-full h-[350px] relative z-10 overflow-hidden">
-      <div className="absolute inset-y-0 left-0 w-[10%] md:w-[500px] bg-gradient-to-r from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-[10%] md:w-[500px] bg-gradient-to-l from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
+      <div className="w-full h-87.5 relative z-10 overflow-hidden">
+      <div className="absolute inset-y-0 left-0 w-[10%] md:w-125 bg-linear-to-r from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-[10%] md:w-125 bg-linear-to-l from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
         <Map />
       </div>
 
