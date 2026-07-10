@@ -3,8 +3,6 @@
 declare const google: any;
 import { useEffect, useRef } from "react";
 
-
-
 const MAP_STYLES = [
   { featureType: "all", elementType: "labels", stylers: [{ visibility: "on" }] },
   { featureType: "all", elementType: "labels.text.fill", stylers: [{ saturation: 36 }, { color: "#000000" }, { lightness: 40 }] },
@@ -37,7 +35,7 @@ export default function Map() {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=marker`;
     script.async = true;
     script.onload = () => {
       if (!mapRef.current) return;
@@ -50,8 +48,9 @@ export default function Map() {
         scrollwheel: false,
         disableDoubleClickZoom: true,
         gestureHandling: "none",
+        mapId: "DEMO_MAP_ID",
       });
-      new google.maps.Marker({
+      new google.maps.marker.AdvancedMarkerElement({
         position: { lat: 41.37348988192273, lng: -8.59339888770085 },
         map,
         title: "Fumarentas do Asfalto",

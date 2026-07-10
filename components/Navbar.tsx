@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart} from "lucide-react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
@@ -99,6 +99,8 @@ export default function Navbar() {
               <Menu size={32} />
             </SheetTrigger>
             <SheetContent side="right" className="bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-[3]">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <SheetDescription className="sr-only">Menu de navegação</SheetDescription>
               <ul className="flex flex-col gap-5 mt-12 items-center">
                 {links.map((link) => (
                   <li key={link.href}>
