@@ -48,9 +48,8 @@ export default function Map() {
         scrollwheel: false,
         disableDoubleClickZoom: true,
         gestureHandling: "none",
-        mapId: "DEMO_MAP_ID",
       });
-      new google.maps.marker.AdvancedMarkerElement({
+      new google.maps.Marker({
         position: { lat: 41.37348988192273, lng: -8.59339888770085 },
         map,
         title: "Fumarentas do Asfalto",

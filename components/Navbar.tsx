@@ -11,10 +11,10 @@ import { FaFacebook, FaInstagram } from "react-icons/fa";
 
 const links = [
   { href: "/", label: "Início" },
-  { href: "/sobre", label: "Sobre" },
-  { href: "/eventos", label: "Eventos" },
-  { href: "/loja", label: "Loja" },
-  { href: "/contacto", label: "Contacto" },
+  { href: "#", label: "Sobre" },
+  { href: "#", label: "Eventos" },
+  { href: "#", label: "Loja" },
+  { href: "#contactos", label: "Contacto" },
 ];
 
 export default function Navbar() {
@@ -71,7 +71,7 @@ export default function Navbar() {
 
         {/* Direita: Carrinho + Login */}
         <div className="flex items-center lg:gap-8 gap-4 shrink-0 ml-auto lg:ml-0">
-          <Link href="/loja/carrinho" className="relative text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <Link href="#" className="relative text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
             <ShoppingCart size={28} />
             <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               {cartCount}
@@ -83,7 +83,7 @@ export default function Navbar() {
           <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
             <FaInstagram size={25} />
           </a>
-          <Link href="/login" className="hidden lg:block">
+          <Link href="#" className="hidden lg:block">
             <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(255,107,0,0.8)] hover:shadow-[0_0_16px_rgba(255,107,0,3.8)] transition-all">
               Login
             </Button>
