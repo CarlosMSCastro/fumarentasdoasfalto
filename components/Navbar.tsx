@@ -65,7 +65,7 @@ export default function Navbar() {
         {/* Links Desktop */}
         <ul className="hidden lg:flex items-center gap-8 flex-1 justify-center">
           {links.map((link) => (
-            <li key={link.href}>
+            <li key={link.label}>
               <Link href={link.href}
               onClick={() => {
                 if (link.href === "/") {
@@ -126,7 +126,7 @@ export default function Navbar() {
               <SheetDescription className="sr-only">Menu de navegação</SheetDescription>
               <ul className="flex flex-col gap-5 mt-12 items-center">
                 {links.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.label}>
                     <Link href={link.href} onClick={() => setOpen(false)} className="text-foreground hover:text-primary drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest">
                       {link.label}
                     </Link>
