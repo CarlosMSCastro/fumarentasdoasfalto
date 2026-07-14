@@ -3,11 +3,13 @@
 interface ScrollIndicatorProps {
   targetId: string;
   className?: string;
+  id?: string;
 }
 
-export default function ScrollIndicator({ targetId, className = "" }: ScrollIndicatorProps) {
+export default function ScrollIndicator({ targetId, className = "", id }: ScrollIndicatorProps) {
   return (
     <button
+      id={id}
       onClick={() => document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' })}
       className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer bg-transparent border-none group ${className}`}
     >

@@ -14,7 +14,7 @@ const links = [
   { href: "#", label: "Sobre" },
   { href: "#", label: "Eventos" },
   { href: "#", label: "Loja" },
-  { href: "#contactos", label: "Contacto" },
+  { href: "/", label: "Contacto", isContacto: true },
 ];
 
 export default function Navbar() {
@@ -73,8 +73,16 @@ export default function Navbar() {
                   if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
                   else window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
-                if (link.href === "#contactos") {
-                  document.getElementById('contactos')?.scrollIntoView({ behavior: 'smooth' });
+                if (link.isContacto) {
+                  const container = document.getElementById('snap-container');
+                  const contactos = document.getElementById('contactos');
+                  if (container && contactos) {
+                    container.style.scrollSnapType = 'none';
+                    container.scrollTo({ top: contactos.offsetTop, behavior: 'smooth' });
+                    container.addEventListener('scrollend', () => {
+                      container.style.scrollSnapType = 'y mandatory';
+                    }, { once: true });
+                  }
                 }
               }}
               className="text-foreground hover:text-primary drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest">

@@ -44,7 +44,7 @@ export default function ObjetivosSection() {
       </div>
       <ObjetivosDesktop />
       <ObjetivosMobile />
-      <ScrollIndicator targetId="contactos" className="bottom-[1vh] z-20" />
+      <ScrollIndicator id="scroll-to-contactos" targetId="contactos" className="bottom-[1vh] z-20" />
     </section>
   );
 }
