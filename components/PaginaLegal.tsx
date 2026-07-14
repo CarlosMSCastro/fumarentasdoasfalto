@@ -20,7 +20,7 @@ export default function PaginaLegal({ titulo, children }: PaginaLegalProps) {
           playsInline
         />
         <div className="relative z-10 w-full max-w-4xl">
-          <h1 className="text-lg md:text-3xl font-bold text-white/90 mb-8 text-center">{titulo}</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-white/90 mb-8 text-center">{titulo}</h1>
           <div className="text-white/70 text-xs md:text-sm leading-normal space-y-1">
             {children}
           </div>
