@@ -2,7 +2,6 @@
 import HeroSection from "@/components/HeroSection";
 import ObjetivosSection from "@/components/ObjetivosSection";
 import ContactosSection from "@/components/ContactosSection";
-import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -10,7 +9,6 @@ export default function Home() {
       <HeroSection />
       <ObjetivosSection />
       <ContactosSection />
-      <Footer />
     </div>
   );
 }

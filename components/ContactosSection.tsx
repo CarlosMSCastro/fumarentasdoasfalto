@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useEffect } from "react";
 import Map from "@/components/Map";
+import Footer from "@/components/Footer";
 
 export default function ContactoSection() {
   const video2Ref = useRef<HTMLVideoElement>(null);
@@ -108,6 +109,8 @@ export default function ContactoSection() {
         <Map />
       </div>
 
+      {/* Footer */}
+      <Footer />
     </section>
   );
 }

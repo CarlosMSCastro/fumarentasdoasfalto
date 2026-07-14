@@ -1,6 +1,5 @@
 "use client";
 import ContactoSection from "@/components/ContactosSection";
-import Footer from "@/components/Footer";
 import ScrollIndicator from "@/components/ScrollIndicator";
 
 interface PaginaLegalProps {
@@ -10,8 +9,8 @@ interface PaginaLegalProps {
 
 export default function PaginaLegal({ titulo, children }: PaginaLegalProps) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="relative flex-1 flex flex-col items-center px-[5%] md:px-[10%] py-32 md:py-40 overflow-hidden">
+    <div className="snap-y snap-mandatory overflow-y-scroll h-dvh">
+      <div className="relative snap-start h-dvh flex flex-col items-center px-[5%] md:px-[10%] py-32 md:py-40 overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
           src="/videos/smoke.mp4"
@@ -28,8 +27,9 @@ export default function PaginaLegal({ titulo, children }: PaginaLegalProps) {
         </div>
         <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" />
       </div>
-      <ContactoSection />
-      <Footer />
+      <div className="snap-start">
+        <ContactoSection />
+      </div>
     </div>
   );
 }
