@@ -9,7 +9,7 @@ interface PaginaLegalProps {
 
 export default function PaginaLegal({ titulo, children }: PaginaLegalProps) {
   return (
-    <div className="snap-y snap-mandatory overflow-y-scroll h-dvh">
+    <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <div className="relative snap-start h-dvh flex flex-col items-center px-[5%] md:px-[10%] py-32 md:py-40 overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
