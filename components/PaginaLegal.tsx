@@ -26,7 +26,7 @@ export default function PaginaLegal({ titulo, children }: PaginaLegalProps) {
           </div>
         </div>
         {/* Mobile */}
-        <ScrollIndicator targetId="contactos" className="relative mt-8 z-20 md:hidden" />
+        <ScrollIndicator targetId="contactos" className="relative mt-8 z-20 md:hidden self-center" />
         {/* Desktop */}
         <ScrollIndicator targetId="contactos" className="absolute bottom-[2vh] z-20 hidden md:flex" />
       </div>
