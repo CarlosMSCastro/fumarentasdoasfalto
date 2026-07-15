@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Rajdhani, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Map from "@/components/Map";
 
 const rajdhani = Rajdhani({
   weight: ["400", "600", "700"],
@@ -31,6 +32,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Navbar />
+        <div className="hidden">
+          <Map />
+        </div>
         {children}
       </body>
     </html>
