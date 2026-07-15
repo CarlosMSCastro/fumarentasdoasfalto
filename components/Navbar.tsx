@@ -21,20 +21,39 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const cartCount = 0;
   const [scrolled, setScrolled] = useState(false);
+  const [inContactos, setInContactos] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    setTimeout(() => setScrolled(false), 0);
+    setTimeout(() => {
+      setScrolled(false);
+      setInContactos(false);
+    }, 0);
     const container = document.getElementById('snap-container');
-    if (!container) {
-      const handleScroll = () => setScrolled(window.scrollY > 100);
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }
-    const handleScroll = () => setScrolled(container.scrollTop > 100);
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      const scrollY = container ? container.scrollTop : window.scrollY;
+      setScrolled(scrollY > 100);
+      const contactos = document.getElementById('contactos');
+      if (contactos) {
+        setInContactos(scrollY >= contactos.offsetTop - 200);
+      } else {
+        setInContactos(false);
+      }
+    };
+    const target: Window | HTMLElement = container || window;
+    target.addEventListener("scroll", handleScroll);
+    return () => target.removeEventListener("scroll", handleScroll);
   }, [pathname]);
+
+  const getLinkClass = (link: typeof links[number]) => {
+    if (link.isContacto) {
+      return inContactos ? "text-primary" : "text-foreground hover:text-primary";
+    }
+    if (inContactos) {
+      return "text-foreground hover:text-primary";
+    }
+    return pathname === link.href && link.href !== "/" ? "text-primary" : "text-foreground hover:text-primary";
+  };
 
   return (
     <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 ${scrolled ? "py-3 lg:pt-2" : "py-6 lg:py-7"} overflow-visible transition-all duration-300 ${
@@ -87,11 +106,7 @@ export default function Navbar() {
                   else window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest ${
-                pathname === link.href && link.href !== "/" && !link.isContacto
-                  ? "text-primary"
-                  : "text-foreground hover:text-primary"
-              }`}>
+              className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest ${getLinkClass(link)}`}>
                 {link.label}
               </Link>
             </li>
@@ -151,11 +166,7 @@ export default function Navbar() {
                         }, 300);
                       }
                     }} 
-                    className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest ${
-                      pathname === link.href && link.href !== "/" && !link.isContacto
-                        ? "text-primary"
-                        : "text-foreground hover:text-primary"
-                    }`}>
+                    className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest ${getLinkClass(link)}`}>
                       {link.label}
                     </Link>
                   </li>
