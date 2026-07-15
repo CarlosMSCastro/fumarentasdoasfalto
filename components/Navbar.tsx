@@ -85,7 +85,11 @@ export default function Navbar() {
                   }
                 }
               }}
-              className="text-foreground hover:text-primary drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest">
+              className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest ${
+                pathname === link.href && link.href !== "/" && !link.isContacto
+                  ? "text-primary"
+                  : "text-foreground hover:text-primary"
+              }`}>
                 {link.label}
               </Link>
             </li>
@@ -142,7 +146,11 @@ export default function Navbar() {
                           }
                         }, 300);
                       }
-                    }} className="text-foreground hover:text-primary drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest">
+                    }} className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest ${
+                      pathname === link.href && link.href !== "/" && !link.isContacto
+                        ? "text-primary"
+                        : "text-foreground hover:text-primary"
+                    }`}>
                       {link.label}
                     </Link>
                   </li>
