@@ -1,7 +1,8 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare const google: any;
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 
 const MAP_STYLES = [
   { featureType: "all", elementType: "labels", stylers: [{ visibility: "on" }] },
@@ -16,7 +17,7 @@ const MAP_STYLES = [
   { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#000000" }, { lightness: 15 }] },
   { featureType: "poi", elementType: "geometry", stylers: [{ color: "#000000" }, { lightness: 21 }, { visibility: "on" }] },
   { featureType: "poi.business", elementType: "geometry", stylers: [{ visibility: "on" }] },
-  { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#ff6b00" }, { lightness: "0" }] },
+  { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#ff6b00" }, { lightness: 0 }] },
   { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ visibility: "off" }] },
   { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#ffffff" }] },
   { featureType: "road.highway", elementType: "labels.text.stroke", stylers: [{ color: "#ff6b00" }] },
@@ -30,14 +31,16 @@ const MAP_STYLES = [
   { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }, { lightness: 17 }] },
 ];
 
+setOptions({
+  key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+});
+
 export default function Map() {
   const mapRef = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=marker`;
-    script.async = true;
-    script.onload = () => {
+    importLibrary("maps").then(() => {
       if (!mapRef.current) return;
       const map = new google.maps.Map(mapRef.current, {
         center: { lat: 41.37348988192273, lng: -8.59339888770085 },
@@ -54,9 +57,14 @@ export default function Map() {
         map,
         title: "Fumarentas do Asfalto",
       });
-    };
-    document.head.appendChild(script);
+      setLoaded(true);
+    });
   }, []);
 
-  return <div ref={mapRef} className="w-full h-87.5 brightness-[0.9] relative z-10 overflow-hidden" />;
+  return (
+    <div className="relative w-full h-87.5">
+      <div ref={mapRef} className="w-full h-full brightness-[0.9] relative z-10 overflow-hidden" />
+      {!loaded && <div className="absolute inset-0 bg-[#0d0d0d] z-20 transition-opacity duration-500" />}
+    </div>
+  );
 }
