@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare const google: any;
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 
 const MAP_STYLES = [
@@ -35,14 +35,24 @@ setOptions({
   key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
 });
 
+let mapInstance: any = null;
+
 export default function Map() {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    importLibrary("maps").then(() => {
+    const init = async () => {
+      await importLibrary("maps");
       if (!mapRef.current) return;
-      const map = new google.maps.Map(mapRef.current, {
+
+      if (mapInstance) {
+        const mapDiv = mapInstance.getDiv();
+        mapRef.current.appendChild(mapDiv);
+        google.maps.event.trigger(mapInstance, "resize");
+        return;
+      }
+
+      mapInstance = new google.maps.Map(mapRef.current, {
         center: { lat: 41.37348988192273, lng: -8.59339888770085 },
         zoom: 15,
         styles: MAP_STYLES,
@@ -52,19 +62,16 @@ export default function Map() {
         disableDoubleClickZoom: true,
         gestureHandling: "none",
       });
+
       new google.maps.Marker({
         position: { lat: 41.37348988192273, lng: -8.59339888770085 },
-        map,
+        map: mapInstance,
         title: "Fumarentas do Asfalto",
       });
-      setLoaded(true);
-    });
+    };
+
+    init();
   }, []);
 
-  return (
-    <div className="relative w-full h-87.5">
-      <div ref={mapRef} className="w-full h-full brightness-[0.9] relative z-10 overflow-hidden" />
-      {!loaded && <div className="absolute inset-0 bg-[#0d0d0d] z-20 transition-opacity duration-500" />}
-    </div>
-  );
+  return <div ref={mapRef} className="w-full h-87.5 brightness-[0.9] relative z-10 overflow-hidden" />;
 }
