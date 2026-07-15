@@ -29,11 +29,11 @@ export default function SobrePage() {
         />
         {/* Conteúdo */}
         <div className="relative z-10 flex h-full flex-col items-end justify-center text-right px-[8%] md:px-[15%]">
-          <p className="text-white/50 text-3xl uppercase tracking-widest mb-2">A nossa</p>
-          <h1 className="text-5xl font-bold text-white md:text-6xl mb-6">
+          <p className="text-white/50 text-xl md:text-3xl uppercase tracking-widest mt-3 mb-1">A nossa</p>
+          <h1 className="text-3xl font-bold text-white md:text-6xl mb-6">
             HISTÓRIA
           </h1>
-          <p className="text-white/80 text-lg max-w-xl mb-4">
+          <p className="text-white/80 text-md md:text-lg max-w-xl mb-4">
             Somos uma associação de apaixonados por motorizadas, principalmente antigas. Aberta a novos sócios e criadora de eventos.
           </p>
           <p className="text-white/70 text-base max-w-xl mb-4">
