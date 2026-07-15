@@ -31,6 +31,7 @@ const MAP_STYLES = [
   { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }, { lightness: 17 }] },
 ];
 
+let initialized = false;
 let mapInstance: any = null;
 
 export default function Map() {
@@ -38,9 +39,12 @@ export default function Map() {
 
   useEffect(() => {
     const init = async () => {
-      setOptions({
-        key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
-      });
+      if (!initialized) {
+        setOptions({
+          key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+        });
+        initialized = true;
+      }
       await importLibrary("maps");
       if (!mapRef.current) return;
 

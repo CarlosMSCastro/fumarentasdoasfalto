@@ -67,13 +67,9 @@ export default function Navbar() {
           {links.map((link) => (
             <li key={link.label}>
               <Link href={link.href}
-              onClick={() => {
-                if (link.href === "/") {
-                  const container = document.getElementById('snap-container');
-                  if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
-                  else window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+              onClick={(e) => {
                 if (link.isContacto) {
+                  e.preventDefault();
                   const container = document.getElementById('snap-container');
                   const contactos = document.getElementById('contactos');
                   if (container && contactos) {
@@ -83,6 +79,12 @@ export default function Navbar() {
                       container.style.scrollSnapType = 'y mandatory';
                     }, { once: true });
                   }
+                  return;
+                }
+                if (link.href === "/") {
+                  const container = document.getElementById('snap-container');
+                  if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+                  else window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
               className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest ${
@@ -131,9 +133,11 @@ export default function Navbar() {
               <ul className="flex flex-col gap-5 mt-12 items-center">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} onClick={() => {
+                    <Link href={link.href} 
+                    onClick={(e) => {
                       setOpen(false);
                       if (link.isContacto) {
+                        e.preventDefault();
                         setTimeout(() => {
                           const container = document.getElementById('snap-container');
                           const contactos = document.getElementById('contactos');
@@ -146,7 +150,8 @@ export default function Navbar() {
                           }
                         }, 300);
                       }
-                    }} className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest ${
+                    }} 
+                    className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest ${
                       pathname === link.href && link.href !== "/" && !link.isContacto
                         ? "text-primary"
                         : "text-foreground hover:text-primary"
