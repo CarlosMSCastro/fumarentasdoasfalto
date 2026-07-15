@@ -36,10 +36,10 @@ export default function SobrePage() {
           <p className="text-white/80 text-md md:text-lg max-w-xl mb-4">
             Somos uma associação de apaixonados por motorizadas, principalmente antigas. Aberta a novos sócios e criadora de eventos.
           </p>
-          <p className="text-white/70 text-base max-w-xl mb-4">
+          <p className="text-white/70 text-sm md:text-base max-w-xl mb-4">
             Nasceu o sonho a 15 de junho de 2024 e a associação foi criada a 29 de novembro de 2024. Foi criada por 14 amigos com o intuito de promover o convívio entre pessoas que gostem de veículos motorizados de duas rodas, principalmente motorizadas de fabrico nacional de 50cc. Contudo, a associação está recetiva a sócios que tenham outro tipo de motas ou mesmo que não tenham. A confraternização e a amizade são o lema desta associação.
           </p>
-          <p className="text-white/60 text-base max-w-xl">
+          <p className="text-white/60 text-sm md:text-base max-w-xl">
             Mantenha-se atualizado sobre os nossos eventos e novidades, incluindo dicas e informações relevantes. Entre em contacto connosco e partilhe as suas sugestões e comentários.
           </p>
         </div>
