@@ -48,7 +48,6 @@ export default function SobrePage() {
       </section>
       <div className="snap-start">
         <ContactoSection />
-        <Footer />
       </div>
     </div>
   );

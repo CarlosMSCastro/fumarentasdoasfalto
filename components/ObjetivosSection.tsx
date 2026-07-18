@@ -38,7 +38,7 @@ export default function ObjetivosSection() {
       <div className="text-left w-full px-[8%] md:px-[13%] relative z-10 mt-10">
         <p className="text-white/90 uppercase tracking-widest text-3xl mb-1">Os nossos</p>
         <h2 className="text-4xl md:text-7xl font-bold text-white/90 mb-2">Objetivos</h2>
-        <p className="text-white/50 text-lg md:text-xl max-w-2xl">
+        <p className="text-white/70 text-lg md:text-xl max-w-2xl">
           Somos uma associação dedicada a promover o amor pelas motorizadas através de eventos, encontros e passeios.
         </p>
       </div>

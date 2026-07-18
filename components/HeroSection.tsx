@@ -14,7 +14,7 @@ export default function HeroSection() {
         playsInline
       />
       {/* Overlay horizontal */}
-      <div className="absolute inset-0 bg-linear-to-r from-black/95 via-black/80 to-black/30" />
+      <div className="absolute inset-0 bg-linear-to-r from-black/75 via-black/60 to-black/20" />
       {/* Overlay vertical bottom */}
       <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/0 to-black/90" />
       {/* Conteúdo */}

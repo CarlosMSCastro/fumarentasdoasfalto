@@ -34,12 +34,12 @@ export default function ContactoSection() {
       />
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-black to-transparent z-10 pointer-events-none" />
       {/* Título */}
-      <div className="mx-auto w-full px-[8%] lg:px-[13%] mt-30 relative z-10">
-        <h2 className="text-4xl lg:text-6xl font-bold text-white/90">Contactos</h2>
+      <div className="mx-auto w-full px-[8%] lg:px-[13%] mt-30 relative z-30">
+        <h2 className="text-4xl lg:text-6xl font-bold text-white/80">Contactos</h2>
       </div>
 
       {/* Grid + CTA — desktop */}
-      <div className="hidden lg:flex lg:pl-[8%] xl:pl-[13%] pr-[8%] xl:pr-[13%] mx-auto w-full py-12 relative z-10">
+      <div className="hidden lg:flex lg:pl-[8%] xl:pl-[13%] pr-[8%] xl:pr-[13%] mx-auto w-full py-12 relative z-30">
         <div className="grid grid-cols-11 gap-4 w-full min-w-0">
           <div className="min-w-0 col-span-4">
             <p className="text-orange-500 uppercase tracking-widest text-base xl:text-lg font-bold mb-4">Horário de Funcionamento</p>
@@ -72,7 +72,7 @@ export default function ContactoSection() {
       </div>
 
       {/* Mobile */}
-      <div className="flex flex-col lg:hidden pl-2 px-3 py-8 gap-2 relative z-10">
+      <div className="flex flex-col lg:hidden pl-2 px-3 py-8 gap-2 relative z-30">
         <div className="mx-[7%] pt-3">
           <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Horário de Funcionamento</p>
           <div className="flex flex-col gap-3 text-white/70 text-lg">
