@@ -6,7 +6,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.5 }}
+      transition={{ duration: 1 }}
+      onAnimationComplete={() => {}}
+      className="animate-in fade-in"
     >
       {children}
     </motion.div>
