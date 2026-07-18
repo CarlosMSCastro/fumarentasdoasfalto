@@ -16,7 +16,7 @@ export default function HeroSection() {
       {/* Overlay horizontal */}
       <div className="absolute inset-0 bg-linear-to-r from-black/95 via-black/80 to-black/30" />
       {/* Overlay vertical bottom */}
-      <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/90" />
+      <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/0 to-black/90" />
       {/* Conteúdo */}
       <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-[8%] md:px-[15%] mt-15">
         <p className="text-white/80 text-lg uppercase tracking-widest mb-2">Bem-vindo</p>

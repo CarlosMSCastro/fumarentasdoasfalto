@@ -13,14 +13,14 @@ export default function SobrePage() {
           style={{ backgroundImage: "url('/sobremimwallpaper.jpg')" }}
         />
         {/* Overlay horizontal */}
-        <div className="absolute inset-0 bg-linear-to-l from-black/95 via-black/60 to-black/30" />
+        <div className="absolute inset-0 bg-linear-to-l from-black/45 via-black/15 to-black/5" />
         {/* Overlay vertical bottom */}
-        <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/50" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/0 to-black/40" />
                 {/* Overlay vertical bottom */}
-        <div className="absolute inset-0 bg-linear-to-t from-transparent via-transparent to-black/70" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/0 to-black/30" />
         {/* Vídeo do fumo */}
         <video
-          className="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none mix-blend-screen"
+          className="absolute inset-0 w-full h-full object-cover opacity-45 pointer-events-none mix-blend-screen"
           src="/videos/smoke.mp4"
           autoPlay
           muted
