@@ -100,7 +100,8 @@ export default function Navbar() {
                   }
                   return;
                 }
-                if (link.href === "/") {
+                if (link.href === pathname) {
+                  e.preventDefault();
                   const container = document.getElementById('snap-container');
                   if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
                   else window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -142,10 +143,10 @@ export default function Navbar() {
             <SheetTrigger className="lg:hidden p-0 text-foreground hover:text-primary transition-colors">
               <Menu size={32} />
             </SheetTrigger>
-            <SheetContent side="right" className="bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3">
+            <SheetContent side="right" className="!w-35 bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <SheetDescription className="sr-only">Menu de navegação</SheetDescription>
-              <ul className="flex flex-col gap-5 mt-12 items-center">
+              <ul className="flex flex-col gap-2 mt-15 items-center">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link href={link.href} 
@@ -164,16 +165,25 @@ export default function Navbar() {
                             }, { once: true });
                           }
                         }, 300);
+                        return;
                       }
-                    }} 
-                    className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-xl font-bold uppercase tracking-widest ${getLinkClass(link)}`}>
+                      if (link.href === pathname) {
+                        e.preventDefault();
+                        setTimeout(() => {
+                          const container = document.getElementById('snap-container');
+                          if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+                          else window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }, 300);
+                      }
+                    }}
+                    className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-lg font-bold uppercase tracking-widest ${getLinkClass(link)}`}>
                       {link.label}
                     </Link>
                   </li>
                 ))}
-                <li className="w-full px-6 mt-4">
+                <li className="w-25 mt-3">
                   <Link href="/login" onClick={() => setOpen(false)}>
-                    <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm py-6 shadow-[0_0_6px_rgba(255,107,0,0.2)] hover:shadow-[0_0_16px_rgba(255,107,0,0.8)] transition-all">
+                    <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(255,107,0,0.2)] hover:shadow-[0_0_16px_rgba(255,107,0,0.8)] transition-all">
                       Login
                     </Button>
                   </Link>

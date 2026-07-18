@@ -1,6 +1,5 @@
 "use client";
 import ContactoSection from "@/components/ContactosSection";
-import Footer from "@/components/Footer";
 import ScrollIndicator from "@/components/ScrollIndicator";
 
 export default function SobrePage() {
