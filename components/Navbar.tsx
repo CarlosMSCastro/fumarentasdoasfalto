@@ -68,7 +68,7 @@ export default function Navbar() {
           else window.scrollTo({ top: 0, behavior: 'smooth' });
         }} className="hidden lg:block shrink-0 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={170} height={170} loading="eager"
-            className={`object-contain transition-all duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] ${scrolled ? "mb-0 !w-25 !h-25" : "-mb-25 !w-[170px] !h-[170px]"}`} />
+            className={`object-contain transition-all duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] ${scrolled ? "mb-0 w-25! h-25!" : "-mb-25 w-42.5! h-42.5!"}`} />
         </Link>
 
         {/* Logo Mobile */}
@@ -78,7 +78,7 @@ export default function Navbar() {
           else window.scrollTo({ top: 0, behavior: 'smooth' });
         }} className="lg:hidden absolute left-6 top-1/3 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={135} height={135} loading="eager"
-            className={`object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] transition-all duration-300 ${scrolled ? "!w-16 !h-16" : "!w-[135px] !h-[135px]"}`}/>
+            className={`object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] transition-all duration-300 ${scrolled ? "w-16! h-16!" : "w-33.75! h-33.75!"}`}/>
         </Link>
 
         {/* Links Desktop */}
@@ -143,7 +143,7 @@ export default function Navbar() {
             <SheetTrigger className="lg:hidden p-0 text-foreground hover:text-primary transition-colors">
               <Menu size={32} />
             </SheetTrigger>
-            <SheetContent side="right" className="!w-35 bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3">
+            <SheetContent side="right" className="w-35! bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <SheetDescription className="sr-only">Menu de navegação</SheetDescription>
               <ul className="flex flex-col gap-2 mt-15 items-center">
