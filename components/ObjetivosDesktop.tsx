@@ -9,11 +9,11 @@ export default function ObjetivosDesktop() {
       <a 
       key={i}
         href={item.href}
-        className="group relative rounded-sm flex-1 md:hover:flex-2 transition-all duration-500 h-[60vh] md:h-[45vh] flex flex-col justify-between p-6"
+        className="group relative rounded-lg flex-1 md:hover:flex-2 opacity-90 transition-all duration-500 h-[60vh] md:h-[45vh] flex flex-col justify-between p-6"
       >
         <div className="absolute inset-0 overflow-hidden rounded-sm">
           <div
-            className="absolute inset-0 bg-cover bg-center brightness-[0.55] group-hover:brightness-60 group-hover:scale-150 transition-all duration-500"
+            className="absolute inset-0 bg-cover bg-center brightness-[0.70] group-hover:brightness-60 group-hover:scale-150 transition-all duration-500"
             style={{ backgroundImage: `url('${item.bg}')` }}
           />
         </div>

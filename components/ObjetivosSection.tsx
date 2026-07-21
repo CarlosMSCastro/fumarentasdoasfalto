@@ -10,7 +10,7 @@ export default function ObjetivosSection() {
   useEffect(() => {
     const v = video2Ref.current;
     if (v) {
-      v.currentTime = 3;
+      v.currentTime = 0.5;
       v.play();
     }
   }, []);
@@ -18,7 +18,7 @@ export default function ObjetivosSection() {
   return (
     <section id="sobre" className="flex flex-col items-center justify-center min-h-dvh pt-15 pb-22 md:py-30 gap-2 relative overflow-hidden snap-start snap-always">
       <video
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none"
         src="/videos/smoke.mp4"
         autoPlay
         muted
