@@ -12,7 +12,7 @@ import { FaFacebook, FaInstagram } from "react-icons/fa";
 const links = [
   { href: "/", label: "Início" },
   { href: "/sobre", label: "Sobre" },
-  { href: "#", label: "Eventos" },
+  { href: "/eventos", label: "Eventos" },
   { href: "#", label: "Loja" },
   { href: "/", label: "Contacto", isContacto: true },
 ];

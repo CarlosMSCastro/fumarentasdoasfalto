@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const cards = [
   { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
-  { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/contacto", bg: "/mecanica.jpg" },
+  { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/reparacao", bg: "/mecanica.jpg" },
   { title: "Workshops e Palestras", sub: "Aprende, ensina, evolui", href: "/eventos", bg: "/worksh.jpg" },
 ];
 
@@ -30,10 +30,26 @@ export default function ObjetivosMobile() {
     if (diff < -50 && active > 0) goTo(active - 1, "right");
   };
 
+  const handleClick = (e: React.MouseEvent, href: string) => {
+    if (href === "/reparacao") {
+      e.preventDefault();
+      const container = document.getElementById('snap-container');
+      const contactos = document.getElementById('contactos');
+      if (container && contactos) {
+        container.style.scrollSnapType = 'none';
+        container.scrollTo({ top: contactos.offsetTop, behavior: 'smooth' });
+        container.addEventListener('scrollend', () => {
+          container.style.scrollSnapType = 'y mandatory';
+        }, { once: true });
+      }
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center gap-4 md:hidden px-8" style={{ touchAction: 'pan-x' }}>
       <a
         href={cards[active].href}
+        onClick={(e) => handleClick(e, cards[active].href)}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className="relative w-full h-[40vh] max-h-87.5 rounded-sm overflow-hidden flex flex-col justify-between p-6"

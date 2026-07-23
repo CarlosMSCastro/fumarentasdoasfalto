@@ -1,14 +1,30 @@
+"use client";
 export default function ObjetivosDesktop() {
+  const handleClick = (e: React.MouseEvent, href: string) => {
+    if (href === "/reparacao") {
+      e.preventDefault();
+      const container = document.getElementById('snap-container');
+      const contactos = document.getElementById('contactos');
+      if (container && contactos) {
+        container.style.scrollSnapType = 'none';
+        container.scrollTo({ top: contactos.offsetTop, behavior: 'smooth' });
+        container.addEventListener('scrollend', () => {
+          container.style.scrollSnapType = 'y mandatory';
+        }, { once: true });
+      }
+    }
+  };
   return (
     <div className="hidden md:flex md:flex-row gap-3 w-full px-[8%] lg:px-[13%]">
       {[
         { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
-        { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/contacto", bg: "/mecanica.jpg" },
+        { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/reparacao", bg: "/mecanica.jpg" },
         { title: "Workshops e Palestras", sub: "Aprende, ensina, evolui", href: "/eventos", bg: "/worksh.jpg" },
       ].map((item, i) => (
       <a 
       key={i}
         href={item.href}
+        onClick={(e) => handleClick(e, item.href)}
         className="group relative rounded-lg flex-1 md:hover:flex-2 opacity-90 transition-all duration-500 h-[60vh] md:h-[45vh] flex flex-col justify-between p-6"
       >
         <div className="absolute inset-0 overflow-hidden rounded-sm">
