@@ -11,7 +11,7 @@
   },
   {
     "id": "02-fundacao",
-    "titulo": "Fundação - Escritura Oficial",
+    "titulo": "Escritura Oficial da Associação",
     "local": "Fradelos",
     "data": "2024-11-30",
     "descricao": "Dia da escritura, marcando oficialmente a fundação da Fumarentas do Asfalto.",
@@ -21,7 +21,7 @@
   },
   {
     "id": "03-passeio-pais-natais-2024",
-    "titulo": "Passeio Pais Natais",
+    "titulo": "Passeio Pais Natais 2024",
     "local": "Santo Tirso (Lama)",
     "data": "2024-12",
     "descricao": "Passeio motard alusivo à quadra natalícia, com espírito solidário. Agradecimento ao Grupo Motard - Os Cabeças.",
@@ -31,7 +31,7 @@
   },
   {
     "id": "04-passeio-de-reis-2025",
-    "titulo": "1º Passeio de Reis",
+    "titulo": "1º Passeio de Reis Fumarentas do Asfalto",
     "local": "Fradelos - Vilarinho - Ribeirão - Fradelos",
     "data": "2025-01-11",
     "descricao": "Primeiro passeio de Reis organizado pela associação, com paragem e visita ao Presépio de Cerejeira, em Fradelos.",
@@ -41,7 +41,7 @@
   },
   {
     "id": "05-rally-famalicao",
-    "titulo": "Rally Famalicão",
+    "titulo": "Rally Famalicão 2024",
     "local": "Famalicão",
     "data": "2025",
     "descricao": "Participação no Rally Famalicão, evento de referência na região.",
@@ -51,7 +51,7 @@
   },
   {
     "id": "06-primeiro-aniversario",
-    "titulo": "1º Aniversário",
+    "titulo": "1º Aniversário Fumarentas do Asfalto",
     "local": "Fradelos, V.N. de Famalicão",
     "data": "2025-06-21",
     "descricao": "Celebração do primeiro aniversário da Fumarentas do Asfalto, com bênção dos capacetes, entrega de lembranças a todos os clubes motards, porco no espeto, jogos tradicionais e concerto da banda Scream Of The Soul.",
@@ -61,7 +61,7 @@
   },
   {
     "id": "07-mostra-comunitaria-fradelos",
-    "titulo": "Mostra Comunitária de Fradelos",
+    "titulo": "Amostra Comunitária de Fradelos",
     "local": "Fradelos",
     "data": "2025-08-03",
     "descricao": "Presença na Mostra Comunitária de Fradelos, com apoio junto dos outros dois motoclubes da freguesia no 1º Passeio de Motas. Obrigado à Junta de Freguesia de Fradelos VNF pelo convite.",
@@ -71,7 +71,7 @@
   },
   {
     "id": "08-ida-a-fatima",
-    "titulo": "Santuário de Fátima",
+    "titulo": "Benção dos Capacetes - Santuário de Fátima",
     "local": "Fátima",
     "data": "2025-09-21",
     "descricao": "Peregrinação motard ao Santuário de Fátima para a celebração anual da Bênção de Capacetes, organizada pela ABC - Associação Bênção Capacetes, desde Fradelos até Fátima.",
@@ -81,7 +81,7 @@
   },
   {
     "id": "09-primeiro-passeio-convivio",
-    "titulo": "1º Passeio Convívio",
+    "titulo": "1º Passeio Convívio Fumarentas do Asfalto",
     "local": "Mosteiro de Arnoso Santa Eulália",
     "data": "2025-10-26",
     "descricao": "Primeiro passeio convívio organizado pela associação, até ao Mosteiro de Arnoso Santa Eulália, com almoço na Taberna do Artur e regresso à Rua do Espírito Santo com castanhas assadas.",
@@ -91,7 +91,7 @@
   },
   {
     "id": "10-passeio-pais-natais-2025",
-    "titulo": "Desfile Motard de Pais Natal",
+    "titulo": "Desfile Motard de Pais Natal 2025",
     "local": "V.N. Famalicão",
     "data": "2025-12-15",
     "descricao": "Participação no desfile motard de Pais Natal em V.N. Famalicão, organizado pelo Clube Motard Escorpiões e pela ACIF.",
@@ -101,7 +101,7 @@
   },
   {
     "id": "11-passeio-de-reis-2026",
-    "titulo": "2º Passeio de Reis",
+    "titulo": "2º Passeio de Reis Fumarentas do Asfalto",
     "local": "Cerejeira, Fradelos",
     "data": "2026-01-13",
     "descricao": "Segunda edição do passeio de Reis da associação, com visita ao Presépio de Cerejeira.",
@@ -111,7 +111,7 @@
   },
   {
     "id": "12-desfile-carnaval-fradelos",
-    "titulo": "Desfile de Carnaval",
+    "titulo": "Desfile de Carnaval Fradelos 2024",
     "local": "Fradelos",
     "data": "2026-02-18",
     "descricao": "Participação no desfile de Carnaval de Fradelos.",
@@ -121,7 +121,7 @@
   },
   {
     "id": "13-segundo-aniversario",
-    "titulo": "2º Aniversário",
+    "titulo": "2º Aniversário Fumarentas do Asfalto",
     "local": "Rua do Espírito Santo, Fradelos VNF",
     "data": "2026-06-20",
     "descricao": "Celebração do segundo aniversário da Fumarentas do Asfalto, com angariação de fundos para material dos bombeiros, porco no espeto, concerto da banda Kay Sábio e sunset com o DJ Nelson Silva.",

@@ -167,12 +167,11 @@ export default function EventosTimeline() {
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-4">
+              <div className="flex items-end gap-2 md:gap-3 mb-4 h-115 z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   globalIndex++;
                   const idx = carouselIndex[ev.id] ?? 0;
-                  const fotoAtual = ev.fotos[idx] ?? ev.fotos[0];
                   return (
                     <Link
                       key={ev.id}
@@ -190,7 +189,7 @@ export default function EventosTimeline() {
                       </div>
                       <div
                         className={`bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
-                          group-hover:rotate-0 group-hover:z-20 group-hover:relative group-hover:w-225 group-hover:px-2 group-hover:py-3
+                          group-hover:rotate-0 group-hover:z-20 group-hover:relative group-hover:w-185
                           ${ev.destaque
                             ? "w-62.5 md:w-80 p-4 pb-5"
                             : "w-48.75 md:w-65.25 p-3 pb-3"

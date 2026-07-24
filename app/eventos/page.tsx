@@ -47,13 +47,12 @@ export default function EventosPage() {
         <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/15 to-black/60" />
         <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/15 to-black/90" />
 
-        <div className="relative z-10 flex h-full flex-col">
-          <div className="pt-35 md:pt-45 text-right px-[8%] md:px-[15%] ">
-            <p className="text-white/90 text-xl uppercase tracking-widest mb-0
-            ">Os nossos</p>
-            <h1 className="text-4xl md:text-6xl font-bold text-white/90">Eventos</h1>
-          </div>
-          <div className="w-[79vw] mx-auto opacity-95 flex-1 flex items-center">
+        <div className="flex h-full flex-col">
+          <div className="relative z-0 w-[79vw] mx-auto opacity-95 flex-1 flex flex-col items-end justify-end pb-55">
+            <div className="relative z-0 pt-35 md:pt-45 text-right px-[8%] md:px-[15%]">
+              <p className="text-white/90 text-xl uppercase tracking-widest mb-0">Os nossos</p>
+              <h1 className="text-4xl md:text-6xl font-bold text-white/90">Eventos</h1>
+            </div>
             <EventosTimeline />
           </div>
         </div>
