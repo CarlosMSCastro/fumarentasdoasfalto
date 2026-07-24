@@ -53,7 +53,7 @@ export default function EventosPage() {
             ">Os nossos</p>
             <h1 className="text-4xl md:text-6xl font-bold text-white/90">Eventos</h1>
           </div>
-          <div className="w-[82vw] mx-auto opacity-95 flex-1 flex items-center">
+          <div className="w-[79vw] mx-auto opacity-95 flex-1 flex items-center">
             <EventosTimeline />
           </div>
         </div>

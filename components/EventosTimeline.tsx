@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import eventosData from "@/data/eventos.json";
 
@@ -50,6 +50,10 @@ export default function EventosTimeline() {
   const anos = Object.keys(grupos).sort();
   const scrollRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef<number | null>(null);
+  const yearRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const monthRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [currentEventId, setCurrentEventId] = useState<string | null>(null);
+  const [currentYear, setCurrentYear] = useState(anos[0]);
   let globalIndex = 0;
 
   useEffect(() => {
@@ -62,9 +66,6 @@ export default function EventosTimeline() {
     };
   }, []);
 
-  const scrollByAmount = (amount: number) => {
-    scrollRef.current?.scrollBy({ left: amount, behavior: "smooth" });
-  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const container = scrollRef.current;
@@ -96,6 +97,25 @@ export default function EventosTimeline() {
     if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
   };
 
+  const handleScroll = () => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    let closest = anos[0];
+    let closestDist = Infinity;
+    anos.forEach((ano) => {
+      const el = yearRefs.current[ano];
+      if (!el) return;
+      const elCenter = el.offsetLeft + el.offsetWidth / 2;
+      const dist = Math.abs(elCenter - containerCenter);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = ano;
+      }
+    });
+    setCurrentYear(closest);
+  };
+
   const ensureVisibleOnHover = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const container = scrollRef.current;
     if (!container) return;
@@ -119,14 +139,12 @@ export default function EventosTimeline() {
   return (
     <div className="relative w-full">
       <button
-        onClick={() => scrollByAmount(-700)}
-        className="absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+        className="pointer-events-none absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
         <ChevronLeft size={96} strokeWidth={1} />
       </button>
       <button
-        onClick={() => scrollByAmount(700)}
-        className="absolute right-1 md:right-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+        className="pointer-events-none absolute right-1 md:right-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
         <ChevronRight size={96} strokeWidth={1} />
       </button>
@@ -135,18 +153,19 @@ export default function EventosTimeline() {
         ref={scrollRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide"
+        onScroll={handleScroll}
+        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide "
         style={{
           maskImage: "linear-gradient(to right, transparent 0px, black 100px, black calc(100% - 100px), transparent 100%)",
           WebkitMaskImage: "linear-gradient(to right, transparent 0px, black 100px, black calc(100% - 100px), transparent 100%)",
         }}
       >
         <div
-          className="flex items-end gap-8 py-4 w-max mx-auto"
+          className="relative flex items-end gap-8 py-4 w-max mx-auto"
           style={{ paddingLeft: "150px", paddingRight: "150px" }}
         >
           {anos.map((ano) => (
-            <div key={ano} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
+            <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
               <div className="flex items-end gap-2 md:gap-3 mb-4">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
@@ -158,7 +177,10 @@ export default function EventosTimeline() {
                       key={ev.id}
                       href={`/eventos/${ev.id}`}
                       className="group relative shrink-0 cursor-pointer"
-                      onMouseEnter={ensureVisibleOnHover}
+                      onMouseEnter={(e) => {
+                        ensureVisibleOnHover(e);
+                        setCurrentEventId(ev.id);
+                      }}
                     >
                       <div className="absolute left-1/2 -translate-x-1/2 -top-3 z-20 text-xl opacity-100 group-hover:opacity-0 transition-opacity duration-700 select-none pointer-events-none">
                         📌
@@ -212,18 +234,31 @@ export default function EventosTimeline() {
                 {grupos[ano].map((ev, i) => (
                   <div
                     key={i}
-                    className={`text-center shrink-0 ${ev.destaque ? "w-52.5 md:w-60" : "w-18.75 md:w-21.25"} text-sm md:text-md text-white/70 uppercase tracking-wide`}
+                    ref={(el) => { monthRefs.current[ev.id] = el; }}
+                    className={`text-center shrink-0 ${ev.destaque ? "w-52.5 md:w-60" : "w-18.75 md:w-21.25"} text-sm md:text-md uppercase tracking-wide transition-colors duration-300 ${
+                      ev.id === currentEventId ? "text-orange-500" : "text-white/70"
+                    }`}
                   >
                     {mesDe(ev.data)}
                   </div>
                 ))}
               </div>
-              <div className="text-white/80 font-bold text-base md:text-lg tracking-wide border-t border-orange-500/30 pt-2 w-full text-center">
+              <div
+                aria-hidden="true"
+                className="opacity-0 pointer-events-none text-base md:text-lg font-bold border-t border-transparent pt-2 w-full text-center"
+              >
                 {ano}
               </div>
             </div>
           ))}
+          <div className="absolute bottom-13 left-0 right-0 border-t border-orange-500/30 pointer-events-none" />
         </div>
+        
+      </div>
+      <div className="text-center mt-0">
+        <span className="text-white/90 absolute bottom-4 left-[48.75%] font-bold text-base md:text-lg tracking-wide">
+          {currentYear}
+        </span>
       </div>
     </div>
   );
