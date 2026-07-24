@@ -44,8 +44,8 @@ export default function EventosPage() {
           onEnded={handleReversoEnded}
         />
         <div className="absolute inset-0 bg-linear-to-r from-black/55 via-black/20 to-black/30" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/10 to-black/60" />
-        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/10 to-black/60" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/15 to-black/60" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/15 to-black/90" />
 
         <div className="relative z-10 flex h-full flex-col">
           <div className="pt-35 md:pt-45 text-right px-[8%] md:px-[15%] ">
