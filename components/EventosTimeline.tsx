@@ -78,7 +78,7 @@ export default function EventosTimeline() {
     const container = scrollRef.current;
     if (!container) return;
     const rect = container.getBoundingClientRect();
-    const edgeZone = 400;
+    const edgeZone = 550;
     const x = e.clientX - rect.left;
     if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
     const step = () => {
