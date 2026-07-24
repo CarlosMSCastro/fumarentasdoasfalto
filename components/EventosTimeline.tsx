@@ -190,8 +190,8 @@ export default function EventosTimeline() {
                         className={`bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
                           group-hover:rotate-0 group-hover:z-20 group-hover:relative group-hover:w-170 group-hover:px-1 group-hover:py-2
                           ${ev.destaque
-                            ? "w-62.5 md:w-70 p-4 pb-5"
-                            : "w-28.75 md:w-55.25 p-3 pb-3"
+                            ? "w-62.5 md:w-80 p-4 pb-5"
+                            : "w-48.75 md:w-65.25 p-3 pb-3"
                           }`}
                       >
                         <div className="max-h-0 overflow-hidden opacity-0 group-hover:max-h-75 group-hover:opacity-100 group-hover:mb-2 transition-all duration-700 ease-out">
@@ -209,7 +209,7 @@ export default function EventosTimeline() {
 
                         <div
                           className={`w-full bg-cover bg-center transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-62.5 md:h-68.75" : "h-43.75 md:h-55.5"
+                            ev.destaque ? "h-72.5 md:h-88.75" : "h-53.75 md:h-75.5"
                           } group-hover:h-0 group-hover:opacity-0`}
                           style={{ backgroundImage: `url('/eventos/${ev.pasta}/${ev.fotos[0]}')` }}
                         />
