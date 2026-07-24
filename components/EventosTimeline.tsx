@@ -256,7 +256,7 @@ export default function EventosTimeline() {
         
       </div>
       <div className="text-center mt-0">
-        <span className="text-white/90 absolute bottom-4 left-[48.75%] font-bold text-base md:text-lg tracking-wide">
+        <span className="text-white/90 absolute bottom-4 left-[48.9%] font-bold text-base md:text-lg tracking-wide">
           {currentYear}
         </span>
       </div>

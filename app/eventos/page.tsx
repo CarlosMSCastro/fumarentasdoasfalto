@@ -48,7 +48,7 @@ export default function EventosPage() {
         <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/10 to-black/60" />
 
         <div className="relative z-10 flex h-full flex-col">
-          <div className="pt-50 md:pt-60 text-right px-[8%] md:px-[15%] ">
+          <div className="pt-35 md:pt-45 text-right px-[8%] md:px-[15%] ">
             <p className="text-white/90 text-xl uppercase tracking-widest mb-0
             ">Os nossos</p>
             <h1 className="text-4xl md:text-6xl font-bold text-white/90">Eventos</h1>
