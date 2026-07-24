@@ -43,16 +43,17 @@ export default function EventosPage() {
           playsInline
           onEnded={handleReversoEnded}
         />
-        <div className="absolute inset-0 bg-linear-to-r from-black/55 via-black/40 to-black/10" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/20 to-black/70" />
-        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/20 to-black/90" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/55 via-black/20 to-black/30" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/10 to-black/60" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/10 to-black/60" />
 
         <div className="relative z-10 flex h-full flex-col">
-          <div className="text-center pt-16 md:pt-20">
-            <p className="text-white/50 text-lg uppercase tracking-widest mb-1">Os nossos</p>
+          <div className="pt-50 md:pt-60 text-right px-[8%] md:px-[15%] ">
+            <p className="text-white/90 text-xl uppercase tracking-widest mb-0
+            ">Os nossos</p>
             <h1 className="text-4xl md:text-6xl font-bold text-white/90">Eventos</h1>
           </div>
-          <div className="flex-1 flex items-center">
+          <div className="w-[82vw] mx-auto opacity-95 flex-1 flex items-center">
             <EventosTimeline />
           </div>
         </div>

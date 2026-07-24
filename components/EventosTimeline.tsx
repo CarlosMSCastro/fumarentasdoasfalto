@@ -25,6 +25,13 @@ function mesDe(data: string) {
   return MESES[parseInt(partes[1]) - 1];
 }
 
+function formatarDataCompleta(data: string) {
+  const partes = data.split("-");
+  if (partes.length === 3) return `${partes[2]} ${MESES[parseInt(partes[1]) - 1]} ${partes[0]}`;
+  if (partes.length === 2) return `${MESES[parseInt(partes[1]) - 1]} ${partes[0]}`;
+  return partes[0];
+}
+
 function agruparPorAno(lista: Evento[]) {
   const grupos: Record<string, Evento[]> = {};
   lista.forEach((ev) => {
@@ -35,6 +42,9 @@ function agruparPorAno(lista: Evento[]) {
   return grupos;
 }
 
+const HOVER_WIDTH = 680;
+const EDGE_BUFFER = 30;
+
 export default function EventosTimeline() {
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
@@ -44,7 +54,8 @@ export default function EventosTimeline() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+      const el = scrollRef.current;
+      el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
     }
     return () => {
       if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
@@ -59,7 +70,7 @@ export default function EventosTimeline() {
     const container = scrollRef.current;
     if (!container) return;
     const rect = container.getBoundingClientRect();
-    const edgeZone = 250;
+    const edgeZone = 600;
     const x = e.clientX - rect.left;
 
     if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
@@ -85,19 +96,39 @@ export default function EventosTimeline() {
     if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
   };
 
+  const ensureVisibleOnHover = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const linkEl = e.currentTarget;
+    const cardLeft = linkEl.offsetLeft;
+    const cardWidthNow = linkEl.offsetWidth;
+    const cardCenter = cardLeft + cardWidthNow / 2;
+    const expandedLeft = cardCenter - HOVER_WIDTH / 2;
+    const expandedRight = cardCenter + HOVER_WIDTH / 2;
+
+    const visibleLeft = container.scrollLeft;
+    const visibleRight = container.scrollLeft + container.clientWidth;
+
+    if (expandedRight > visibleRight - EDGE_BUFFER) {
+      container.scrollTo({ left: container.scrollLeft + (expandedRight - visibleRight) + EDGE_BUFFER, behavior: "smooth" });
+    } else if (expandedLeft < visibleLeft + EDGE_BUFFER) {
+      container.scrollTo({ left: container.scrollLeft - (visibleLeft - expandedLeft) - EDGE_BUFFER, behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="relative w-full">
       <button
         onClick={() => scrollByAmount(-700)}
         className="absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
-        <ChevronLeft size={56} strokeWidth={2.5} />
+        <ChevronLeft size={96} strokeWidth={1} />
       </button>
       <button
         onClick={() => scrollByAmount(700)}
         className="absolute right-1 md:right-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
-        <ChevronRight size={56} strokeWidth={2.5} />
+        <ChevronRight size={96} strokeWidth={1} />
       </button>
 
       <div
@@ -106,17 +137,17 @@ export default function EventosTimeline() {
         onMouseLeave={handleMouseLeave}
         className="w-full overflow-x-auto overflow-y-visible scrollbar-hide"
         style={{
-          maskImage: "linear-gradient(to right, transparent 0px, black 70px, black calc(100% - 70px), transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to right, transparent 0px, black 70px, black calc(100% - 70px), transparent 100%)",
+          maskImage: "linear-gradient(to right, transparent 0px, black 100px, black calc(100% - 100px), transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent 0px, black 100px, black calc(100% - 100px), transparent 100%)",
         }}
       >
         <div
           className="flex items-end gap-8 py-4 w-max mx-auto"
-          style={{ paddingLeft: "360px", paddingRight: "360px" }}
+          style={{ paddingLeft: "150px", paddingRight: "150px" }}
         >
           {anos.map((ano) => (
-            <div key={ano} className="flex flex-col items-center shrink-0 min-h-[440px] justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-4 [&:has(.evt-card:hover)_.evt-card:not(:hover)]:pointer-events-none">
+            <div key={ano} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
+              <div className="flex items-end gap-2 md:gap-3 mb-4">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   globalIndex++;
@@ -126,21 +157,22 @@ export default function EventosTimeline() {
                     <Link
                       key={ev.id}
                       href={`/eventos/${ev.id}`}
-                      className="evt-card group relative shrink-0 cursor-pointer"
+                      className="group relative shrink-0 cursor-pointer"
+                      onMouseEnter={ensureVisibleOnHover}
                     >
-                      <div className="absolute left-1/2 -translate-x-1/2 -top-3 z-20 text-xl opacity-100 group-hover:opacity-0 transition-opacity duration-300 select-none">
+                      <div className="absolute left-1/2 -translate-x-1/2 -top-3 z-20 text-xl opacity-100 group-hover:opacity-0 transition-opacity duration-700 select-none pointer-events-none">
                         📌
                       </div>
 
                       <div
-                        className={`bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,0.7)] transition-all duration-500 ease-out origin-bottom ${rotate}
-                          group-hover:rotate-0 group-hover:z-20 group-hover:relative group-hover:w-[680px] group-hover:px-1 group-hover:py-2
+                        className={`bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
+                          group-hover:rotate-0 group-hover:z-20 group-hover:relative group-hover:w-170 group-hover:px-1 group-hover:py-2
                           ${ev.destaque
-                            ? "w-[210px] md:w-[240px] p-4 pb-8"
-                            : "w-[75px] md:w-[85px] p-1.5 pb-4"
+                            ? "w-62.5 md:w-70 p-4 pb-5"
+                            : "w-28.75 md:w-55.25 p-3 pb-3"
                           }`}
                       >
-                        <div className="max-h-0 overflow-hidden opacity-0 group-hover:max-h-[300px] group-hover:opacity-100 group-hover:mb-2 transition-all duration-500">
+                        <div className="max-h-0 overflow-hidden opacity-0 group-hover:max-h-75 group-hover:opacity-100 group-hover:mb-2 transition-all duration-700 ease-out">
                           <div className="flex gap-1">
                             <div
                               className="w-1/2 aspect-4/3 bg-cover bg-center"
@@ -154,18 +186,21 @@ export default function EventosTimeline() {
                         </div>
 
                         <div
-                          className={`w-full bg-cover bg-center transition-all duration-300 ease-out ${
-                            ev.destaque ? "h-[170px] md:h-[195px]" : "h-[55px] md:h-[62px]"
+                          className={`w-full bg-cover bg-center transition-all duration-700 ease-out ${
+                            ev.destaque ? "h-62.5 md:h-68.75" : "h-43.75 md:h-55.5"
                           } group-hover:h-0 group-hover:opacity-0`}
                           style={{ backgroundImage: `url('/eventos/${ev.pasta}/${ev.fotos[0]}')` }}
                         />
 
                         <div
-                          className={`font-bold text-center text-black/85 mt-2 px-1 leading-tight transition-all duration-500 ${
+                          className={`flex items-center mt-2 px-1 transition-all duration-700 ease-out justify-center group-hover:justify-between ${
                             ev.destaque ? "text-base md:text-lg" : "text-[10px] md:text-xs"
                           } group-hover:text-sm md:group-hover:text-base`}
                         >
-                          {ev.titulo}
+                          <span className="font-bold text-black/85 leading-tight">{ev.titulo}</span>
+                          <span className="hidden group-hover:inline text-black/70 font-semibold text-sm md:text-base whitespace-nowrap ml-2">
+                            {formatarDataCompleta(ev.data)}
+                          </span>
                         </div>
                       </div>
                     </Link>
@@ -177,13 +212,13 @@ export default function EventosTimeline() {
                 {grupos[ano].map((ev, i) => (
                   <div
                     key={i}
-                    className={`text-center shrink-0 ${ev.destaque ? "w-[210px] md:w-[240px]" : "w-[75px] md:w-[85px]"} text-[10px] md:text-xs text-white/40 uppercase tracking-wide`}
+                    className={`text-center shrink-0 ${ev.destaque ? "w-52.5 md:w-60" : "w-18.75 md:w-21.25"} text-sm md:text-md text-white/70 uppercase tracking-wide`}
                   >
                     {mesDe(ev.data)}
                   </div>
                 ))}
               </div>
-              <div className="text-orange-500/80 font-bold text-base md:text-lg tracking-wide border-t border-orange-500/30 pt-2 w-full text-center">
+              <div className="text-white/80 font-bold text-base md:text-lg tracking-wide border-t border-orange-500/30 pt-2 w-full text-center">
                 {ano}
               </div>
             </div>
