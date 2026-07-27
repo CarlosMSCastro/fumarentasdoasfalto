@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import eventosData from "@/data/eventos.json";
@@ -39,7 +40,9 @@ function agruparPorAno(lista: Evento[]) {
 const HOVER_WIDTH = 680;
 const EDGE_BUFFER = 30;
 const CAROUSEL_LIMIT = 4;
+const CLICK_SCROLL_NAV_DELAY = 450;
 export default function EventosTimeline() {
+  const router = useRouter();
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -141,6 +144,26 @@ export default function EventosTimeline() {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const container = scrollRef.current;
+    const linkEl = e.currentTarget;
+    if (!container) {
+      router.push(`/eventos/${id}`);
+      return;
+    }
+    const cardCenter = linkEl.offsetLeft + linkEl.offsetWidth / 2;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    const target = Math.max(0, Math.min(cardCenter - container.clientWidth / 2, maxScroll));
+    if (Math.abs(container.scrollLeft - target) < 4) {
+      router.push(`/eventos/${id}`);
+      return;
+    }
+    container.scrollTo({ left: target, behavior: "smooth" });
+    window.setTimeout(() => router.push(`/eventos/${id}`), CLICK_SCROLL_NAV_DELAY);
+  };
+
   return (
     <div className="relative w-full md:-mt-[150px]">
       <button
@@ -193,6 +216,7 @@ export default function EventosTimeline() {
                         setHoveredId(ev.id);
                       }}
                       onMouseLeave={() => setHoveredId(null)}
+                      onClick={(e) => handleCardClick(e, ev.id)}
                     >
                       <div
                         className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}

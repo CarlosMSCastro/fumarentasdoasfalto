@@ -34,7 +34,7 @@ export default function EventoPage() {
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
-    const update = () => setItemsPerPage(mql.matches ? 3 : 2);
+    const update = () => setItemsPerPage(mql.matches ? 3 : 4);
     update();
     mql.addEventListener("change", update);
     return () => mql.removeEventListener("change", update);
@@ -100,36 +100,40 @@ export default function EventoPage() {
         <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/15 to-black/90" />
 
         <div className="flex h-full flex-col">
-          <div className="relative z-0 w-full opacity-95 flex-1 min-h-0 flex flex-col justify-start pb-[clamp(2rem,12dvh,13.75rem)] md:pb-[13dvh] pt-40 md:pt-[clamp(9.5rem,9dvh,11.25rem)]">
-            <div className="px-[8%] md:px-[13%]">
+          <div className="relative z-0 w-full opacity-95 flex-1 min-h-0 flex flex-col justify-start pb-[clamp(5.5rem,8dvh,10rem)] md:pb-[clamp(6rem,7dvh,9dvh)] pt-40 md:pt-[clamp(7.5rem,7dvh,10rem)]">
+            <div className="px-[8%] md:px-[13%] shrink-0">
               <Link
                 href="/eventos"
-                className="inline-flex items-center md:pt-20 gap-2 self-start text-white/90 hover:text-orange-500 transition-colors text-xs md:text-sm font-semibold uppercase tracking-widest mb-2 md:mb-3"
+                className="inline-flex items-center md:pt-20 gap-2 self-start text-white/90 hover:text-orange-500 transition-colors text-xs md:text-sm font-semibold uppercase tracking-widest mb-1 md:mb-3"
               >
                 <ArrowLeft size={18} />
                 Voltar aos eventos
               </Link>
 
-              <p className="text-orange-500 uppercase tracking-widest text-xs md:text-base font-bold mb-1 md:mb-2">
+              <p className="text-orange-500 uppercase tracking-widest text-xs md:text-base font-bold mb-0.5 md:mb-2">
                 {evento.local} &middot; {formatarDataCompleta(evento.data)}
               </p>
-              <h1 className="text-2xl md:text-5xl font-bold text-white/90 mb-1.5 md:mb-3 max-w-4xl line-clamp-2">{evento.titulo}</h1>
-              <p className="text-white/70 text-xs md:text-lg max-w-3xl mb-3 md:mb-6 line-clamp-2 md:line-clamp-3">{evento.descricao}</p>
+              <h1 className="text-2xl md:text-5xl font-bold text-white/90 mb-1 md:mb-3 max-w-4xl line-clamp-2">{evento.titulo}</h1>
+              <p className="text-white/70 text-xs md:text-lg max-w-3xl mb-1.5 md:mb-6 line-clamp-2 md:line-clamp-3">{evento.descricao}</p>
             </div>
 
-            <div className="relative h-[clamp(7rem,24dvh,10rem)] md:h-[clamp(12rem,34dvh,18rem)] flex items-center">
+            <div className="relative flex-1 min-h-52 md:min-h-44 max-h-76 md:max-h-68 flex items-center">
               <button
                 onClick={() => setPhotoStart((s) => Math.max(0, s - 1))}
                 disabled={!podeRecuar}
                 aria-label="Fotos anteriores"
                 className="absolute left-[3%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
               >
-                <ChevronLeft size={32} strokeWidth={2.5} className="md:w-12 md:h-12" />
+                <ChevronLeft size={40} strokeWidth={2.5} className="md:w-12 md:h-12" />
               </button>
 
               <div
                 className="w-full h-full grid gap-2 md:gap-3 px-[8%] md:px-[13%]"
-                style={{ gridTemplateColumns: `repeat(${itemsPerPage}, minmax(0, 1fr))` }}
+                style={
+                  itemsPerPage === 4
+                    ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gridTemplateRows: "repeat(2, minmax(0, 1fr))" }
+                    : { gridTemplateColumns: `repeat(${itemsPerPage}, minmax(0, 1fr))` }
+                }
               >
                 {visiveis.map((foto, i) => {
                   const realIndex = photoStart + i;
@@ -158,11 +162,11 @@ export default function EventoPage() {
                 aria-label="Fotos seguintes"
                 className="absolute right-[3%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
               >
-                <ChevronRight size={32} strokeWidth={2.5} className="md:w-12 md:h-12" />
+                <ChevronRight size={40} strokeWidth={2.5} className="md:w-12 md:h-12" />
               </button>
             </div>
 
-            <p className="text-center text-white/60 text-xs md:text-sm font-semibold tracking-widest mt-2 md:mt-3">
+            <p className="text-center text-white/60 text-xs md:text-sm font-semibold tracking-widest mt-1 md:mt-3 shrink-0">
               {Math.min(photoStart + itemsPerPage, evento.fotos.length)} / {evento.fotos.length}
             </p>
           </div>
