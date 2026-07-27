@@ -29,7 +29,7 @@
     "descricao": "Passeio motard alusivo à quadra natalícia, com espírito solidário. Agradecimento ao Grupo Motard - Os Cabeças.",
     "destaque": false,
     "pasta": "03-PasseioPaisNatais2024",
-    "capa": "01.jpg",
+    "capa": "02.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg"]
   },
   {
@@ -40,7 +40,7 @@
     "descricao": "Primeiro passeio de Reis organizado pela associação, com paragem e visita ao Presépio de Cerejeira, em Fradelos.",
     "destaque": false,
     "pasta": "04-PasseioDeReis2025",
-    "capa": "01.jpg",
+    "capa": "09.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg", "09.jpg", "10.jpg", "11.jpg"]
   },
   {
@@ -51,7 +51,7 @@
     "descricao": "Participação no Rally Famalicão, evento de referência na região.",
     "destaque": false,
     "pasta": "05-RallyFamalicao",
-    "capa": "01.jpg",
+    "capa": "07.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg"]
   },
   {
@@ -62,7 +62,7 @@
     "descricao": "Celebração do primeiro aniversário da Fumarentas do Asfalto, com bênção dos capacetes, entrega de lembranças a todos os clubes motards, porco no espeto, jogos tradicionais e concerto da banda Scream Of The Soul.",
     "destaque": true,
     "pasta": "06-1ºAniversario",
-    "capa": "01.jpg",
+    "capa": "03.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg", "09.jpg", "10.jpg", "11.jpg", "12.jpg", "13.jpg", "14.jpg", "15.jpg", "16.jpg", "17.jpg", "18.jpg", "19.jpg"]
   },
   {
@@ -73,7 +73,7 @@
     "descricao": "Presença na Mostra Comunitária de Fradelos, com apoio junto dos outros dois motoclubes da freguesia no 1º Passeio de Motas. Obrigado à Junta de Freguesia de Fradelos VNF pelo convite.",
     "destaque": false,
     "pasta": "07-AmostraComunitariaFradelos",
-    "capa": "01.jpg",
+    "capa": "02.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg"]
   },
   {
@@ -84,7 +84,7 @@
     "descricao": "Peregrinação motard ao Santuário de Fátima para a celebração anual da Bênção de Capacetes, organizada pela ABC - Associação Bênção Capacetes, desde Fradelos até Fátima.",
     "destaque": false,
     "pasta": "08-IdaAFatima",
-    "capa": "01.jpg",
+    "capa": "13.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg", "09.jpg", "10.jpg", "11.jpg", "12.jpg", "13.jpg", "14.jpg", "15.jpg"]
   },
   {
@@ -95,7 +95,7 @@
     "descricao": "Primeiro passeio convívio organizado pela associação, até ao Mosteiro de Arnoso Santa Eulália, com almoço na Taberna do Artur e regresso à Rua do Espírito Santo com castanhas assadas.",
     "destaque": false,
     "pasta": "09-1ºPasseioConvivio",
-    "capa": "01.jpg",
+    "capa": "02.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg"]
   },
   {
@@ -106,7 +106,7 @@
     "descricao": "Participação no desfile motard de Pais Natal em V.N. Famalicão, organizado pelo Clube Motard Escorpiões e pela ACIF.",
     "destaque": false,
     "pasta": "10-PasseioPaisNatais2025",
-    "capa": "01.jpg",
+    "capa": "06.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg"]
   },
   {
@@ -117,7 +117,7 @@
     "descricao": "Segunda edição do passeio de Reis da associação, com visita ao Presépio de Cerejeira.",
     "destaque": false,
     "pasta": "11-PasseioDeReis2026",
-    "capa": "01.jpg",
+    "capa": "11.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg", "09.jpg", "10.jpg", "11.jpg", "12.jpg", "13.jpg", "14.jpg", "15.jpg", "16.jpg", "17.jpg", "18.jpg"]
   },
   {
@@ -128,7 +128,7 @@
     "descricao": "Participação no desfile de Carnaval de Fradelos.",
     "destaque": false,
     "pasta": "12-DesfileCarnavalFradelos",
-    "capa": "01.jpg",
+    "capa": "04.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg"]
   },
   {
@@ -139,7 +139,7 @@
     "descricao": "Celebração do segundo aniversário da Fumarentas do Asfalto, com angariação de fundos para material dos bombeiros, porco no espeto, concerto da banda Kay Sábio e sunset com o DJ Nelson Silva.",
     "destaque": true,
     "pasta": "13-2ºAniversário",
-    "capa": "01.jpg",
+    "capa": "05.jpg",
     "fotos": ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg", "09.jpg", "10.jpg", "11.jpg", "12.jpg", "13.jpg", "14.jpg", "15.jpg", "16.jpg", "17.jpg", "18.jpg"]
   }
 ]
