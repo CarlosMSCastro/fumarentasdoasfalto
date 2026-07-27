@@ -106,7 +106,7 @@ export default function ContactoSection() {
       <div className="w-full h-87.5 relative z-10 overflow-hidden">
       <div className="absolute inset-y-0 left-0 w-[10%] md:w-125 bg-linear-to-r from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-[10%] md:w-125 bg-linear-to-l from-[#0d0d0d] to-transparent z-20 pointer-events-none" />
-        <Map />
+        <Map deferUntilNear />
       </div>
 
       {/* Footer */}
