@@ -34,11 +34,26 @@ const MAP_STYLES = [
 let initialized = false;
 let mapInstance: any = null;
 
-export default function Map() {
+const MAP_CENTER = { lat: 41.37348988192273, lng: -8.59339888770085 };
+
+interface MapProps {
+  // When true, this mount doesn't grab the map on mount — it waits until its
+  // own container is about to enter the viewport. The map instance otherwise
+  // sits (and stays actively composited/"warm") in the always-on-screen
+  // anchor instance for as long as possible; claiming it only at the last
+  // moment keeps its off-screen dormancy (which is what causes the tile
+  // layer to go "cold" and flash on reveal) as short as possible.
+  deferUntilNear?: boolean;
+}
+
+export default function Map({ deferUntilNear = false }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const init = async () => {
+    let observer: IntersectionObserver | null = null;
+    let cancelled = false;
+
+    const createOrClaim = async () => {
       if (!initialized) {
         setOptions({
           key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
@@ -46,17 +61,20 @@ export default function Map() {
         initialized = true;
       }
       await importLibrary("maps");
-      if (!mapRef.current) return;
+      if (cancelled || !mapRef.current) return;
 
       if (mapInstance) {
         const mapDiv = mapInstance.getDiv();
         mapRef.current.appendChild(mapDiv);
         google.maps.event.trigger(mapInstance, "resize");
+        mapInstance.setCenter(MAP_CENTER);
         return;
       }
 
+      if (deferUntilNear) return; // anchor instance hasn't created it yet — nothing to claim
+
       mapInstance = new google.maps.Map(mapRef.current, {
-        center: { lat: 41.37348988192273, lng: -8.59339888770085 },
+        center: MAP_CENTER,
         zoom: 15,
         styles: MAP_STYLES,
         disableDefaultUI: true,
@@ -67,14 +85,29 @@ export default function Map() {
       });
 
       new google.maps.Marker({
-        position: { lat: 41.37348988192273, lng: -8.59339888770085 },
+        position: MAP_CENTER,
         map: mapInstance,
         title: "Fumarentas do Asfalto",
       });
     };
 
-    init();
-  }, []);
+    if (deferUntilNear) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) createOrClaim();
+        },
+        { rootMargin: "200px 0px 200px 0px" }
+      );
+      if (mapRef.current) observer.observe(mapRef.current);
+    } else {
+      createOrClaim();
+    }
 
-  return <div ref={mapRef} className="w-full h-87.5 bg-[#0a0a0a] brightness-[0.9] relative z-10 overflow-hidden" />;
+    return () => {
+      cancelled = true;
+      observer?.disconnect();
+    };
+  }, [deferUntilNear]);
+
+  return <div ref={mapRef} className="w-full h-87.5 bg-[#0a0a0a] brightness-[0.9] relative z-10 overflow-hidden will-change-transform" />;
 }
