@@ -146,12 +146,12 @@ export default function EventosTimeline() {
       <button
         className="pointer-events-none absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
-        <ChevronLeft strokeWidth={1} className="w-5 h-5 md:w-24 md:h-24" />
+        <ChevronLeft strokeWidth={1} className="w-8 h-8 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
       </button>
       <button
         className="pointer-events-none absolute right-1 md:right-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
-        <ChevronRight strokeWidth={1} className="w-5 h-5 md:w-24 md:h-24" />
+        <ChevronRight strokeWidth={1} className="w-8 h-8 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
       </button>
       <div
         ref={scrollRef}
@@ -165,11 +165,11 @@ export default function EventosTimeline() {
         }}
       >
         <div
-          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] pb-4 w-max mx-auto pl-10 pr-10 md:pl-[150px] md:pr-[150px]"
+          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] pb-4 w-max mx-auto pl-2 pr-2 md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-5 h-[clamp(10rem,35dvh,28.75rem)] md:h-[clamp(18rem,calc(98dvh_-_373px),32rem)] z-30">
+              <div className="flex items-end gap-2 md:gap-3 mb-5 h-[clamp(13rem,58dvh,24rem)] md:h-[clamp(18rem,calc(98dvh_-_373px),32rem)] z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
@@ -212,7 +212,7 @@ export default function EventosTimeline() {
                         </div>
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-[clamp(7rem,22dvh,18.125rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-108" : "h-[clamp(5.5rem,16dvh,13.4375rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-95"
+                            ev.destaque ? "h-[clamp(9.5rem,48dvh,19rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-[clamp(28rem,calc(152dvh_-_576px),49rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-[clamp(24rem,calc(128dvh_-_490px),42rem)]"
                           }`}
                         >
                           <div
@@ -240,7 +240,7 @@ export default function EventosTimeline() {
                               ))}
                             </div>
                           )}
-                          <div className="absolute bottom-2 right-2 z-20 opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                          <div className="absolute bottom-2 right-2 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
                             <span className="flex items-center justify-center w-13 h-13 rounded-full bg-orange-500 text-white shadow-lg">
                               <ArrowUpRight size={28} strokeWidth={2.5} />
                             </span>
@@ -287,7 +287,7 @@ export default function EventosTimeline() {
 
       </div>
       <div className="text-center mt-0">
-        <span className="text-white/90 absolute bottom-4 left-[48.9%] font-bold text-base md:text-lg tracking-wide">
+        <span className="text-white/90 absolute bottom-4 left-1/2 -translate-x-1/2 font-bold text-base md:text-lg tracking-wide">
           {currentYear}
         </span>
       </div>
