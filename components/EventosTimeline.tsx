@@ -165,7 +165,7 @@ export default function EventosTimeline() {
         }}
       >
         <div
-          className="relative flex items-end gap-4 md:gap-8 pt-14 md:pt-[146px] pb-4 w-max mx-auto pl-2 pr-2 md:pl-[150px] md:pr-[150px]"
+          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] pb-4 w-max mx-auto pl-2 pr-2 md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
@@ -212,7 +212,7 @@ export default function EventosTimeline() {
                         </div>
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-[clamp(9.5rem,48dvh,19rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_370px),31.5rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_315px),26.875rem)]"
+                            ev.destaque ? "h-[clamp(8.5rem,42dvh,16.75rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_370px),31.5rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_315px),26.875rem)]"
                           }`}
                         >
                           <div
