@@ -167,7 +167,7 @@ export default function EventosTimeline() {
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-4 h-115 z-30">
+              <div className="flex items-end gap-2 md:gap-3 mb-4 h-115 md:h-[clamp(17rem,calc(98dvh_-_419px),28.75rem)] z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   globalIndex++;
@@ -222,7 +222,7 @@ export default function EventosTimeline() {
                         </div>
                         <div
                           className={`w-full bg-cover bg-center transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-72.5 md:h-88.75" : "h-53.75 md:h-75.5"
+                            ev.destaque ? "h-72.5 md:h-[clamp(13rem,calc(76dvh_-_324px),22.1875rem)]" : "h-53.75 md:h-[clamp(11rem,calc(64dvh_-_275px),18.875rem)]"
                           } group-hover:h-0 group-hover:opacity-0`}
                           style={{ backgroundImage: `url('/eventos/${ev.pasta}/${ev.fotos[0]}')` }}
                         />
