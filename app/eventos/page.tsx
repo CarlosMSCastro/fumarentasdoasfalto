@@ -49,7 +49,7 @@ export default function EventosPage() {
 
         <div className="flex h-full flex-col">
           <div className="relative z-0 w-[79vw] mx-auto opacity-95 flex-1 min-h-0 flex flex-col items-end justify-start pb-[clamp(2rem,12dvh,13.75rem)] md:pb-[13dvh]">
-            <div className="relative z-0 pt-[clamp(4rem,18dvh,8.75rem)] md:pt-[clamp(9.5rem,9dvh,11.25rem)] text-right px-[8%] md:px-[15%]">
+            <div className="relative z-0 pt-[clamp(3rem,12dvh,8.75rem)] md:pt-[clamp(9.5rem,9dvh,11.25rem)] text-right px-[8%] md:px-[15%]">
               <p className="text-white/90 text-xl uppercase tracking-widest mb-0">Os nossos</p>
               <h1 className="text-4xl md:text-6xl font-bold text-white/90">Eventos</h1>
             </div>
