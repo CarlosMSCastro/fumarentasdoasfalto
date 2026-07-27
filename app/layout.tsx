@@ -30,9 +30,13 @@ export default function RootLayout({
       lang="pt"
       className={`${rajdhani.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+        <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className="min-h-full flex flex-col">
         <Navbar />
-        <div className="hidden">
+        <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
           <Map />
         </div>
         {children}
