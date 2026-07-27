@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import eventosData from "@/data/eventos.json";
 interface Evento {
   id: string;
@@ -11,6 +11,7 @@ interface Evento {
   descricao: string;
   destaque: boolean;
   pasta: string;
+  capa: string;
   fotos: string[];
 }
 const eventos = eventosData as Evento[];
@@ -35,8 +36,9 @@ function agruparPorAno(lista: Evento[]) {
   });
   return grupos;
 }
-const HOVER_WIDTH = 900;
+const HOVER_WIDTH = 680;
 const EDGE_BUFFER = 30;
+const CAROUSEL_LIMIT = 4;
 export default function EventosTimeline() {
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
@@ -63,11 +65,12 @@ export default function EventosTimeline() {
   useEffect(() => {
     if (!hoveredId) return;
     const ev = eventos.find((e) => e.id === hoveredId);
-    if (!ev || ev.fotos.length <= 1) return;
+    const total = ev ? Math.min(ev.fotos.length, CAROUSEL_LIMIT) : 0;
+    if (!ev || total <= 1) return;
     const interval = setInterval(() => {
       setCarouselIndex((prev) => {
         const current = prev[hoveredId] ?? 0;
-        const next = (current + 1) % ev.fotos.length;
+        const next = (current + 1) % total;
         return { ...prev, [hoveredId]: next };
       });
     }, 1800);
@@ -139,16 +142,16 @@ export default function EventosTimeline() {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full md:-mt-[150px]">
       <button
         className="pointer-events-none absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
-        <ChevronLeft size={96} strokeWidth={1} />
+        <ChevronLeft strokeWidth={1} className="w-5 h-5 md:w-24 md:h-24" />
       </button>
       <button
         className="pointer-events-none absolute right-1 md:right-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
-        <ChevronRight size={96} strokeWidth={1} />
+        <ChevronRight strokeWidth={1} className="w-5 h-5 md:w-24 md:h-24" />
       </button>
       <div
         ref={scrollRef}
@@ -157,26 +160,33 @@ export default function EventosTimeline() {
         onScroll={handleScroll}
         className="w-full overflow-x-auto overflow-y-visible scrollbar-hide "
         style={{
-          maskImage: "linear-gradient(to right, transparent 0px, black 100px, black calc(100% - 100px), transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to right, transparent 0px, black 100px, black calc(100% - 100px), transparent 100%)",
+          maskImage: "linear-gradient(to right, transparent 0px, black clamp(24px,8vw,100px), black calc(100% - clamp(24px,8vw,100px)), transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent 0px, black clamp(24px,8vw,100px), black calc(100% - clamp(24px,8vw,100px)), transparent 100%)",
         }}
       >
         <div
-          className="relative flex items-end gap-8 py-4 w-max mx-auto"
-          style={{ paddingLeft: "150px", paddingRight: "150px" }}
+          className="relative flex items-end gap-4 md:gap-8 pt-8 md:pt-[146px] pb-4 w-max mx-auto pl-10 pr-10 md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-4 h-115 md:h-[clamp(17rem,calc(98dvh_-_419px),28.75rem)] z-30">
+              <div className="flex items-end gap-2 md:gap-3 mb-5 h-[clamp(12rem,42dvh,28.75rem)] md:h-[clamp(18rem,calc(98dvh_-_373px),32rem)] z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
+                  const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
+                  const highSide = globalIndex % 2 === 0 ? "right" : "left";
+                  const idHash = ev.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+                  const randomFlip = idHash % 4 === 0;
+                  const pinOnRight = randomFlip ? highSide === "left" : highSide === "right";
+                  const pinSide = pinOnRight ? "left-[78%]" : "left-[22%]";
                   globalIndex++;
                   const idx = carouselIndex[ev.id] ?? 0;
                   return (
                     <Link
                       key={ev.id}
                       href={`/eventos/${ev.id}`}
-                      className="group relative shrink-0 cursor-pointer"
+                      className={`group relative shrink-0 cursor-pointer ${
+                        ev.destaque ? "w-62.5 md:w-80" : "w-48.75 md:w-71.25"
+                      }`}
                       onMouseEnter={(e) => {
                         ensureVisibleOnHover(e);
                         setCurrentEventId(ev.id);
@@ -184,48 +194,58 @@ export default function EventosTimeline() {
                       }}
                       onMouseLeave={() => setHoveredId(null)}
                     >
-                      <div className="absolute left-1/2 -translate-x-1/2 -top-3 z-20 text-xl opacity-100 group-hover:opacity-0 transition-opacity duration-700 select-none pointer-events-none">
-                        📌
-                      </div>
                       <div
-                        className={`bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
-                          group-hover:rotate-0 group-hover:z-20 group-hover:relative group-hover:w-185
+                        className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
+                          ${hoverRotate} group-hover:z-20
                           ${ev.destaque
-                            ? "w-62.5 md:w-80 p-4 pb-5"
-                            : "w-48.75 md:w-65.25 p-3 pb-3"
+                            ? "w-62.5 md:w-80 md:group-hover:w-160 p-4 pb-8"
+                            : "w-48.75 md:w-71.25 md:group-hover:w-142.5 p-3 pb-6"
                           }`}
                       >
-                        <div className="max-h-0 overflow-hidden opacity-0 group-hover:max-h-125 group-hover:opacity-100 group-hover:mb-3 transition-all duration-700 ease-out">
-                          <div className="relative w-full aspect-video bg-black overflow-hidden">
-                        {ev.fotos.map((foto, i) => (
-                          <div
-                            key={i}
-                            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ${
-                              i === idx ? "opacity-100" : "opacity-0"
-                            }`}
-                            style={{ backgroundImage: `url('/eventos/${ev.pasta}/${foto}')` }}
+                        <div className={`absolute -translate-x-1/2 -top-4.5 z-20 w-9 h-9 opacity-100 group-hover:opacity-0 transition-opacity duration-700 select-none pointer-events-none ${pinSide}`}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src="/pin.png"
+                            alt=""
+                            className={`w-full h-full object-contain ${ev.destaque ? "hue-rotate-[50deg] saturate-150 brightness-110" : ""}`}
                           />
-                        ))}
-                            {ev.fotos.length > 1 && (
-                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                                {ev.fotos.map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                                      i === idx ? "bg-orange-500" : "bg-white/50"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </div>
                         </div>
                         <div
-                          className={`w-full bg-cover bg-center transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-72.5 md:h-[clamp(13rem,calc(76dvh_-_324px),22.1875rem)]" : "h-53.75 md:h-[clamp(11rem,calc(64dvh_-_275px),18.875rem)]"
-                          } group-hover:h-0 group-hover:opacity-0`}
-                          style={{ backgroundImage: `url('/eventos/${ev.pasta}/${ev.fotos[0]}')` }}
-                        />
+                          className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
+                            ev.destaque ? "h-[clamp(9rem,32dvh,18.125rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-108" : "h-[clamp(7rem,24dvh,13.4375rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-95"
+                          }`}
+                        >
+                          <div
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{ backgroundImage: `url('/eventos/${ev.pasta}/${ev.capa}')` }}
+                          />
+                          {ev.fotos.slice(0, CAROUSEL_LIMIT).map((foto, i) => (
+                            <div
+                              key={i}
+                              className={`absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-700 ${
+                                i === idx ? "md:group-hover:opacity-100" : ""
+                              }`}
+                              style={{ backgroundImage: `url('/eventos/${ev.pasta}/${foto}')` }}
+                            />
+                          ))}
+                          {Math.min(ev.fotos.length, CAROUSEL_LIMIT) > 1 && (
+                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 opacity-0 transition-opacity duration-700 md:group-hover:opacity-100">
+                              {ev.fotos.slice(0, CAROUSEL_LIMIT).map((_, i) => (
+                                <div
+                                  key={i}
+                                  className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                                    i === idx ? "bg-orange-500" : "bg-white/50"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          )}
+                          <div className="absolute bottom-2 right-2 z-20 opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                            <span className="flex items-center justify-center w-13 h-13 rounded-full bg-orange-500 text-white shadow-lg">
+                              <ArrowUpRight size={28} strokeWidth={2.5} />
+                            </span>
+                          </div>
+                        </div>
                         <div
                           className={`flex items-center mt-2 px-1 transition-all duration-700 ease-out justify-center group-hover:justify-between ${
                             ev.destaque ? "text-base md:text-lg" : "text-[10px] md:text-xs"
@@ -246,8 +266,8 @@ export default function EventosTimeline() {
                   <div
                     key={i}
                     ref={(el) => { monthRefs.current[ev.id] = el; }}
-                    className={`text-center shrink-0 ${ev.destaque ? "w-52.5 md:w-60" : "w-18.75 md:w-21.25"} text-sm md:text-md uppercase tracking-wide transition-colors duration-300 ${
-                      ev.id === currentEventId ? "text-orange-500" : "text-white/70"
+                    className={`text-center shrink-0 ${ev.destaque ? "w-52.5 md:w-60" : "w-18.75 md:w-21.25"} text-sm md:text-md uppercase tracking-wide font-semibold transition-colors duration-300 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] ${
+                      ev.id === currentEventId ? "text-orange-500" : "text-white/90"
                     }`}
                   >
                     {mesDe(ev.data)}
