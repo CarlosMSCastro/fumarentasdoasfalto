@@ -165,7 +165,7 @@ export default function EventosTimeline() {
         }}
       >
         <div
-          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] pb-4 w-max mx-auto pl-2 pr-2 md:pl-[150px] md:pr-[150px]"
+          className="relative flex items-end gap-4 md:gap-8 pt-14 md:pt-[146px] pb-4 w-max mx-auto pl-2 pr-2 md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
@@ -185,7 +185,7 @@ export default function EventosTimeline() {
                       key={ev.id}
                       href={`/eventos/${ev.id}`}
                       className={`group relative shrink-0 cursor-pointer ${
-                        ev.destaque ? "w-62.5 md:w-80" : "w-48.75 md:w-71.25"
+                        ev.destaque ? "w-62.5 md:w-80" : "w-56 md:w-71.25"
                       }`}
                       onMouseEnter={(e) => {
                         ensureVisibleOnHover(e);
@@ -199,7 +199,7 @@ export default function EventosTimeline() {
                           ${hoverRotate} group-hover:z-20
                           ${ev.destaque
                             ? "w-62.5 md:w-80 md:group-hover:w-102.5 p-4 pb-8"
-                            : "w-48.75 md:w-71.25 md:group-hover:w-91.5 p-3 pb-6"
+                            : "w-56 md:w-71.25 md:group-hover:w-91.5 p-3 pb-6"
                           }`}
                       >
                         <div className={`absolute -translate-x-1/2 -top-4.5 z-20 w-9 h-9 opacity-100 group-hover:opacity-0 transition-opacity duration-700 select-none pointer-events-none ${pinSide}`}>
