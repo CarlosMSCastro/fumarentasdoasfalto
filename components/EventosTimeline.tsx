@@ -198,8 +198,8 @@ export default function EventosTimeline() {
                         className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
                           ${hoverRotate} group-hover:z-20
                           ${ev.destaque
-                            ? "w-62.5 md:w-80 md:group-hover:w-160 p-4 pb-8"
-                            : "w-48.75 md:w-71.25 md:group-hover:w-142.5 p-3 pb-6"
+                            ? "w-62.5 md:w-80 md:group-hover:w-144 p-4 pb-8"
+                            : "w-48.75 md:w-71.25 md:group-hover:w-128.25 p-3 pb-6"
                           }`}
                       >
                         <div className={`absolute -translate-x-1/2 -top-4.5 z-20 w-9 h-9 opacity-100 group-hover:opacity-0 transition-opacity duration-700 select-none pointer-events-none ${pinSide}`}>
@@ -212,7 +212,7 @@ export default function EventosTimeline() {
                         </div>
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-[clamp(9.5rem,48dvh,19rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-[clamp(28rem,calc(152dvh_-_576px),49rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-[clamp(24rem,calc(128dvh_-_490px),42rem)]"
+                            ev.destaque ? "h-[clamp(9.5rem,48dvh,19rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-[clamp(25rem,calc(137dvh_-_518px),44rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-[clamp(21.5rem,calc(115dvh_-_441px),37.5rem)]"
                           }`}
                         >
                           <div
