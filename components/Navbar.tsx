@@ -52,7 +52,8 @@ export default function Navbar() {
     if (inContactos) {
       return "text-foreground hover:text-primary";
     }
-    return pathname === link.href && link.href !== "/" ? "text-primary" : "text-foreground hover:text-primary";
+    const isActive = link.href !== "/" && (pathname === link.href || pathname.startsWith(`${link.href}/`));
+    return isActive ? "text-primary" : "text-foreground hover:text-primary";
   };
 
   return (
