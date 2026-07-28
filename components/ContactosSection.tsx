@@ -1,33 +1,14 @@
 "use client";
-import { useRef, useEffect } from "react";
 import Map from "@/components/Map";
 import Footer from "@/components/Footer";
 
 export default function ContactoSection() {
-  const video2Ref = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const v = video2Ref.current;
-    if (v) {
-      v.currentTime = 0;
-      v.play();
-    }
-  }, []);
-
   return (
     <section className="flex flex-col relative overflow-hidden snap-start" id="contactos">
       <video
-        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-30 md:opacity-20 pointer-events-none"
+        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-30 md:opacity-20 pointer-events-none scale-x-[-1]"
         src="/videos/smoke.mp4"
         autoPlay
-        muted
-        loop
-        playsInline
-      />
-      <video
-        ref={video2Ref}
-        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-30 md:opacity-20 pointer-events-none scale-x-[-1] scale-y-[-1]"
-        src="/videos/smoke.mp4"
         muted
         loop
         playsInline

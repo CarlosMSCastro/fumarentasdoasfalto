@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
@@ -284,30 +285,40 @@ export default function EventosTimeline() {
                             ev.destaque ? "h-[clamp(8.5rem,42dvh,16.75rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)]"
                           }`}
                         >
-                          <div
-                            className="absolute inset-0 bg-cover bg-center"
-                            style={{ backgroundImage: `url('/eventos/${ev.pasta}/${ev.capa}')` }}
+                          <Image
+                            src={`/eventos/${ev.pasta}/${ev.capa}`}
+                            alt={ev.titulo}
+                            fill
+                            sizes={ev.destaque ? "(max-width: 768px) 250px, 410px" : "(max-width: 768px) 224px, 366px"}
+                            className="object-cover"
                           />
-                          {ev.fotos.slice(0, CAROUSEL_LIMIT).map((foto, i) => (
-                            <div
-                              key={i}
-                              className={`absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-700 ${
-                                i === idx ? "md:group-hover:opacity-100" : ""
-                              }`}
-                              style={{ backgroundImage: `url('/eventos/${ev.pasta}/${foto}')` }}
-                            />
-                          ))}
-                          {Math.min(ev.fotos.length, CAROUSEL_LIMIT) > 1 && (
-                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 opacity-0 transition-opacity duration-700 md:group-hover:opacity-100">
-                              {ev.fotos.slice(0, CAROUSEL_LIMIT).map((_, i) => (
-                                <div
+                          {hoveredId === ev.id && (
+                            <>
+                              {ev.fotos.slice(0, CAROUSEL_LIMIT).map((foto, i) => (
+                                <Image
                                   key={i}
-                                  className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                                    i === idx ? "bg-orange-500" : "bg-white/50"
+                                  src={`/eventos/${ev.pasta}/${foto}`}
+                                  alt={`${ev.titulo} - foto ${i + 1}`}
+                                  fill
+                                  sizes={ev.destaque ? "410px" : "366px"}
+                                  className={`object-cover opacity-0 transition-opacity duration-700 ${
+                                    i === idx ? "md:group-hover:opacity-100" : ""
                                   }`}
                                 />
                               ))}
-                            </div>
+                              {Math.min(ev.fotos.length, CAROUSEL_LIMIT) > 1 && (
+                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 opacity-0 transition-opacity duration-700 md:group-hover:opacity-100">
+                                  {ev.fotos.slice(0, CAROUSEL_LIMIT).map((_, i) => (
+                                    <div
+                                      key={i}
+                                      className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                                        i === idx ? "bg-orange-500" : "bg-white/50"
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </>
                           )}
                           <div className="absolute bottom-2 right-2 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
                             <span className="flex items-center justify-center w-13 h-13 rounded-full bg-orange-500 text-white shadow-lg">
