@@ -1,20 +1,9 @@
 "use client";
-import { useRef, useEffect } from "react";
 import ObjetivosDesktop from "@/components/ObjetivosDesktop";
 import ObjetivosMobile from "@/components/ObjetivosMobile";
 import ScrollIndicator from "@/components/ScrollIndicator";
 
 export default function ObjetivosSection() {
-  const video2Ref = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const v = video2Ref.current;
-    if (v) {
-      v.currentTime = 0.5;
-      v.play();
-    }
-  }, []);
-
   return (
     <section id="sobre" className="flex flex-col items-center justify-center min-h-dvh pt-15 pb-22 md:py-30 gap-2 relative overflow-hidden snap-start snap-always">
       <div
@@ -25,17 +14,9 @@ export default function ObjetivosSection() {
       <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/85" />
       <div className="absolute inset-0 bg-linear-to-t from-black/20 via-black/30 to-black/85" />
       <video
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none mix-blend-screen"
+        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none mix-blend-screen scale-x-[-1]"
         src="/videos/smoke.mp4"
         autoPlay
-        muted
-        loop
-        playsInline
-      />
-      <video
-        ref={video2Ref}
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none mix-blend-screen scale-x-[-1] scale-y-[-1]"
-        src="/videos/smoke.mp4"
         muted
         loop
         playsInline
