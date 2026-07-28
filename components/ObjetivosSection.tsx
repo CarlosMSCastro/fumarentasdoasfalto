@@ -14,19 +14,18 @@ export default function ObjetivosSection() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-linear-to-l from-black/45 via-black/40 to-black/35" />
-      <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/85" />
-      <div className="absolute inset-0 bg-linear-to-t from-black/20 via-black/30 to-black/85" />
+      <div className="absolute inset-0 bg-linear-to-l from-black/15 via-black/30 to-black/65" />
+      <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/55" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/20 via-black/30 to-black/55" />
       <video
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none mix-blend-screen scale-x-[-1]"
+        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-40 pointer-events-none mix-blend-screen scale-x-[-1]"
         src="/videos/smoke.mp4"
         autoPlay
         muted
         loop
         playsInline
       />
-      <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-black to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black to-transparent z-10 pointer-events-none" />
+
       <div className="text-left w-full px-[8%] md:px-[13%] relative z-10 mt-10">
         <p className="text-white/90 uppercase tracking-widest text-3xl mb-1">Os nossos</p>
         <h2 className="text-4xl md:text-7xl font-bold text-white/90 mb-2">Objetivos</h2>
