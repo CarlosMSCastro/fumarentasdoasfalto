@@ -214,7 +214,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center" onClick={onClose}>
       <div
         ref={boxRef}
-        className="relative w-[85vw] h-[70vh] md:w-[75vw] md:h-[80vh] overflow-hidden cursor-grab active:cursor-grabbing"
+        className="relative w-[85vw] h-[70vh] md:w-[75vw] md:h-[80vh] cursor-grab active:cursor-grabbing"
         onClick={handleBoxClick}
         onPointerDown={handleBoxPointerDown}
         onPointerMove={handleBoxPointerMove}
@@ -223,21 +223,26 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <Image
-          src={`/eventos/${pasta}/${fotos[index]}`}
-          alt={`${titulo} - foto ${index + 1}`}
-          fill
-          draggable={false}
-          sizes="90vw"
-          className="object-contain touch-none"
-          style={{ transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})` }}
-          priority
-          onLoad={(e) => {
-            const img = e.currentTarget;
-            naturalRef.current = { w: img.naturalWidth, h: img.naturalHeight };
-            recompute();
-          }}
-        />
+        {/* overflow-hidden isolado aqui (e não no boxRef) para não cortar o
+            botão de fechar, que é propositadamente posicionado fora dos
+            limites da foto letterboxed */}
+        <div className="absolute inset-0 overflow-hidden">
+          <Image
+            src={`/eventos/${pasta}/${fotos[index]}`}
+            alt={`${titulo} - foto ${index + 1}`}
+            fill
+            draggable={false}
+            sizes="90vw"
+            className="object-contain touch-none"
+            style={{ transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})` }}
+            priority
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              naturalRef.current = { w: img.naturalWidth, h: img.naturalHeight };
+              recompute();
+            }}
+          />
+        </div>
 
         {total > 1 && arrowPos && (
           <>

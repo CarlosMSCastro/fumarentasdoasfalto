@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useState } from "react";
 
 const cards = [
@@ -60,9 +61,12 @@ export default function ObjetivosMobile() {
           opacity: sliding ? 0 : 1,
         }}
       >
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-90 brightness-[0.55]"
-          style={{ backgroundImage: `url('${cards[active].bg}')` }}
+        <Image
+          src={cards[active].bg}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover opacity-90 brightness-[0.55]"
         />
         <h3 className="relative z-10 text-5xl font-bold text-white">{cards[active].title}</h3>
         <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-5 py-4 rounded-full text-lg">
