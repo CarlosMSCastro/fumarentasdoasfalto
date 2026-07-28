@@ -10,7 +10,7 @@ Official site for "Fumarentas do Asfalto" (a motorcycle association), replacing 
 
 ## Before writing Next.js code
 
-This project pins `next@16.2.6`, a version newer than most training data. **Read `node_modules/next/dist/docs/` before using any Next.js API you're not 100% sure about** — App Router conventions, config options, and data-fetching APIs may differ from what you expect. `app/template.tsx` in this repo (used purely for a fade-in page transition via framer-motion) is an example of a file whose purpose isn't obvious without knowing current App Router special-file conventions.
+This project pins `next@16.2.6`, a version newer than most training data. **Read `node_modules/next/dist/docs/` before using any Next.js API you're not 100% sure about** — App Router conventions, config options, and data-fetching APIs may differ from what you expect. `app/template.tsx` in this repo (used purely for a fade-in page transition via `tw-animate-css` utility classes) is an example of a file whose purpose isn't obvious without knowing current App Router special-file conventions.
 
 ## Commands
 
