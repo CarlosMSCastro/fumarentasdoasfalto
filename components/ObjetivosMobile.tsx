@@ -47,45 +47,45 @@ export default function ObjetivosMobile() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-4 md:hidden px-8" style={{ touchAction: 'pan-x' }}>
-      <a
-        href={cards[active].href}
-        onClick={(e) => handleClick(e, cards[active].href)}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        className="relative w-full h-[56vh] max-h-120 rounded-sm overflow-hidden flex flex-col justify-between p-6"
-        style={{
-          touchAction: 'pan-x',
-          transition: "transform 0.3s ease, opacity 0.3s ease",
-          transform: sliding === "left" ? "translateX(-40px)" : sliding === "right" ? "translateX(40px)" : "translateX(0)",
-          opacity: sliding ? 0 : 1,
-        }}
-      >
-        <Image
-          src={cards[active].bg}
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover opacity-95 brightness-[0.55]"
-        />
-        <h3 className="relative z-10 text-5xl font-bold text-white">{cards[active].title}</h3>
-        <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-5 py-4 rounded-full text-lg">
-          →
-        </div>
+    <div className="w-full flex flex-col items-center md:hidden px-8" style={{ touchAction: 'pan-x' }}>
+      {/* wrapper com o tamanho visual do card; os dots ficam aqui fora do
+          <a> animado para não sofrerem o slide/fade da troca de card */}
+      <div className="relative w-full h-[43vh] max-h-94.5">
+        <a
+          href={cards[active].href}
+          onClick={(e) => handleClick(e, cards[active].href)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="absolute inset-0 rounded-sm overflow-hidden flex flex-col justify-between p-6"
+          style={{
+            touchAction: 'pan-x',
+            transition: "transform 0.3s ease, opacity 0.3s ease",
+            transform: sliding === "left" ? "translateX(-40px)" : sliding === "right" ? "translateX(40px)" : "translateX(0)",
+            opacity: sliding ? 0 : 1,
+          }}
+        >
+          <Image
+            src={cards[active].bg}
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover opacity-95 brightness-[0.55]"
+          />
+          <h3 className="relative z-10 text-5xl font-bold text-white">{cards[active].title}</h3>
+          <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-5 py-4 rounded-full text-lg">
+            →
+          </div>
+        </a>
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-3">
           {cards.map((_, i) => (
             <button
               key={i}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                goTo(i, i > active ? "left" : "right");
-              }}
+              onClick={() => goTo(i, i > active ? "left" : "right")}
               className={`h-3 rounded-full transition-all duration-300 ${i === active ? "bg-orange-500 w-6" : "bg-white/40 w-3"}`}
             />
           ))}
         </div>
-      </a>
+      </div>
     </div>
   );
 }
