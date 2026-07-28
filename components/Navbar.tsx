@@ -6,8 +6,28 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart} from "lucide-react";
-import { FaFacebook, FaInstagram } from "react-icons/fa";
+import { Menu, ShoppingCart } from "lucide-react";
+
+// lucide-react dropped brand/logo icons — these are small local stroke icons
+// (matching lucide's own visual style) so we don't need a whole extra icon
+// library just for two social links.
+function FacebookIcon({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
 
 const links = [
   { href: "/", label: "Início" },
@@ -131,10 +151,10 @@ export default function Navbar() {
             </span>
           </Link>
           <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
-            <FaFacebook size={25} />
+            <FacebookIcon size={25} />
           </a>
           <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
-            <FaInstagram size={25} />
+            <InstagramIcon size={25} />
           </a>
           <Link href="#" className="hidden lg:block">
             <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(255,107,0,0.8)] hover:shadow-[0_0_16px_rgba(255,107,0,3.8)] transition-all">
@@ -142,10 +162,10 @@ export default function Navbar() {
             </Button>
           </Link>
           <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-foreground hover:text-primary transition-all">
-            <FaFacebook size={28} />
+            <FacebookIcon size={28} />
           </a>
           <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="lg:hidden text-foreground hover:text-primary transition-all">
-            <FaInstagram size={28} />
+            <InstagramIcon size={28} />
           </a>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger className="lg:hidden p-0 text-foreground hover:text-primary transition-colors">

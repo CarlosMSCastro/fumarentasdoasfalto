@@ -34,6 +34,23 @@ const MAP_STYLES = [
 let initialized = false;
 let mapInstance: any = null;
 
+const IDLE_TIMEOUT_MS = 2000;
+const IDLE_FALLBACK_DELAY_MS = 1500;
+
+// Schedules `cb` for whenever the main thread is next idle (falling back to a
+// plain timeout on browsers without requestIdleCallback, e.g. older Safari),
+// so the eager/root Map instance doesn't compete with the page's initial
+// render for bandwidth/CPU. Returns a canceller safe to call even if `cb`
+// already ran.
+function scheduleIdle(cb: () => void): () => void {
+  if (typeof window.requestIdleCallback === "function") {
+    const id = window.requestIdleCallback(cb, { timeout: IDLE_TIMEOUT_MS });
+    return () => window.cancelIdleCallback(id);
+  }
+  const id = window.setTimeout(cb, IDLE_FALLBACK_DELAY_MS);
+  return () => window.clearTimeout(id);
+}
+
 const MAP_CENTER = { lat: 41.37348988192273, lng: -8.59339888770085 };
 
 interface MapProps {
@@ -51,6 +68,7 @@ export default function Map({ deferUntilNear = false }: MapProps) {
 
   useEffect(() => {
     let observer: IntersectionObserver | null = null;
+    let cancelIdle: (() => void) | null = null;
     let cancelled = false;
 
     const createOrClaim = async () => {
@@ -100,12 +118,15 @@ export default function Map({ deferUntilNear = false }: MapProps) {
       );
       if (mapRef.current) observer.observe(mapRef.current);
     } else {
-      createOrClaim();
+      // Root/anchor instance: don't compete with the page's initial render —
+      // wait for the main thread to be idle before loading the Maps JS API.
+      cancelIdle = scheduleIdle(createOrClaim);
     }
 
     return () => {
       cancelled = true;
       observer?.disconnect();
+      cancelIdle?.();
     };
   }, [deferUntilNear]);
 
