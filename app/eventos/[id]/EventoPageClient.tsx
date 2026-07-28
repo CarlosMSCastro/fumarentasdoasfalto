@@ -12,6 +12,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [photoStart, setPhotoStart] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(2);
+  const [isDesktop, setIsDesktop] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const mouseStartX = useRef<number | null>(null);
   const draggedRef = useRef(false);
@@ -34,7 +35,10 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
-    const update = () => setItemsPerPage(mql.matches ? 3 : 4);
+    const update = () => {
+      setIsDesktop(mql.matches);
+      setItemsPerPage(mql.matches ? 3 : 4);
+    };
     update();
     mql.addEventListener("change", update);
     return () => mql.removeEventListener("change", update);
@@ -68,11 +72,20 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
     );
   }
 
-  const maxStart = Math.max(0, evento.fotos.length - itemsPerPage);
   const visiveis = evento.fotos.slice(photoStart, photoStart + itemsPerPage);
   const podeRecuar = photoStart > 0;
-  const podeAvancar = photoStart < maxStart;
-  const step = itemsPerPage;
+  const podeAvancar = photoStart + itemsPerPage < evento.fotos.length;
+  // Mobile pagina página-a-página (não repete fotos já vistas no último
+  // grupo, mesmo que fique incompleto); desktop desliza 1 foto de cada vez.
+  const step = isDesktop ? 1 : itemsPerPage;
+
+  const avancar = () => {
+    if (podeAvancar) setPhotoStart((s) => s + step);
+  };
+
+  const recuar = () => {
+    if (podeRecuar) setPhotoStart((s) => Math.max(0, s - step));
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -85,8 +98,8 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
     const deltaX = e.changedTouches[0].clientX - startX;
     const SWIPE_THRESHOLD = 40;
     if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
-    if (deltaX < 0) setPhotoStart((s) => Math.min(maxStart, s + step));
-    else setPhotoStart((s) => Math.max(0, s - step));
+    if (deltaX < 0) avancar();
+    else recuar();
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -108,8 +121,8 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
     const deltaX = e.clientX - startX;
     const SWIPE_THRESHOLD = 40;
     if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
-    if (deltaX < 0) setPhotoStart((s) => Math.min(maxStart, s + step));
-    else setPhotoStart((s) => Math.max(0, s - step));
+    if (deltaX < 0) avancar();
+    else recuar();
   };
 
   return (
@@ -141,7 +154,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
         <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/15 to-black/90" />
 
         <div className="flex h-full flex-col">
-          <div className="relative z-0 w-full opacity-95 flex-1 min-h-0 flex flex-col justify-start pb-[clamp(5.5rem,8dvh,10rem)] md:pb-[clamp(6rem,7dvh,9dvh)] pt-40 md:pt-[clamp(7.5rem,7dvh,10rem)]">
+          <div className="relative z-0 w-full opacity-95 flex-1 min-h-0 flex flex-col justify-start pb-[clamp(4rem,6dvh,8rem)] md:pb-[clamp(6rem,7dvh,9dvh)] pt-40 md:pt-[clamp(7.5rem,7dvh,10rem)]">
             <div className="px-[8%] md:px-[13%] shrink-0">
               <Link
                 href="/eventos"
@@ -167,7 +180,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
               onPointerUp={handlePointerUp}
             >
               <button
-                onClick={() => setPhotoStart((s) => Math.max(0, s - step))}
+                onClick={recuar}
                 disabled={!podeRecuar}
                 aria-label="Fotos anteriores"
                 className="absolute left-[0%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
@@ -176,11 +189,14 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
               </button>
 
               <div
-                className="w-full h-full grid gap-2 md:gap-3 px-[8%] md:px-[13%]"
+                key={isDesktop ? `page-${photoStart}` : "mobile-grid"}
+                className={`w-full h-full grid gap-2 md:gap-3 px-[5%] md:px-[13%] ${isDesktop ? "animate-in fade-in zoom-in-90 duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]" : ""}`}
                 style={
-                  itemsPerPage === 4
-                    ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gridTemplateRows: "repeat(2, minmax(0, 1fr))" }
-                    : { gridTemplateColumns: `repeat(${itemsPerPage}, minmax(0, 1fr))` }
+                  isDesktop
+                    ? { gridTemplateColumns: `repeat(${itemsPerPage}, minmax(0, 1fr))` }
+                    : visiveis.length <= 2
+                      ? { gridTemplateColumns: `repeat(${Math.max(visiveis.length, 1)}, minmax(0, 1fr))`, gridTemplateRows: "repeat(1, minmax(0, 1fr))" }
+                      : { gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gridTemplateRows: "repeat(2, minmax(0, 1fr))" }
                 }
               >
                 {visiveis.map((foto, i) => {
@@ -193,7 +209,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
                         setLightboxIndex(realIndex);
                       }}
                       aria-label={`Ver foto ${realIndex + 1} em tamanho grande`}
-                      className="relative h-full w-full overflow-hidden rounded-lg group cursor-pointer"
+                      className="relative h-full w-full overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105 hover:z-10"
                     >
                       <Image
                         src={`/eventos/${evento.pasta}/${foto}`}
@@ -201,7 +217,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
                         fill
                         draggable={false}
                         sizes="(max-width: 768px) 45vw, 27vw"
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="object-cover"
                       />
                     </button>
                   );
@@ -209,7 +225,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
               </div>
 
               <button
-                onClick={() => setPhotoStart((s) => Math.min(maxStart, s + step))}
+                onClick={avancar}
                 disabled={!podeAvancar}
                 aria-label="Fotos seguintes"
                 className="absolute right-[0%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
@@ -224,7 +240,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
           </div>
         </div>
 
-        <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" />
+        <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" compact />
       </section>
 
       <div className="snap-start">
