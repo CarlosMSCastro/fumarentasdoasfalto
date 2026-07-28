@@ -135,7 +135,7 @@ export default function EventoPage() {
             </div>
 
             <div
-              className="relative flex-1 min-h-52 md:min-h-44 max-h-76 md:max-h-68 flex items-center"
+              className="relative flex-1 min-h-52 md:min-h-44 max-h-104 md:max-h-136 flex items-center"
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >
