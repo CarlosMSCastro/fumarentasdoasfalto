@@ -41,6 +41,7 @@ const HOVER_WIDTH = 680;
 const EDGE_BUFFER = 30;
 const CAROUSEL_LIMIT = 4;
 const CLICK_SCROLL_NAV_DELAY = 450;
+const DRAG_THRESHOLD = 6;
 export default function EventosTimeline() {
   const router = useRouter();
   const grupos = agruparPorAno(eventos);
@@ -49,6 +50,11 @@ export default function EventosTimeline() {
   const autoScrollRef = useRef<number | null>(null);
   const yearRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const monthRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const pointerTypeRef = useRef<string>("mouse");
+  const isDraggingRef = useRef(false);
+  const dragMovedRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartScrollRef = useRef(0);
   const [currentEventId, setCurrentEventId] = useState<string | null>(null);
   const [currentYear, setCurrentYear] = useState(anos[0]);
   const [carouselIndex, setCarouselIndex] = useState<Record<string, number>>({});
@@ -80,7 +86,38 @@ export default function EventosTimeline() {
     return () => clearInterval(interval);
   }, [hoveredId]);
 
+  useEffect(() => {
+    const handleWindowMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      const container = scrollRef.current;
+      if (!container) return;
+      const dx = e.clientX - dragStartXRef.current;
+      if (Math.abs(dx) > DRAG_THRESHOLD) dragMovedRef.current = true;
+      container.scrollLeft = dragStartScrollRef.current - dx;
+    };
+    const handleWindowMouseUp = () => {
+      isDraggingRef.current = false;
+    };
+    window.addEventListener("mousemove", handleWindowMouseMove);
+    window.addEventListener("mouseup", handleWindowMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleWindowMouseMove);
+      window.removeEventListener("mouseup", handleWindowMouseUp);
+    };
+  }, []);
+
+  const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
+    const container = scrollRef.current;
+    if (!container || e.button !== 0) return;
+    e.preventDefault();
+    isDraggingRef.current = true;
+    dragMovedRef.current = false;
+    dragStartXRef.current = e.clientX;
+    dragStartScrollRef.current = container.scrollLeft;
+  };
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isDraggingRef.current) return;
     const container = scrollRef.current;
     if (!container) return;
     const rect = container.getBoundingClientRect();
@@ -145,7 +182,12 @@ export default function EventosTimeline() {
   };
 
   const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (dragMovedRef.current) {
+      e.preventDefault();
+      return;
+    }
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (pointerTypeRef.current !== "mouse") return;
     e.preventDefault();
     const container = scrollRef.current;
     const linkEl = e.currentTarget;
@@ -178,10 +220,11 @@ export default function EventosTimeline() {
       </button>
       <div
         ref={scrollRef}
+        onMouseDown={handleDragStart}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onScroll={handleScroll}
-        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide "
+        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide cursor-grab active:cursor-grabbing"
         style={{
           maskImage: "linear-gradient(to right, transparent 0px, black clamp(24px,8vw,100px), black calc(100% - clamp(24px,8vw,100px)), transparent 100%)",
           WebkitMaskImage: "linear-gradient(to right, transparent 0px, black clamp(24px,8vw,100px), black calc(100% - clamp(24px,8vw,100px)), transparent 100%)",
@@ -216,6 +259,7 @@ export default function EventosTimeline() {
                         setHoveredId(ev.id);
                       }}
                       onMouseLeave={() => setHoveredId(null)}
+                      onPointerDown={(e) => { pointerTypeRef.current = e.pointerType; }}
                       onClick={(e) => handleCardClick(e, ev.id)}
                     >
                       <div

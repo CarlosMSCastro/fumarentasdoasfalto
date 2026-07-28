@@ -143,7 +143,7 @@ export default function EventoPage() {
                 onClick={() => setPhotoStart((s) => Math.max(0, s - step))}
                 disabled={!podeRecuar}
                 aria-label="Fotos anteriores"
-                className="absolute left-[3%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+                className="absolute left-[0%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
               >
                 <ChevronLeft size={40} strokeWidth={2.5} className="md:w-12 md:h-12" />
               </button>
@@ -181,7 +181,7 @@ export default function EventoPage() {
                 onClick={() => setPhotoStart((s) => Math.min(maxStart, s + step))}
                 disabled={!podeAvancar}
                 aria-label="Fotos seguintes"
-                className="absolute right-[3%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+                className="absolute right-[0%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
               >
                 <ChevronRight size={40} strokeWidth={2.5} className="md:w-12 md:h-12" />
               </button>
