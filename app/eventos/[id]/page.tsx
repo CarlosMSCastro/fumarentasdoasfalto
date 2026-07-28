@@ -123,6 +123,7 @@ export default function EventoPage() {
           className="absolute inset-0 h-full w-full object-cover transition-opacity duration-100"
           style={{ opacity: showNormal ? 1 : 0 }}
           src="/videos/drone.mp4"
+          poster="/videos/drone-poster.jpg"
           autoPlay
           muted
           playsInline
@@ -133,6 +134,7 @@ export default function EventoPage() {
           className="absolute inset-0 h-full w-full object-cover transition-opacity duration-100"
           style={{ opacity: showNormal ? 0 : 1 }}
           src="/videos/drone-reverso.mp4"
+          poster="/videos/drone-reverso-poster.jpg"
           muted
           playsInline
           onEnded={handleReversoEnded}

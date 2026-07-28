@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/.video-originals-backup
 
 # debug
 npm-debug.log*
