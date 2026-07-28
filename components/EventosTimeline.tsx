@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import eventosData from "@/data/eventos.json";
@@ -41,17 +40,14 @@ function agruparPorAno(lista: Evento[]) {
 const HOVER_WIDTH = 680;
 const EDGE_BUFFER = 30;
 const CAROUSEL_LIMIT = 4;
-const CLICK_SCROLL_NAV_DELAY = 450;
 const DRAG_THRESHOLD = 6;
 export default function EventosTimeline() {
-  const router = useRouter();
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
   const scrollRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef<number | null>(null);
   const yearRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const monthRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const pointerTypeRef = useRef<string>("mouse");
   const isDraggingRef = useRef(false);
   const dragMovedRef = useRef(false);
   const dragStartXRef = useRef(0);
@@ -182,33 +178,18 @@ export default function EventosTimeline() {
     }
   };
 
-  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  // Navegação é feita pelo <Link> nativo (sem scrollTo/delay antes de navegar
+  // — isso causava um deslize lateral indevido em praticamente todos os
+  // cliques, já que um cartão raramente está exatamente centado no momento
+  // do clique). Só bloqueamos a navegação quando houve um drag real.
+  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (dragMovedRef.current) {
       e.preventDefault();
-      return;
     }
-    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    if (pointerTypeRef.current !== "mouse") return;
-    e.preventDefault();
-    const container = scrollRef.current;
-    const linkEl = e.currentTarget;
-    if (!container) {
-      router.push(`/eventos/${id}`);
-      return;
-    }
-    const cardCenter = linkEl.offsetLeft + linkEl.offsetWidth / 2;
-    const maxScroll = container.scrollWidth - container.clientWidth;
-    const target = Math.max(0, Math.min(cardCenter - container.clientWidth / 2, maxScroll));
-    if (Math.abs(container.scrollLeft - target) < 4) {
-      router.push(`/eventos/${id}`);
-      return;
-    }
-    container.scrollTo({ left: target, behavior: "smooth" });
-    window.setTimeout(() => router.push(`/eventos/${id}`), CLICK_SCROLL_NAV_DELAY);
   };
 
   return (
-    <div className="relative w-full md:-mt-[150px]">
+    <div className="relative w-full md:-mt-[150px] [@media(min-width:768px)_and_(max-height:950px)]:-mt-[215px]">
       <button
         className="pointer-events-none absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
       >
@@ -225,18 +206,18 @@ export default function EventosTimeline() {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onScroll={handleScroll}
-        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide cursor-grab active:cursor-grabbing"
+        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide cursor-grab active:cursor-grabbing [--edge-fade:4px] md:[--edge-fade:clamp(24px,8vw,100px)]"
         style={{
-          maskImage: "linear-gradient(to right, transparent 0px, black clamp(24px,8vw,100px), black calc(100% - clamp(24px,8vw,100px)), transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to right, transparent 0px, black clamp(24px,8vw,100px), black calc(100% - clamp(24px,8vw,100px)), transparent 100%)",
+          maskImage: "linear-gradient(to right, transparent 0px, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent 0px, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%)",
         }}
       >
         <div
-          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] pb-4 w-max mx-auto pl-2 pr-2 md:pl-[150px] md:pr-[150px]"
+          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] [@media(min-width:768px)_and_(max-height:950px)]:pt-[70px] pb-4 w-max mx-auto pl-1 pr-1 md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-5 h-[clamp(13rem,58dvh,24rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] z-30">
+              <div className="flex items-end gap-2 md:gap-3 mb-5 [@media(min-width:768px)_and_(max-height:950px)]:mb-2 h-[clamp(14rem,64dvh,27rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] [@media(min-width:768px)_and_(max-height:950px)]:h-[clamp(20rem,calc(98dvh_-_160px),40rem)] z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
@@ -261,8 +242,7 @@ export default function EventosTimeline() {
                         setHoveredId(ev.id);
                       }}
                       onPointerLeave={() => setHoveredId(null)}
-                      onPointerDown={(e) => { pointerTypeRef.current = e.pointerType; }}
-                      onClick={(e) => handleCardClick(e, ev.id)}
+                      onClick={handleCardClick}
                     >
                       <div
                         className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
@@ -282,7 +262,9 @@ export default function EventosTimeline() {
                         </div>
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-[clamp(8.5rem,42dvh,16.75rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)]"
+                            ev.destaque
+                              ? "h-[clamp(9.5rem,48dvh,18.5rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)] [@media(min-width:768px)_and_(max-height:950px)]:h-[clamp(17.5rem,calc(76dvh_-_110px),30rem)] [@media(min-width:768px)_and_(max-height:950px)]:group-hover:h-[clamp(22rem,calc(98dvh_-_140px),39rem)]"
+                              : "h-[clamp(9rem,50dvh,19rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)] [@media(min-width:768px)_and_(max-height:950px)]:h-[clamp(15rem,calc(64dvh_-_90px),26rem)] [@media(min-width:768px)_and_(max-height:950px)]:group-hover:h-[clamp(19rem,calc(82dvh_-_110px),33rem)]"
                           }`}
                         >
                           <Image
