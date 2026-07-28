@@ -16,6 +16,8 @@ export default function EventoPage() {
   const [photoStart, setPhotoStart] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(2);
   const touchStartX = useRef<number | null>(null);
+  const mouseStartX = useRef<number | null>(null);
+  const draggedRef = useRef(false);
 
   const [showNormal, setShowNormal] = useState(true);
   const normalRef = useRef<HTMLVideoElement>(null);
@@ -73,7 +75,7 @@ export default function EventoPage() {
   const visiveis = evento.fotos.slice(photoStart, photoStart + itemsPerPage);
   const podeRecuar = photoStart > 0;
   const podeAvancar = photoStart < maxStart;
-  const step = itemsPerPage === 4 ? itemsPerPage : 1;
+  const step = itemsPerPage;
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -84,6 +86,29 @@ export default function EventoPage() {
     touchStartX.current = null;
     if (startX === null) return;
     const deltaX = e.changedTouches[0].clientX - startX;
+    const SWIPE_THRESHOLD = 40;
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
+    if (deltaX < 0) setPhotoStart((s) => Math.min(maxStart, s + step));
+    else setPhotoStart((s) => Math.max(0, s - step));
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
+    e.preventDefault();
+    mouseStartX.current = e.clientX;
+    draggedRef.current = false;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (mouseStartX.current === null) return;
+    if (Math.abs(e.clientX - mouseStartX.current) > 8) draggedRef.current = true;
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const startX = mouseStartX.current;
+    mouseStartX.current = null;
+    if (startX === null) return;
+    const deltaX = e.clientX - startX;
     const SWIPE_THRESHOLD = 40;
     if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
     if (deltaX < 0) setPhotoStart((s) => Math.min(maxStart, s + step));
@@ -135,9 +160,12 @@ export default function EventoPage() {
             </div>
 
             <div
-              className="relative flex-1 min-h-52 md:min-h-44 max-h-104 md:max-h-136 flex items-center"
+              className="relative flex-1 min-h-52 md:min-h-44 max-h-104 md:max-h-136 flex items-center cursor-grab active:cursor-grabbing"
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
             >
               <button
                 onClick={() => setPhotoStart((s) => Math.max(0, s - step))}
@@ -161,7 +189,10 @@ export default function EventoPage() {
                   return (
                     <button
                       key={foto}
-                      onClick={() => setLightboxIndex(realIndex)}
+                      onClick={() => {
+                        if (draggedRef.current) return;
+                        setLightboxIndex(realIndex);
+                      }}
                       aria-label={`Ver foto ${realIndex + 1} em tamanho grande`}
                       className="relative h-full w-full overflow-hidden rounded-lg group cursor-pointer"
                     >
@@ -169,6 +200,7 @@ export default function EventoPage() {
                         src={`/eventos/${evento.pasta}/${foto}`}
                         alt={`${evento.titulo} - foto ${realIndex + 1}`}
                         fill
+                        draggable={false}
                         sizes="(max-width: 768px) 45vw, 27vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />

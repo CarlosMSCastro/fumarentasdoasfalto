@@ -163,7 +163,7 @@ export default function EventosTimeline() {
     setCurrentYear(closest);
   };
 
-  const ensureVisibleOnHover = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const ensureVisibleOnHover = (e: React.PointerEvent<HTMLAnchorElement>) => {
     const container = scrollRef.current;
     if (!container) return;
     const linkEl = e.currentTarget;
@@ -235,7 +235,7 @@ export default function EventosTimeline() {
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-5 h-[clamp(13rem,58dvh,24rem)] md:h-[clamp(18rem,calc(98dvh_-_373px),32rem)] z-30">
+              <div className="flex items-end gap-2 md:gap-3 mb-5 h-[clamp(13rem,58dvh,24rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
@@ -253,12 +253,13 @@ export default function EventosTimeline() {
                       className={`group relative shrink-0 cursor-pointer ${
                         ev.destaque ? "w-62.5 md:w-80" : "w-56 md:w-71.25"
                       }`}
-                      onMouseEnter={(e) => {
+                      onPointerEnter={(e) => {
+                        if (e.pointerType !== "mouse") return;
                         ensureVisibleOnHover(e);
                         setCurrentEventId(ev.id);
                         setHoveredId(ev.id);
                       }}
-                      onMouseLeave={() => setHoveredId(null)}
+                      onPointerLeave={() => setHoveredId(null)}
                       onPointerDown={(e) => { pointerTypeRef.current = e.pointerType; }}
                       onClick={(e) => handleCardClick(e, ev.id)}
                     >
@@ -280,7 +281,7 @@ export default function EventosTimeline() {
                         </div>
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
-                            ev.destaque ? "h-[clamp(8.5rem,42dvh,16.75rem)] md:h-[clamp(14rem,calc(76dvh_-_288px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_370px),31.5rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_245px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_315px),26.875rem)]"
+                            ev.destaque ? "h-[clamp(8.5rem,42dvh,16.75rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)]" : "h-[clamp(8rem,44dvh,17rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)]"
                           }`}
                         >
                           <div

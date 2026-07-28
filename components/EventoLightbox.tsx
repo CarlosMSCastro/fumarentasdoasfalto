@@ -24,7 +24,15 @@ interface ArrowPos {
   nextRight: number;
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 const ARROW_CLEARANCE = 56;
+const SWIPE_THRESHOLD = 50;
+const MAX_SCALE = 4;
+const DRAG_THRESHOLD = 8;
 
 export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, onIndexChange }: EventoLightboxProps) {
   const total = fotos.length;
@@ -33,11 +41,21 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
   const [rect, setRect] = useState<Rect | null>(null);
   const [arrowPos, setArrowPos] = useState<ArrowPos | null>(null);
   const [prevIndex, setPrevIndex] = useState(index);
+  const [scale, setScale] = useState(1);
+  const [translate, setTranslate] = useState<Point>({ x: 0, y: 0 });
+
+  const pinchRef = useRef<{ startDist: number; startScale: number; startTranslate: Point } | null>(null);
+  const panRef = useRef<{ startX: number; startY: number; startTranslate: Point } | null>(null);
+  const touchSwipeStartRef = useRef<number | null>(null);
+  const mouseStartXRef = useRef<number | null>(null);
+  const draggedRef = useRef(false);
 
   if (index !== prevIndex) {
     setPrevIndex(index);
     setRect(null);
     setArrowPos(null);
+    setScale(1);
+    setTranslate({ x: 0, y: 0 });
   }
 
   const goPrev = useCallback(() => {
@@ -47,6 +65,17 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
   const goNext = useCallback(() => {
     onIndexChange((index + 1) % total);
   }, [index, total, onIndexChange]);
+
+  const clampTranslate = (t: Point, s: number): Point => {
+    const box = boxRef.current;
+    if (!box || s <= 1) return { x: 0, y: 0 };
+    const maxX = (box.clientWidth * (s - 1)) / 2;
+    const maxY = (box.clientHeight * (s - 1)) / 2;
+    return {
+      x: Math.min(maxX, Math.max(-maxX, t.x)),
+      y: Math.min(maxY, Math.max(-maxY, t.y)),
+    };
+  };
 
   // Fits the natural image aspect ratio inside the box, so the overlay
   // (close button, arrows, click-to-close area) tracks the actual visible
@@ -96,15 +125,112 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
     };
   }, [onClose, goPrev, goNext]);
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const [t1, t2] = [e.touches[0], e.touches[1]];
+      pinchRef.current = {
+        startDist: Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY),
+        startScale: scale,
+        startTranslate: translate,
+      };
+      touchSwipeStartRef.current = null;
+    } else if (e.touches.length === 1) {
+      if (scale > 1.01) {
+        panRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, startTranslate: translate };
+      } else {
+        touchSwipeStartRef.current = e.touches[0].clientX;
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchRef.current) {
+      e.preventDefault();
+      const [t1, t2] = [e.touches[0], e.touches[1]];
+      const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      const nextScale = Math.min(MAX_SCALE, Math.max(1, pinchRef.current.startScale * (dist / pinchRef.current.startDist)));
+      setScale(nextScale);
+      setTranslate(clampTranslate(pinchRef.current.startTranslate, nextScale));
+    } else if (e.touches.length === 1 && panRef.current) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - panRef.current.startX;
+      const dy = e.touches[0].clientY - panRef.current.startY;
+      setTranslate(clampTranslate({ x: panRef.current.startTranslate.x + dx, y: panRef.current.startTranslate.y + dy }, scale));
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (pinchRef.current) {
+      pinchRef.current = null;
+      if (scale < 1.05) {
+        setScale(1);
+        setTranslate({ x: 0, y: 0 });
+      }
+      return;
+    }
+    if (panRef.current) {
+      panRef.current = null;
+      return;
+    }
+    const startX = touchSwipeStartRef.current;
+    touchSwipeStartRef.current = null;
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+    if (dx < 0) goNext();
+    else goPrev();
+  };
+
+  const handleBoxPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
+    e.preventDefault();
+    mouseStartXRef.current = e.clientX;
+    draggedRef.current = false;
+  };
+
+  const handleBoxPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (mouseStartXRef.current === null) return;
+    if (Math.abs(e.clientX - mouseStartXRef.current) > DRAG_THRESHOLD) draggedRef.current = true;
+  };
+
+  const handleBoxPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const startX = mouseStartXRef.current;
+    mouseStartXRef.current = null;
+    if (startX === null) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+    if (dx < 0) goNext();
+    else goPrev();
+  };
+
+  const handleBoxClick = (e: React.MouseEvent) => {
+    if (draggedRef.current) {
+      e.stopPropagation();
+      draggedRef.current = false;
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center" onClick={onClose}>
-      <div ref={boxRef} className="relative w-[85vw] h-[70vh] md:w-[75vw] md:h-[80vh]">
+      <div
+        ref={boxRef}
+        className="relative w-[85vw] h-[70vh] md:w-[75vw] md:h-[80vh] overflow-hidden cursor-grab active:cursor-grabbing"
+        onClick={handleBoxClick}
+        onPointerDown={handleBoxPointerDown}
+        onPointerMove={handleBoxPointerMove}
+        onPointerUp={handleBoxPointerUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <Image
           src={`/eventos/${pasta}/${fotos[index]}`}
           alt={`${titulo} - foto ${index + 1}`}
           fill
+          draggable={false}
           sizes="90vw"
-          className="object-contain"
+          className="object-contain touch-none"
+          style={{ transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})` }}
           priority
           onLoad={(e) => {
             const img = e.currentTarget;
@@ -122,7 +248,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
               }}
               aria-label="Foto anterior"
               style={{ left: arrowPos.prevLeft }}
-              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
             >
               <ChevronLeft size={40} strokeWidth={2.5} className="md:w-14 md:h-14" />
             </button>
@@ -133,7 +259,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
               }}
               aria-label="Foto seguinte"
               style={{ right: arrowPos.nextRight }}
-              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
             >
               <ChevronRight size={40} strokeWidth={2.5} className="md:w-14 md:h-14" />
             </button>
@@ -149,7 +275,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
             <button
               onClick={onClose}
               aria-label="Fechar"
-              className="absolute -top-4 -right-4 md:-top-5 md:-right-5 z-10 flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-black/80 border border-white/20 text-white/90 hover:text-orange-500 hover:border-orange-500 transition-all"
+              className="absolute -top-4 -right-4 md:-top-5 md:-right-5 z-10 flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-black/80 border border-white/20 text-white/90 hover:text-orange-500 hover:border-orange-500 transition-all cursor-pointer"
             >
               <X size={20} strokeWidth={2.5} />
             </button>
