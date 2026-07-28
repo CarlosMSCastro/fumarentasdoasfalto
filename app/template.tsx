@@ -1,16 +1,7 @@
-"use client";
-import { motion } from "framer-motion";
-
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      onAnimationComplete={() => {}}
-      className="animate-in fade-in"
-    >
+    <div className="animate-in fade-in ease-out duration-1000">
       {children}
-    </motion.div>
+    </div>
   );
 }
