@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import fundadoresData from "@/data/fundadores.json";
 
@@ -10,8 +11,24 @@ interface Fundador {
 }
 
 const fundadores = fundadoresData as Fundador[];
+const TAP_REVEAL_MS = 2000;
 
 export default function FoundersSection() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const activeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (activeTimeoutRef.current) clearTimeout(activeTimeoutRef.current);
+    };
+  }, []);
+
+  const handleCardTap = (i: number) => {
+    setActiveIndex(i);
+    if (activeTimeoutRef.current) clearTimeout(activeTimeoutRef.current);
+    activeTimeoutRef.current = setTimeout(() => setActiveIndex(null), TAP_REVEAL_MS);
+  };
+
   return (
     <section id="fundadores" className="relative h-dvh w-full overflow-hidden snap-start">
       {/* Imagem de fundo */}
@@ -41,28 +58,29 @@ export default function FoundersSection() {
         </div>
 
         <div
-          className="flex-1 min-h-40 md:min-h-64 max-h-96 md:max-h-168 grid grid-cols-7 gap-1.5 md:gap-3"
+          className="flex-1 min-h-40 md:min-h-64 max-h-96 md:max-h-168 grid grid-flow-col auto-cols-[27vw] gap-1.5 overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-hide md:grid-flow-row md:auto-cols-auto md:grid-cols-7 md:gap-3 md:overflow-visible md:snap-none"
           style={{ gridTemplateRows: "repeat(2, minmax(0, 1fr))" }}
         >
           {fundadores.map((fundador, i) => (
             <div
               key={i}
-              className="group relative overflow-hidden rounded-md bg-neutral-800"
+              onClick={() => handleCardTap(i)}
+              className="group relative overflow-hidden rounded-md bg-neutral-800 snap-start cursor-pointer"
             >
               <Image
                 src={`/fundadores/${fundador.foto}`}
                 alt={fundador.nome}
                 fill
-                sizes="(max-width: 768px) 14vw, 10vw"
-                className="object-cover transition-all duration-300 group-hover:brightness-75"
+                sizes="(max-width: 768px) 27vw, 10vw"
+                className={`object-cover transition-all duration-300 group-hover:brightness-75 ${activeIndex === i ? "brightness-75" : ""}`}
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/15 to-black/10" />
               <div className="absolute inset-0 flex items-end p-1 md:p-2.5">
                 <div className="relative w-full">
-                  <span className="block text-white font-bold uppercase leading-[0.85] text-[11px] sm:text-sm md:text-3xl transition-opacity duration-300 group-hover:opacity-0">
+                  <span className={`block text-white font-bold uppercase leading-[0.85] text-[11px] sm:text-sm md:text-3xl transition-opacity duration-300 group-hover:opacity-0 ${activeIndex === i ? "opacity-0" : ""}`}>
                     {fundador.nome}
                   </span>
-                  <span className="absolute inset-0 flex items-end text-orange-500 font-bold uppercase leading-[0.85] text-[11px] sm:text-sm md:text-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className={`absolute inset-0 flex items-end text-orange-500 font-bold uppercase leading-[0.85] text-[11px] sm:text-sm md:text-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${activeIndex === i ? "opacity-100" : ""}`}>
                     {fundador.cargo}
                   </span>
                 </div>
