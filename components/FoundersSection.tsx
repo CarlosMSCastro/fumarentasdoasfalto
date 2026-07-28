@@ -77,10 +77,10 @@ export default function FoundersSection() {
               <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/15 to-black/10" />
               <div className="absolute inset-0 flex items-end p-1 md:p-2.5">
                 <div className="relative w-full">
-                  <span className={`block text-white font-bold uppercase leading-[0.85] text-sm sm:text-base md:text-3xl transition-opacity duration-300 group-hover:opacity-0 ${activeIndex === i ? "opacity-0" : ""}`}>
+                  <span className={`block text-white font-bold uppercase leading-[0.85] text-lg sm:text-base md:text-3xl transition-opacity duration-300 group-hover:opacity-0 ${activeIndex === i ? "opacity-0" : ""}`}>
                     {fundador.nome}
                   </span>
-                  <span className={`absolute inset-0 flex items-end text-orange-500 font-bold uppercase leading-[0.85] text-sm sm:text-base md:text-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${activeIndex === i ? "opacity-100" : ""}`}>
+                  <span className={`absolute inset-0 flex items-end text-orange-500 font-bold uppercase leading-[0.85] text-lg sm:text-base md:text-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${activeIndex === i ? "opacity-100" : ""}`}>
                     {fundador.cargo}
                   </span>
                 </div>
