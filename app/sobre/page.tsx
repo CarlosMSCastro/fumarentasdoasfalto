@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import ContactoSection from "@/components/ContactosSection";
 import FoundersSection from "@/components/FoundersSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
@@ -8,9 +9,13 @@ export default function SobrePage() {
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <section className="relative h-dvh w-full overflow-hidden snap-start">
         {/* Imagem de fundo */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/sobremimwallpaper.jpg')" }}
+        <Image
+          src="/sobremimwallpaper.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
         {/* Overlay horizontal */}
         <div className="absolute inset-0 bg-linear-to-l from-black/35 via-black/15 to-black/5" />

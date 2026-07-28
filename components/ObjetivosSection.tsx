@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import ObjetivosDesktop from "@/components/ObjetivosDesktop";
 import ObjetivosMobile from "@/components/ObjetivosMobile";
 import ScrollIndicator from "@/components/ScrollIndicator";
@@ -6,9 +7,12 @@ import ScrollIndicator from "@/components/ScrollIndicator";
 export default function ObjetivosSection() {
   return (
     <section id="sobre" className="flex flex-col items-center justify-center min-h-dvh pt-15 pb-22 md:py-30 gap-2 relative overflow-hidden snap-start snap-always">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/Objetivosbg.jpg')" }}
+      <Image
+        src="/Objetivosbg.jpg"
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover"
       />
       <div className="absolute inset-0 bg-linear-to-l from-black/45 via-black/40 to-black/35" />
       <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/85" />

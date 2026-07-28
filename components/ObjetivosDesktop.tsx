@@ -1,4 +1,6 @@
 "use client";
+import Image from "next/image";
+
 export default function ObjetivosDesktop() {
   const handleClick = (e: React.MouseEvent, href: string) => {
     if (href === "/reparacao") {
@@ -28,9 +30,12 @@ export default function ObjetivosDesktop() {
         className="group relative rounded-lg flex-1 md:hover:flex-2 opacity-90 transition-all duration-500 h-[60vh] md:h-[45vh] flex flex-col justify-between p-6 shadow-[0_25px_60px_rgba(0,0,0,0.85)]"
       >
         <div className="absolute inset-0 overflow-hidden rounded-sm">
-          <div
-            className="absolute inset-0 bg-cover bg-center brightness-[0.70] group-hover:brightness-60 group-hover:scale-150 transition-all duration-500"
-            style={{ backgroundImage: `url('${item.bg}')` }}
+          <Image
+            src={item.bg}
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 33vw, 25vw"
+            className="object-cover brightness-[0.70] group-hover:brightness-60 group-hover:scale-150 transition-all duration-500"
           />
         </div>
         <h3 className="relative z-10 text-xl md:text-2xl font-bold text-white group-hover:text-2xl md:group-hover:text-3xl transition-all duration-300">{item.title}</h3>

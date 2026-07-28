@@ -32,9 +32,12 @@ export default function FoundersSection() {
   return (
     <section id="fundadores" className="relative h-dvh w-full overflow-hidden snap-start">
       {/* Imagem de fundo */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/sobremimwallpaper2.jpg')" }}
+      <Image
+        src="/sobremimwallpaper2.jpg"
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover"
       />
       {/* Overlay horizontal */}
       <div className="absolute inset-0 bg-linear-to-l from-black/55 via-black/65 to-black/65" />
