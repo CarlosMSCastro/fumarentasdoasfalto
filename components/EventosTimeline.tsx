@@ -87,7 +87,7 @@ export default function EventosTimeline() {
   }, [hoveredId]);
 
   useEffect(() => {
-    const handleWindowMouseMove = (e: MouseEvent) => {
+    const handleWindowPointerMove = (e: PointerEvent) => {
       if (!isDraggingRef.current) return;
       const container = scrollRef.current;
       if (!container) return;
@@ -95,20 +95,20 @@ export default function EventosTimeline() {
       if (Math.abs(dx) > DRAG_THRESHOLD) dragMovedRef.current = true;
       container.scrollLeft = dragStartScrollRef.current - dx;
     };
-    const handleWindowMouseUp = () => {
+    const handleWindowPointerUp = () => {
       isDraggingRef.current = false;
     };
-    window.addEventListener("mousemove", handleWindowMouseMove);
-    window.addEventListener("mouseup", handleWindowMouseUp);
+    window.addEventListener("pointermove", handleWindowPointerMove);
+    window.addEventListener("pointerup", handleWindowPointerUp);
     return () => {
-      window.removeEventListener("mousemove", handleWindowMouseMove);
-      window.removeEventListener("mouseup", handleWindowMouseUp);
+      window.removeEventListener("pointermove", handleWindowPointerMove);
+      window.removeEventListener("pointerup", handleWindowPointerUp);
     };
   }, []);
 
-  const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
     const container = scrollRef.current;
-    if (!container || e.button !== 0) return;
+    if (!container || e.pointerType !== "mouse" || e.button !== 0) return;
     e.preventDefault();
     isDraggingRef.current = true;
     dragMovedRef.current = false;
@@ -220,7 +220,7 @@ export default function EventosTimeline() {
       </button>
       <div
         ref={scrollRef}
-        onMouseDown={handleDragStart}
+        onPointerDown={handleDragStart}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onScroll={handleScroll}
