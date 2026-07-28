@@ -60,21 +60,18 @@ export default function FoundersSection() {
           <h2 className="text-4xl md:text-6xl font-bold text-white/90">Fundadores</h2>
         </div>
 
-        <div
-          className="flex-1 min-h-40 md:min-h-64 max-h-96 md:max-h-168 grid grid-flow-col auto-cols-[27vw] gap-1.5 overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-hide md:grid-flow-row md:auto-cols-auto md:grid-cols-7 md:gap-3 md:overflow-visible md:snap-none"
-          style={{ gridTemplateRows: "repeat(2, minmax(0, 1fr))" }}
-        >
+        <div className="flex-1 min-h-40 md:min-h-64 md:max-h-168 grid grid-cols-3 auto-rows-fr gap-1.5 md:grid-cols-7 md:gap-3">
           {fundadores.map((fundador, i) => (
             <div
               key={i}
               onClick={() => handleCardTap(i)}
-              className="group relative overflow-hidden rounded-md bg-neutral-800 snap-start cursor-pointer"
+              className="group relative overflow-hidden rounded-md bg-neutral-800 cursor-pointer"
             >
               <Image
                 src={`/fundadores/${fundador.foto}`}
                 alt={fundador.nome}
                 fill
-                sizes="(max-width: 768px) 27vw, 10vw"
+                sizes="(max-width: 768px) 28vw, 10vw"
                 className={`object-cover transition-all duration-300 group-hover:brightness-75 ${activeIndex === i ? "brightness-75" : ""}`}
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/15 to-black/10" />
