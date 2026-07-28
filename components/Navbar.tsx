@@ -22,12 +22,14 @@ export default function Navbar() {
   const cartCount = 0;
   const [scrolled, setScrolled] = useState(false);
   const [inContactos, setInContactos] = useState(false);
+  const [navTransparentZone, setNavTransparentZone] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     setTimeout(() => {
       setScrolled(false);
       setInContactos(false);
+      setNavTransparentZone(false);
     }, 0);
     const container = document.getElementById('snap-container');
     const handleScroll = () => {
@@ -39,6 +41,11 @@ export default function Navbar() {
       } else {
         setInContactos(false);
       }
+      const isWithin = (el: HTMLElement | null) =>
+        !!el && scrollY >= el.offsetTop - 50 && scrollY < el.offsetTop + el.offsetHeight - 50;
+      const fundadores = document.getElementById('fundadores');
+      const objetivos = document.getElementById('sobre');
+      setNavTransparentZone(isWithin(fundadores) || isWithin(objetivos));
     };
     const target: Window | HTMLElement = container || window;
     target.addEventListener("scroll", handleScroll);
@@ -58,7 +65,7 @@ export default function Navbar() {
 
   return (
     <nav className={`w-full fixed top-0 left-0 right-0 z-50 px-6 ${scrolled ? "py-3 lg:pt-2" : "py-6 lg:py-7"} overflow-visible transition-all duration-300 ${
-  scrolled ? "bg-black/25 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.5)]" : "bg-transparent border-transparent"
+  scrolled ? (navTransparentZone ? "bg-transparent border-transparent" : "bg-black/25 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.5)]") : "bg-transparent border-transparent"
 }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
 

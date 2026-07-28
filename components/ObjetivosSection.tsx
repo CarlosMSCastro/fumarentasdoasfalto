@@ -17,8 +17,15 @@ export default function ObjetivosSection() {
 
   return (
     <section id="sobre" className="flex flex-col items-center justify-center min-h-dvh pt-15 pb-22 md:py-30 gap-2 relative overflow-hidden snap-start snap-always">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/Objetivosbg.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-linear-to-l from-black/45 via-black/40 to-black/35" />
+      <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/85" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/20 via-black/30 to-black/85" />
       <video
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-80 pointer-events-none mix-blend-screen"
         src="/videos/smoke.mp4"
         autoPlay
         muted
@@ -27,7 +34,7 @@ export default function ObjetivosSection() {
       />
       <video
         ref={video2Ref}
-        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none scale-x-[-1] scale-y-[-1]"
+        className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-60 pointer-events-none mix-blend-screen scale-x-[-1] scale-y-[-1]"
         src="/videos/smoke.mp4"
         muted
         loop
