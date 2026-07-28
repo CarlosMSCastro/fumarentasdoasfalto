@@ -15,6 +15,7 @@ export default function EventoPage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [photoStart, setPhotoStart] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(2);
+  const touchStartX = useRef<number | null>(null);
 
   const [showNormal, setShowNormal] = useState(true);
   const normalRef = useRef<HTMLVideoElement>(null);
@@ -72,6 +73,22 @@ export default function EventoPage() {
   const visiveis = evento.fotos.slice(photoStart, photoStart + itemsPerPage);
   const podeRecuar = photoStart > 0;
   const podeAvancar = photoStart < maxStart;
+  const step = itemsPerPage === 4 ? itemsPerPage : 1;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const startX = touchStartX.current;
+    touchStartX.current = null;
+    if (startX === null) return;
+    const deltaX = e.changedTouches[0].clientX - startX;
+    const SWIPE_THRESHOLD = 40;
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
+    if (deltaX < 0) setPhotoStart((s) => Math.min(maxStart, s + step));
+    else setPhotoStart((s) => Math.max(0, s - step));
+  };
 
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
@@ -117,9 +134,13 @@ export default function EventoPage() {
               <p className="text-white/70 text-xs md:text-lg max-w-3xl mb-1.5 md:mb-6 line-clamp-2 md:line-clamp-3">{evento.descricao}</p>
             </div>
 
-            <div className="relative flex-1 min-h-52 md:min-h-44 max-h-76 md:max-h-68 flex items-center">
+            <div
+              className="relative flex-1 min-h-52 md:min-h-44 max-h-76 md:max-h-68 flex items-center"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
               <button
-                onClick={() => setPhotoStart((s) => Math.max(0, s - 1))}
+                onClick={() => setPhotoStart((s) => Math.max(0, s - step))}
                 disabled={!podeRecuar}
                 aria-label="Fotos anteriores"
                 className="absolute left-[3%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
@@ -157,7 +178,7 @@ export default function EventoPage() {
               </div>
 
               <button
-                onClick={() => setPhotoStart((s) => Math.min(maxStart, s + 1))}
+                onClick={() => setPhotoStart((s) => Math.min(maxStart, s + step))}
                 disabled={!podeAvancar}
                 aria-label="Fotos seguintes"
                 className="absolute right-[3%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
