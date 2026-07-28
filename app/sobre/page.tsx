@@ -1,5 +1,6 @@
 "use client";
 import ContactoSection from "@/components/ContactosSection";
+import FoundersSection from "@/components/FoundersSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 
 export default function SobrePage() {
@@ -43,8 +44,9 @@ export default function SobrePage() {
           </p>
         </div>
         {/* Scroll Indicator */}
-        <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" />
+        <ScrollIndicator targetId="fundadores" className="bottom-[2vh] z-20" />
       </section>
+      <FoundersSection />
       <div className="snap-start">
         <ContactoSection />
       </div>
