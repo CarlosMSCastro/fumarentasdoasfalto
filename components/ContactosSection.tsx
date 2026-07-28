@@ -17,7 +17,7 @@ export default function ContactoSection() {
   return (
     <section className="flex flex-col relative overflow-hidden snap-start" id="contactos">
       <video
-        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-20 pointer-events-none"
+        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-30 md:opacity-20 pointer-events-none"
         src="/videos/smoke.mp4"
         autoPlay
         muted
@@ -26,7 +26,7 @@ export default function ContactoSection() {
       />
       <video
         ref={video2Ref}
-        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-20 pointer-events-none scale-x-[-1] scale-y-[-1]"
+        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-30 md:opacity-20 pointer-events-none scale-x-[-1] scale-y-[-1]"
         src="/videos/smoke.mp4"
         muted
         loop
