@@ -37,15 +37,14 @@ function agruparPorAno(lista: Evento[]) {
   });
   return grupos;
 }
-const HOVER_WIDTH = 680;
-const EDGE_BUFFER = 30;
 const CAROUSEL_LIMIT = 4;
 const DRAG_THRESHOLD = 6;
+const ARROW_SCROLL_SPEED = 8;
 export default function EventosTimeline() {
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const autoScrollRef = useRef<number | null>(null);
+  const arrowScrollRef = useRef<number | null>(null);
   const yearRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const monthRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const isDraggingRef = useRef(false);
@@ -64,9 +63,29 @@ export default function EventosTimeline() {
       el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
     }
     return () => {
-      if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
+      if (arrowScrollRef.current) cancelAnimationFrame(arrowScrollRef.current);
     };
   }, []);
+
+  // Scroll contínuo só enquanto o rato está mesmo em cima de uma seta —
+  // distinto do auto-scroll por proximidade à margem que foi removido.
+  const startArrowScroll = (direction: 1 | -1) => {
+    if (arrowScrollRef.current) cancelAnimationFrame(arrowScrollRef.current);
+    const step = () => {
+      const container = scrollRef.current;
+      if (!container) return;
+      container.scrollLeft += direction * ARROW_SCROLL_SPEED;
+      arrowScrollRef.current = requestAnimationFrame(step);
+    };
+    arrowScrollRef.current = requestAnimationFrame(step);
+  };
+
+  const stopArrowScroll = () => {
+    if (arrowScrollRef.current) {
+      cancelAnimationFrame(arrowScrollRef.current);
+      arrowScrollRef.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!hoveredId) return;
@@ -113,34 +132,6 @@ export default function EventosTimeline() {
     dragStartScrollRef.current = container.scrollLeft;
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDraggingRef.current) return;
-    const container = scrollRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const edgeZone = 550;
-    const x = e.clientX - rect.left;
-    if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
-    const step = () => {
-      if (!container) return;
-      if (x < edgeZone) {
-        container.scrollLeft -= 3;
-      } else if (x > rect.width - edgeZone) {
-        container.scrollLeft += 3;
-      } else {
-        return;
-      }
-      autoScrollRef.current = requestAnimationFrame(step);
-    };
-    if (x < edgeZone || x > rect.width - edgeZone) {
-      autoScrollRef.current = requestAnimationFrame(step);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
-  };
-
   const handleScroll = () => {
     const container = scrollRef.current;
     if (!container) return;
@@ -160,24 +151,6 @@ export default function EventosTimeline() {
     setCurrentYear(closest);
   };
 
-  const ensureVisibleOnHover = (e: React.PointerEvent<HTMLAnchorElement>) => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const linkEl = e.currentTarget;
-    const cardLeft = linkEl.offsetLeft;
-    const cardWidthNow = linkEl.offsetWidth;
-    const cardCenter = cardLeft + cardWidthNow / 2;
-    const expandedLeft = cardCenter - HOVER_WIDTH / 2;
-    const expandedRight = cardCenter + HOVER_WIDTH / 2;
-    const visibleLeft = container.scrollLeft;
-    const visibleRight = container.scrollLeft + container.clientWidth;
-    if (expandedRight > visibleRight - EDGE_BUFFER) {
-      container.scrollTo({ left: container.scrollLeft + (expandedRight - visibleRight) + EDGE_BUFFER, behavior: "smooth" });
-    } else if (expandedLeft < visibleLeft + EDGE_BUFFER) {
-      container.scrollTo({ left: container.scrollLeft - (visibleLeft - expandedLeft) - EDGE_BUFFER, behavior: "smooth" });
-    }
-  };
-
   // Navegação é feita pelo <Link> nativo (sem scrollTo/delay antes de navegar
   // — isso causava um deslize lateral indevido em praticamente todos os
   // cliques, já que um cartão raramente está exatamente centado no momento
@@ -189,22 +162,26 @@ export default function EventosTimeline() {
   };
 
   return (
-    <div className="relative w-full md:-mt-[150px] [@media(min-width:768px)_and_(max-height:950px)]:-mt-[215px]">
+    <div className="relative w-full md:-mt-[150px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:-mt-[215px]">
       <button
-        className="pointer-events-none absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+        onPointerEnter={(e) => { if (e.pointerType === "mouse") startArrowScroll(-1); }}
+        onPointerLeave={(e) => { if (e.pointerType === "mouse") stopArrowScroll(); }}
+        aria-label="Recuar na timeline"
+        className="absolute -left-1 md:left-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
       >
         <ChevronLeft strokeWidth={1} className="w-8 h-8 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
       </button>
       <button
-        className="pointer-events-none absolute right-1 md:right-4 top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+        onPointerEnter={(e) => { if (e.pointerType === "mouse") startArrowScroll(1); }}
+        onPointerLeave={(e) => { if (e.pointerType === "mouse") stopArrowScroll(); }}
+        aria-label="Avançar na timeline"
+        className="absolute -right-1 md:right-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
       >
         <ChevronRight strokeWidth={1} className="w-8 h-8 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
       </button>
       <div
         ref={scrollRef}
         onPointerDown={handleDragStart}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
         onScroll={handleScroll}
         className="w-full overflow-x-auto overflow-y-visible scrollbar-hide cursor-grab active:cursor-grabbing [--edge-fade:4px] md:[--edge-fade:clamp(24px,8vw,100px)]"
         style={{
@@ -213,11 +190,11 @@ export default function EventosTimeline() {
         }}
       >
         <div
-          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] [@media(min-width:768px)_and_(max-height:950px)]:pt-[70px] pb-4 w-max mx-auto pl-1 pr-1 md:pl-[150px] md:pr-[150px]"
+          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:pt-[70px] pb-4 w-max mx-auto pl-1 pr-1 md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-5 [@media(min-width:768px)_and_(max-height:950px)]:mb-2 h-[clamp(14rem,64dvh,27rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] [@media(min-width:768px)_and_(max-height:950px)]:h-[clamp(20rem,calc(98dvh_-_160px),40rem)] z-30">
+              <div className="flex items-end gap-2 md:gap-3 mb-5 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:mb-2 h-[clamp(14rem,64dvh,27rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(20rem,calc(98dvh_-_160px),40rem)] z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
@@ -237,7 +214,6 @@ export default function EventosTimeline() {
                       }`}
                       onPointerEnter={(e) => {
                         if (e.pointerType !== "mouse") return;
-                        ensureVisibleOnHover(e);
                         setCurrentEventId(ev.id);
                         setHoveredId(ev.id);
                       }}
@@ -263,8 +239,8 @@ export default function EventosTimeline() {
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
                             ev.destaque
-                              ? "h-[clamp(9.5rem,48dvh,18.5rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)] [@media(min-width:768px)_and_(max-height:950px)]:h-[clamp(17.5rem,calc(76dvh_-_110px),30rem)] [@media(min-width:768px)_and_(max-height:950px)]:group-hover:h-[clamp(22rem,calc(98dvh_-_140px),39rem)]"
-                              : "h-[clamp(9rem,50dvh,19rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)] [@media(min-width:768px)_and_(max-height:950px)]:h-[clamp(15rem,calc(64dvh_-_90px),26rem)] [@media(min-width:768px)_and_(max-height:950px)]:group-hover:h-[clamp(19rem,calc(82dvh_-_110px),33rem)]"
+                              ? "h-[clamp(9.5rem,48dvh,18.5rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(17.5rem,calc(76dvh_-_110px),30rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:group-hover:h-[clamp(22rem,calc(98dvh_-_140px),39rem)]"
+                              : "h-[clamp(9rem,50dvh,19rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(15rem,calc(64dvh_-_90px),26rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:group-hover:h-[clamp(19rem,calc(82dvh_-_110px),33rem)]"
                           }`}
                         >
                           <Image

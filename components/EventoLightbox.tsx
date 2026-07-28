@@ -43,6 +43,18 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
   const [prevIndex, setPrevIndex] = useState(index);
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState<Point>({ x: 0, y: 0 });
+  const [closing, setClosing] = useState(false);
+
+  const requestClose = useCallback(() => {
+    setClosing(true);
+  }, []);
+
+  // Só desmonta de facto quando a animação de saída (fade-out) termina de
+  // verdade, em vez de um timeout com a duração "adivinhada" — assim fica
+  // sempre em sincronia com a duration da classe CSS.
+  const handleAnimationEnd = () => {
+    if (closing) onClose();
+  };
 
   const pinchRef = useRef<{ startDist: number; startScale: number; startTranslate: Point } | null>(null);
   const panRef = useRef<{ startX: number; startY: number; startTranslate: Point } | null>(null);
@@ -113,7 +125,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") requestClose();
       if (e.key === "ArrowLeft") goPrev();
       if (e.key === "ArrowRight") goNext();
     };
@@ -123,7 +135,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
       window.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
     };
-  }, [onClose, goPrev, goNext]);
+  }, [requestClose, goPrev, goNext]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
@@ -211,7 +223,13 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center" onClick={onClose}>
+    <div
+      className={`fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center ${
+        closing ? "animate-out fade-out fill-mode-forwards duration-300" : "animate-in fade-in duration-300"
+      }`}
+      onClick={requestClose}
+      onAnimationEnd={handleAnimationEnd}
+    >
       <div
         ref={boxRef}
         className="relative w-[85vw] h-[70vh] md:w-[75vw] md:h-[80vh] cursor-grab active:cursor-grabbing"
@@ -278,7 +296,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              onClick={onClose}
+              onClick={requestClose}
               aria-label="Fechar"
               className="absolute -top-4 -right-4 md:-top-5 md:-right-5 z-10 flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-black/80 border border-white/20 text-white/90 hover:text-orange-500 hover:border-orange-500 transition-all cursor-pointer"
             >
