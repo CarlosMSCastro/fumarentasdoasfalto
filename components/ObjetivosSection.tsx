@@ -14,9 +14,9 @@ export default function ObjetivosSection() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-linear-to-l from-black/15 via-black/30 to-black/65" />
-      <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/55" />
-      <div className="absolute inset-0 bg-linear-to-t from-black/20 via-black/30 to-black/55" />
+      <div className="absolute inset-0 bg-linear-to-l from-black/15 via-black/30 to-black/45" />
+      <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/75" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/10 via-black/20 to-black/70" />
       <video
         className="absolute inset-0 w-full h-full object-cover object-[center_top] md:object-center opacity-40 pointer-events-none mix-blend-screen scale-x-[-1]"
         src="/videos/smoke.mp4"
