@@ -8,11 +8,15 @@ import ScrollIndicator from "@/components/ScrollIndicator";
 import EventoLightbox from "@/components/EventoLightbox";
 import { formatarDataCompleta, type Evento } from "@/lib/eventos";
 
+const EDGE_BOUNCE_PX = 14;
+
 export default function EventoPageClient({ evento }: { evento: Evento | undefined }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [photoStart, setPhotoStart] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(2);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [navDirection, setNavDirection] = useState<"next" | "prev">("next");
+  const [edgeBounce, setEdgeBounce] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const mouseStartX = useRef<number | null>(null);
   const draggedRef = useRef(false);
@@ -79,12 +83,31 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   // grupo, mesmo que fique incompleto); desktop desliza 1 foto de cada vez.
   const step = isDesktop ? 1 : itemsPerPage;
 
+  // Pequeno "empurrão e volta" na direção tentada, para indicar visualmente
+  // que não há mais fotos nesse sentido (em vez de não acontecer nada).
+  const triggerEdgeBounce = (direction: 1 | -1) => {
+    setEdgeBounce(direction * EDGE_BOUNCE_PX);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setEdgeBounce(0));
+    });
+  };
+
   const avancar = () => {
-    if (podeAvancar) setPhotoStart((s) => s + step);
+    if (podeAvancar) {
+      setNavDirection("next");
+      setPhotoStart((s) => s + step);
+    } else {
+      triggerEdgeBounce(1);
+    }
   };
 
   const recuar = () => {
-    if (podeRecuar) setPhotoStart((s) => Math.max(0, s - step));
+    if (podeRecuar) {
+      setNavDirection("prev");
+      setPhotoStart((s) => Math.max(0, s - step));
+    } else {
+      triggerEdgeBounce(-1);
+    }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -181,56 +204,65 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
             >
               <button
                 onClick={recuar}
-                disabled={!podeRecuar}
                 aria-label="Fotos anteriores"
-                className="absolute left-[0%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+                className={`absolute left-[0%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeRecuar ? "" : "opacity-40"}`}
               >
-                <ChevronLeft size={40} strokeWidth={2.5} className="md:w-12 md:h-12" />
+                <ChevronLeft size={48} strokeWidth={2.5} className="md:w-16 md:h-16" />
               </button>
 
               <div
-                key={isDesktop ? `page-${photoStart}` : "mobile-grid"}
-                className={`w-full h-full grid gap-2 md:gap-3 px-[5%] md:px-[13%] ${isDesktop ? "animate-in fade-in zoom-in-90 duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]" : ""}`}
-                style={
-                  isDesktop
-                    ? { gridTemplateColumns: `repeat(${itemsPerPage}, minmax(0, 1fr))` }
-                    : visiveis.length <= 2
-                      ? { gridTemplateColumns: `repeat(${Math.max(visiveis.length, 1)}, minmax(0, 1fr))`, gridTemplateRows: "repeat(1, minmax(0, 1fr))" }
-                      : { gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gridTemplateRows: "repeat(2, minmax(0, 1fr))" }
-                }
+                className="w-full h-full"
+                style={{ transform: `translateX(${edgeBounce}px)`, transition: "transform 150ms ease-out" }}
               >
-                {visiveis.map((foto, i) => {
-                  const realIndex = photoStart + i;
-                  return (
-                    <button
-                      key={foto}
-                      onClick={() => {
-                        if (draggedRef.current) return;
-                        setLightboxIndex(realIndex);
-                      }}
-                      aria-label={`Ver foto ${realIndex + 1} em tamanho grande`}
-                      className="relative h-full w-full overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105 hover:z-10"
-                    >
-                      <Image
-                        src={`/eventos/${evento.pasta}/${foto}`}
-                        alt={`${evento.titulo} - foto ${realIndex + 1}`}
-                        fill
-                        draggable={false}
-                        sizes="(max-width: 768px) 45vw, 27vw"
-                        className="object-cover"
-                      />
-                    </button>
-                  );
-                })}
+                <div
+                  key={isDesktop ? `page-${photoStart}` : "mobile-grid"}
+                  className={`w-full h-full grid gap-2 md:gap-3 px-[5%] md:px-[13%] ${
+                    isDesktop
+                      ? `animate-in fade-in zoom-in-90 ${navDirection === "next" ? "slide-in-from-right-8" : "slide-in-from-left-8"} duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]`
+                      : ""
+                  }`}
+                  style={
+                    isDesktop
+                      ? { gridTemplateColumns: `repeat(${itemsPerPage}, minmax(0, 1fr))` }
+                      : visiveis.length <= 2
+                        ? { gridTemplateColumns: `repeat(${Math.max(visiveis.length, 1)}, minmax(0, 1fr))`, gridTemplateRows: "repeat(1, minmax(0, 1fr))" }
+                        : { gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gridTemplateRows: "repeat(2, minmax(0, 1fr))" }
+                  }
+                >
+                  {visiveis.map((foto, i) => {
+                    const realIndex = photoStart + i;
+                    return (
+                      <button
+                        key={foto}
+                        onClick={() => {
+                          if (draggedRef.current) return;
+                          setLightboxIndex(realIndex);
+                        }}
+                        aria-label={`Ver foto ${realIndex + 1} em tamanho grande`}
+                        className="relative h-full w-full rounded-lg cursor-pointer shadow-[0_15px_30px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:scale-105 hover:z-10"
+                      >
+                        <div className="relative h-full w-full overflow-hidden rounded-lg">
+                          <Image
+                            src={`/eventos/${evento.pasta}/${foto}`}
+                            alt={`${evento.titulo} - foto ${realIndex + 1}`}
+                            fill
+                            draggable={false}
+                            sizes="(max-width: 768px) 45vw, 27vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <button
                 onClick={avancar}
-                disabled={!podeAvancar}
                 aria-label="Fotos seguintes"
-                className="absolute right-[0%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 disabled:opacity-25 disabled:pointer-events-none transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)]"
+                className={`absolute right-[0%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeAvancar ? "" : "opacity-40"}`}
               >
-                <ChevronRight size={40} strokeWidth={2.5} className="md:w-12 md:h-12" />
+                <ChevronRight size={48} strokeWidth={2.5} className="md:w-16 md:h-16" />
               </button>
             </div>
 
