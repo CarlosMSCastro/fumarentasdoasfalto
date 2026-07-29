@@ -159,7 +159,7 @@ export default function EventosTimeline() {
   };
 
   return (
-    <div className="relative w-full md:-mt-[150px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:-mt-2">
+    <div className="relative w-full -mt-6 md:-mt-[150px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:-mt-2">
       <button
         onPointerEnter={(e) => { if (e.pointerType === "mouse") startArrowScroll(-1); }}
         onPointerLeave={(e) => { if (e.pointerType === "mouse") stopArrowScroll(); }}
