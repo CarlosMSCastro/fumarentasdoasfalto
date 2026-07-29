@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { scrollToContactosBypassingSnap } from "@/lib/scroll";
 
 const cards = [
   { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
@@ -34,15 +35,7 @@ export default function ObjetivosMobile() {
   const handleClick = (e: React.MouseEvent, href: string) => {
     if (href === "/reparacao") {
       e.preventDefault();
-      const container = document.getElementById('snap-container');
-      const contactos = document.getElementById('contactos');
-      if (container && contactos) {
-        container.style.scrollSnapType = 'none';
-        container.scrollTo({ top: contactos.offsetTop, behavior: 'smooth' });
-        container.addEventListener('scrollend', () => {
-          container.style.scrollSnapType = 'y mandatory';
-        }, { once: true });
-      }
+      scrollToContactosBypassingSnap();
     }
   };
 

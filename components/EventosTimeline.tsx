@@ -4,31 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
-import eventosData from "@/data/eventos.json";
-interface Evento {
-  id: string;
-  titulo: string;
-  local: string;
-  data: string;
-  descricao: string;
-  destaque: boolean;
-  pasta: string;
-  capa: string;
-  fotos: string[];
-}
-const eventos = eventosData as Evento[];
-const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-function mesDe(data: string) {
-  const partes = data.split("-");
-  if (partes.length < 2) return "";
-  return MESES[parseInt(partes[1]) - 1];
-}
-function formatarDataCompleta(data: string) {
-  const partes = data.split("-");
-  if (partes.length === 3) return `${partes[2]} ${MESES[parseInt(partes[1]) - 1]} ${partes[0]}`;
-  if (partes.length === 2) return `${MESES[parseInt(partes[1]) - 1]} ${partes[0]}`;
-  return partes[0];
-}
+import { getEventos, mesDe, formatarDataCompleta, type Evento } from "@/lib/eventos";
+const eventos = getEventos();
 function agruparPorAno(lista: Evento[]) {
   const grupos: Record<string, Evento[]> = {};
   lista.forEach((ev) => {
@@ -174,7 +151,7 @@ export default function EventosTimeline() {
         onPointerEnter={(e) => { if (e.pointerType === "mouse") startArrowScroll(-1); }}
         onPointerLeave={(e) => { if (e.pointerType === "mouse") stopArrowScroll(); }}
         aria-label="Recuar na timeline"
-        className="absolute -left-1 md:left-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
+        className="absolute -left-1 md:left-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all glow-primary cursor-pointer"
       >
         <ChevronLeft strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1 animate-bounce-x-left" />
       </button>
@@ -182,7 +159,7 @@ export default function EventosTimeline() {
         onPointerEnter={(e) => { if (e.pointerType === "mouse") startArrowScroll(1); }}
         onPointerLeave={(e) => { if (e.pointerType === "mouse") stopArrowScroll(); }}
         aria-label="Avançar na timeline"
-        className="absolute -right-1 md:right-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
+        className="absolute -right-1 md:right-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all glow-primary cursor-pointer"
       >
         <ChevronRight strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1 animate-bounce-x-right" />
       </button>

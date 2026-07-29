@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import ContactosSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import EventoLightbox from "@/components/EventoLightbox";
+import DroneVideoBackground from "@/components/DroneVideoBackground";
 import { formatarDataCompleta, type Evento } from "@/lib/eventos";
 
 const EDGE_BOUNCE_PX = 14;
@@ -28,22 +29,6 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   const draggedRef = useRef(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const wheelHandlerRef = useRef<(e: WheelEvent) => void>(() => {});
-
-  const [showNormal, setShowNormal] = useState(true);
-  const normalRef = useRef<HTMLVideoElement>(null);
-  const reversoRef = useRef<HTMLVideoElement>(null);
-
-  const handleNormalEnded = () => {
-    setShowNormal(false);
-    if (reversoRef.current) reversoRef.current.currentTime = 0;
-    reversoRef.current?.play();
-  };
-
-  const handleReversoEnded = () => {
-    setShowNormal(true);
-    if (normalRef.current) normalRef.current.currentTime = 0;
-    normalRef.current?.play();
-  };
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
@@ -204,30 +189,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <section className="relative h-dvh w-full overflow-hidden snap-start">
-        <video
-          ref={normalRef}
-          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-100"
-          style={{ opacity: showNormal ? 1 : 0 }}
-          src="/videos/drone.mp4"
-          poster="/videos/drone-poster.jpg"
-          autoPlay
-          muted
-          playsInline
-          onEnded={handleNormalEnded}
-        />
-        <video
-          ref={reversoRef}
-          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-100"
-          style={{ opacity: showNormal ? 0 : 1 }}
-          src="/videos/drone-reverso.mp4"
-          poster="/videos/drone-reverso-poster.jpg"
-          muted
-          playsInline
-          onEnded={handleReversoEnded}
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-black/55 via-black/20 to-black/30" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/15 to-black/60" />
-        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/15 to-black/90" />
+        <DroneVideoBackground />
 
         <div className="flex h-full flex-col">
           <div className="relative z-0 w-full opacity-95 flex-1 min-h-0 flex flex-col justify-start pb-[clamp(4rem,6dvh,8rem)] md:pb-[clamp(6rem,7dvh,9dvh)] pt-40 md:pt-[clamp(7.5rem,7dvh,10rem)]">
@@ -262,7 +224,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
               <button
                 onClick={recuar}
                 aria-label="Fotos anteriores"
-                className={`absolute -left-[2%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeRecuar ? "" : "opacity-40"}`}
+                className={`absolute -left-[2%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all glow-primary ${podeRecuar ? "" : "opacity-40"}`}
               >
                 <ChevronLeft size={68} strokeWidth={2} className="md:w-16 md:h-16 animate-bounce-x-left" />
               </button>
@@ -317,7 +279,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
               <button
                 onClick={avancar}
                 aria-label="Fotos seguintes"
-                className={`absolute -right-[2%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeAvancar ? "" : "opacity-40"}`}
+                className={`absolute -right-[2%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all glow-primary ${podeAvancar ? "" : "opacity-40"}`}
               >
                 <ChevronRight size={68} strokeWidth={2} className="md:w-16 md:h-16 animate-bounce-x-right" />
               </button>

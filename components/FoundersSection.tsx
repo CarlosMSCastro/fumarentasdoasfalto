@@ -2,15 +2,9 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import ScrollIndicator from "@/components/ScrollIndicator";
-import fundadoresData from "@/data/fundadores.json";
+import { getFundadores } from "@/lib/fundadores";
 
-interface Fundador {
-  nome: string;
-  cargo: string;
-  foto: string;
-}
-
-const fundadores = fundadoresData as Fundador[];
+const fundadores = getFundadores();
 const TAP_REVEAL_MS = 2000;
 
 export default function FoundersSection() {

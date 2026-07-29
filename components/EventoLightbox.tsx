@@ -287,7 +287,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
               }}
               aria-label="Foto anterior"
               style={{ left: arrowPos.prevLeft }}
-              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
+              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all glow-primary cursor-pointer"
             >
               <ChevronLeft size={40} strokeWidth={2.5} className="md:w-14 md:h-14" />
             </button>
@@ -298,7 +298,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
               }}
               aria-label="Foto seguinte"
               style={{ right: arrowPos.nextRight }}
-              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
+              className="absolute top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all glow-primary cursor-pointer"
             >
               <ChevronRight size={40} strokeWidth={2.5} className="md:w-14 md:h-14" />
             </button>
