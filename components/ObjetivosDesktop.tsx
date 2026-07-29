@@ -27,7 +27,7 @@ export default function ObjetivosDesktop() {
       key={i}
         href={item.href}
         onClick={(e) => handleClick(e, item.href)}
-        className="group relative rounded-lg flex-1 md:hover:flex-2 opacity-95 transition-all duration-500 h-[60vh] md:h-[45vh] flex flex-col justify-between p-6 shadow-[0_25px_60px_rgba(0,0,0,0.85)]"
+        className="group relative rounded-lg flex-1 md:hover:flex-2 opacity-99 transition-all duration-500 h-[60vh] md:h-[45vh] flex flex-col justify-between p-6 shadow-[0_25px_60px_rgba(0,0,0,1)]"
       >
         <div className="absolute inset-0 overflow-hidden rounded-sm">
           <Image

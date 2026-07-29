@@ -39,7 +39,7 @@ function agruparPorAno(lista: Evento[]) {
 }
 const CAROUSEL_LIMIT = 4;
 const DRAG_THRESHOLD = 6;
-const ARROW_SCROLL_SPEED = 8;
+const ARROW_SCROLL_SPEED = 3;
 export default function EventosTimeline() {
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
@@ -151,10 +151,7 @@ export default function EventosTimeline() {
     setCurrentYear(closest);
   };
 
-  // Navegação é feita pelo <Link> nativo (sem scrollTo/delay antes de navegar
-  // — isso causava um deslize lateral indevido em praticamente todos os
-  // cliques, já que um cartão raramente está exatamente centado no momento
-  // do clique). Só bloqueamos a navegação quando houve um drag real.
+
   const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (dragMovedRef.current) {
       e.preventDefault();
