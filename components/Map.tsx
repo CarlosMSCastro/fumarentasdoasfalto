@@ -1,10 +1,8 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
-declare const google: any;
 import { useEffect, useRef } from "react";
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 
-const MAP_STYLES = [
+const MAP_STYLES: google.maps.MapTypeStyle[] = [
   { featureType: "all", elementType: "labels", stylers: [{ visibility: "on" }] },
   { featureType: "all", elementType: "labels.text.fill", stylers: [{ saturation: 36 }, { color: "#000000" }, { lightness: 40 }] },
   { featureType: "all", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#000000" }, { lightness: 16 }] },
@@ -32,7 +30,7 @@ const MAP_STYLES = [
 ];
 
 let initialized = false;
-let mapInstance: any = null;
+let mapInstance: google.maps.Map | null = null;
 
 const IDLE_TIMEOUT_MS = 2000;
 const IDLE_FALLBACK_DELAY_MS = 1500;

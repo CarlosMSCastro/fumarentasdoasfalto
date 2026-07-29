@@ -1,53 +1,14 @@
 "use client";
-import { useRef, useState } from "react";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import EventosTimeline from "@/components/EventosTimeline";
+import DroneVideoBackground from "@/components/DroneVideoBackground";
 
 export default function EventosPage() {
-  const [showNormal, setShowNormal] = useState(true);
-  const normalRef = useRef<HTMLVideoElement>(null);
-  const reversoRef = useRef<HTMLVideoElement>(null);
-
-  const handleNormalEnded = () => {
-    setShowNormal(false);
-    if (reversoRef.current) reversoRef.current.currentTime = 0;
-    reversoRef.current?.play();
-  };
-
-  const handleReversoEnded = () => {
-    setShowNormal(true);
-    if (normalRef.current) normalRef.current.currentTime = 0;
-    normalRef.current?.play();
-  };
-
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <section className="relative h-dvh w-full overflow-hidden snap-start">
-        <video
-          ref={normalRef}
-          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-100"
-          style={{ opacity: showNormal ? 1 : 0 }}
-          src="/videos/drone.mp4"
-          poster="/videos/drone-poster.jpg"
-          autoPlay
-          muted
-          playsInline
-          onEnded={handleNormalEnded}
-        />
-        <video
-          ref={reversoRef}
-          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-100"
-          style={{ opacity: showNormal ? 0 : 1 }}
-          src="/videos/drone-reverso.mp4"
-          poster="/videos/drone-reverso-poster.jpg"
-          muted
-          playsInline
-          onEnded={handleReversoEnded}
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-black/55 via-black/20 to-black/30" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/15 to-black/60" />
-        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/15 to-black/90" />
+        <DroneVideoBackground />
 
         <div className="flex h-full flex-col">
           <div className="relative z-0 w-[100vw] md:w-[79vw] mx-auto opacity-95 flex-1 min-h-0 flex flex-col items-end justify-start pb-[clamp(1.5rem,8dvh,10rem)] md:pb-[13dvh] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:pb-[9dvh]">

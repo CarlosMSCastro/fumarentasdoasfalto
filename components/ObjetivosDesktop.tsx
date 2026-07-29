@@ -1,19 +1,12 @@
 "use client";
 import Image from "next/image";
+import { scrollToContactosBypassingSnap } from "@/lib/scroll";
 
 export default function ObjetivosDesktop() {
   const handleClick = (e: React.MouseEvent, href: string) => {
     if (href === "/reparacao") {
       e.preventDefault();
-      const container = document.getElementById('snap-container');
-      const contactos = document.getElementById('contactos');
-      if (container && contactos) {
-        container.style.scrollSnapType = 'none';
-        container.scrollTo({ top: contactos.offsetTop, behavior: 'smooth' });
-        container.addEventListener('scrollend', () => {
-          container.style.scrollSnapType = 'y mandatory';
-        }, { once: true });
-      }
+      scrollToContactosBypassingSnap();
     }
   };
   return (

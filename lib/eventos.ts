@@ -24,6 +24,12 @@ export function getEventoById(id: string): Evento | undefined {
 
 const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
+export function mesDe(data: string): string {
+  const partes = data.split("-");
+  if (partes.length < 2) return "";
+  return MESES[parseInt(partes[1]) - 1];
+}
+
 export function formatarDataCompleta(data: string): string {
   const partes = data.split("-");
   if (partes.length === 3) return `${partes[2]} ${MESES[parseInt(partes[1]) - 1]} ${partes[0]}`;

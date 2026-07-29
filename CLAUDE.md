@@ -38,7 +38,7 @@ No test suite is configured.
 
 ### Homepage scroll-snap
 
-`app/page.tsx` wraps `HeroSection`, `ObjetivosSection`, and `ContactosSection` in a `#snap-container` (`snap-y snap-mandatory`, `h-dvh`, `overflow-y-scroll`). `ScrollIndicator` is a reusable arrow component that scrolls to the next section, but has to temporarily override `scrollSnapType` to animate smoothly past the snap points — see how it's used in `HeroSection`/`ObjetivosSection` before changing snap behavior. Other pages (`/sobre`, `/eventos`, legal pages) are normal (non-snap) scroll pages.
+`app/page.tsx` wraps `HeroSection`, `ObjetivosSection`, and `ContactosSection` in a `#snap-container` (`snap-y snap-mandatory`, `h-dvh`, `overflow-y-scroll`). `ScrollIndicator` is a reusable arrow component that just calls `scrollIntoView` on its target — it does **not** touch `scrollSnapType`. The snap-bypass workaround (temporarily setting `scrollSnapType = 'none'` so a programmatic scroll to `#contactos` isn't intercepted by the snap points, then restoring it on `scrollend`) lives in `lib/scroll.ts` (`scrollToContactosBypassingSnap`), used by `Navbar` and `ObjetivosDesktop`/`ObjetivosMobile` — see those call sites before changing snap behavior. Other pages (`/sobre`, `/eventos`, legal pages) are normal (non-snap) scroll pages.
 
 ### Eventos (events timeline)
 

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart } from "lucide-react";
+import { scrollToContactosBypassingSnap } from "@/lib/scroll";
 
 // lucide-react dropped brand/logo icons — these are small local stroke icons
 // (matching lucide's own visual style) so we don't need a whole extra icon
@@ -96,7 +97,7 @@ export default function Navbar() {
           else window.scrollTo({ top: 0, behavior: 'smooth' });
         }} className="hidden lg:block shrink-0 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={170} height={170} loading="eager"
-            className={`object-contain transition-all duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] ${scrolled ? "mb-0 w-25! h-25!" : "-mb-25 w-42.5! h-42.5!"}`} />
+            className={`object-contain transition-all duration-300 hover:scale-105 drop-shadow-[0_0_12px_rgba(var(--primary-rgb),0.6)] ${scrolled ? "mb-0 w-25! h-25!" : "-mb-25 w-42.5! h-42.5!"}`} />
         </Link>
 
         {/* Logo Mobile */}
@@ -106,7 +107,7 @@ export default function Navbar() {
           else window.scrollTo({ top: 0, behavior: 'smooth' });
         }} className="lg:hidden absolute left-6 top-1/3 z-10">
           <Image src="/logo.png" alt="Fumarentas do Asfalto" width={135} height={135} loading="eager"
-            className={`object-contain drop-shadow-[0_0_12px_rgba(255,107,0,0.6)] transition-all duration-300 ${scrolled ? "w-16! h-16!" : "w-33.75! h-33.75!"}`}/>
+            className={`object-contain drop-shadow-[0_0_12px_rgba(var(--primary-rgb),0.6)] transition-all duration-300 ${scrolled ? "w-16! h-16!" : "w-33.75! h-33.75!"}`}/>
         </Link>
 
         {/* Links Desktop */}
@@ -117,15 +118,7 @@ export default function Navbar() {
               onClick={(e) => {
                 if (link.isContacto) {
                   e.preventDefault();
-                  const container = document.getElementById('snap-container');
-                  const contactos = document.getElementById('contactos');
-                  if (container && contactos) {
-                    container.style.scrollSnapType = 'none';
-                    container.scrollTo({ top: contactos.offsetTop, behavior: 'smooth' });
-                    container.addEventListener('scrollend', () => {
-                      container.style.scrollSnapType = 'y mandatory';
-                    }, { once: true });
-                  }
+                  scrollToContactosBypassingSnap();
                   return;
                 }
                 if (link.href === pathname) {
@@ -135,7 +128,7 @@ export default function Navbar() {
                   else window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.8)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest ${getLinkClass(link)}`}>
+              className={`drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.8)] hover:drop-shadow-[0_0_10px_rgba(var(--primary-rgb),5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest ${getLinkClass(link)}`}>
                 {link.label}
               </Link>
             </li>
@@ -144,20 +137,20 @@ export default function Navbar() {
 
         {/* Direita: Carrinho + Login */}
         <div className="flex items-center lg:gap-8 gap-4 shrink-0 ml-auto lg:ml-0">
-          <Link href="#" className="relative text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <Link href="#" className="relative text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <ShoppingCart size={28} />
             <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               {cartCount}
             </span>
           </Link>
-          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <FacebookIcon size={25} />
           </a>
-          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(255,107,0,0.7)]">
+          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <InstagramIcon size={25} />
           </a>
           <Link href="#" className="hidden lg:block">
-            <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(255,107,0,0.8)] hover:shadow-[0_0_16px_rgba(255,107,0,3.8)] transition-all">
+            <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.8)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),3.8)] transition-all">
               Login
             </Button>
           </Link>
@@ -182,17 +175,7 @@ export default function Navbar() {
                       setOpen(false);
                       if (link.isContacto) {
                         e.preventDefault();
-                        setTimeout(() => {
-                          const container = document.getElementById('snap-container');
-                          const contactos = document.getElementById('contactos');
-                          if (container && contactos) {
-                            container.style.scrollSnapType = 'none';
-                            container.scrollTo({ top: contactos.offsetTop, behavior: 'smooth' });
-                            container.addEventListener('scrollend', () => {
-                              container.style.scrollSnapType = 'y mandatory';
-                            }, { once: true });
-                          }
-                        }, 300);
+                        setTimeout(scrollToContactosBypassingSnap, 300);
                         return;
                       }
                       if (link.href === pathname) {
@@ -204,14 +187,14 @@ export default function Navbar() {
                         }, 300);
                       }
                     }}
-                    className={`drop-shadow-[0_0_4px_rgba(255,107,0,0.2)] hover:drop-shadow-[0_0_10px_rgba(255,107,0,0.8)] transition-all text-lg font-bold uppercase tracking-widest ${getLinkClass(link)}`}>
+                    className={`drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.2)] hover:drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.8)] transition-all text-lg font-bold uppercase tracking-widest ${getLinkClass(link)}`}>
                       {link.label}
                     </Link>
                   </li>
                 ))}
                 <li className="w-25 mt-3">
                   <Link href="/login" onClick={() => setOpen(false)}>
-                    <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(255,107,0,0.2)] hover:shadow-[0_0_16px_rgba(255,107,0,0.8)] transition-all">
+                    <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all">
                       Login
                     </Button>
                   </Link>
