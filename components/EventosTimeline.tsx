@@ -191,7 +191,7 @@ export default function EventosTimeline() {
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:min-h-[clamp(2rem,calc(98dvh_-_398px),27.5rem)] justify-end overflow-visible">
-              <div className="flex items-end gap-2 md:gap-3 mb-5 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:mb-2 h-[clamp(14rem,64dvh,27rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(1rem,calc(98dvh_-_439px),30rem)] z-30">
+              <div className="flex items-end gap-2 md:gap-3 mb-5 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:mb-4 h-[clamp(14rem,64dvh,27rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(1rem,calc(98dvh_-_439px),30rem)] z-30">
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
@@ -236,8 +236,8 @@ export default function EventosTimeline() {
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
                             ev.destaque
-                              ? "h-[clamp(9.5rem,48dvh,18.5rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(0.85rem,calc(98dvh_-_520px),22.5rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:group-hover:h-[clamp(15rem,calc(98dvh_-_418px),29rem)]"
-                              : "h-[clamp(9rem,50dvh,19rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(0.7rem,calc(98dvh_-_570px),19.5rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:group-hover:h-[clamp(12rem,calc(98dvh_-_489px),24.5rem)]"
+                              ? "h-[clamp(9.5rem,48dvh,18.5rem)] md:h-[clamp(14rem,calc(76dvh_-_194px),24.5rem)] md:group-hover:h-[clamp(17.75rem,calc(98dvh_-_255px),31.5rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(0.85rem,calc(98dvh_-_505px),22.5rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:group-hover:h-[clamp(6rem,calc(98dvh_-_510px),29rem)]"
+                              : "h-[clamp(9rem,50dvh,19rem)] md:h-[clamp(12rem,calc(64dvh_-_160px),21rem)] md:group-hover:h-[clamp(15.25rem,calc(82dvh_-_207px),26.875rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(0.7rem,calc(98dvh_-_555px),19.5rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:group-hover:h-[clamp(4rem,calc(98dvh_-_581px),24.5rem)]"
                           }`}
                         >
                           <Image

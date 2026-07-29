@@ -158,6 +158,9 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   const handleWheel = (e: React.WheelEvent) => {
     if (e.ctrlKey) return;
     if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    // Sem isto, o browser interpreta o deltaX como gesto de navegação
+    // (voltar/avançar página) em vez de o reservar para o carrossel.
+    e.preventDefault();
     if (Math.abs(e.deltaX) < WHEEL_DELTA_THRESHOLD) return;
     const now = Date.now();
     if (now - lastWheelNavRef.current < WHEEL_COOLDOWN_MS) return;
