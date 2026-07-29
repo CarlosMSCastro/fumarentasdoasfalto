@@ -187,7 +187,7 @@ export default function EventosTimeline() {
         }}
       >
         <div
-          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:pt-[70px] pb-4 w-max mx-auto pl-1 pr-1 md:pl-[150px] md:pr-[150px]"
+          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:pt-[70px] pb-6 md:pb-4 w-max mx-auto pl-1 pr-1 md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:min-h-[clamp(2rem,calc(98dvh_-_398px),27.5rem)] justify-end overflow-visible">
