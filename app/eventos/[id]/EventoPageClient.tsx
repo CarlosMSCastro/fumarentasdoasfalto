@@ -23,6 +23,8 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   const touchStartX = useRef<number | null>(null);
   const mouseStartX = useRef<number | null>(null);
   const draggedRef = useRef(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const wheelHandlerRef = useRef<(e: WheelEvent) => void>(() => {});
 
   const [showNormal, setShowNormal] = useState(true);
   const normalRef = useRef<HTMLVideoElement>(null);
@@ -51,37 +53,22 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
     return () => mql.removeEventListener("change", update);
   }, []);
 
-  if (!evento) {
-    return (
-      <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
-        <section className="relative h-dvh w-full flex flex-col items-center justify-center gap-6 snap-start bg-black overflow-hidden">
-          <video
-            className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
-            src="/videos/smoke.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
-          <p className="relative z-10 text-white/70 text-lg">Evento não encontrado.</p>
-          <Link
-            href="/eventos"
-            className="relative z-10 rounded-full bg-orange-500 px-6 py-3 text-white font-semibold hover:bg-orange-600 transition-all"
-          >
-            Voltar aos eventos
-          </Link>
-          <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" />
-        </section>
-        <div className="snap-start">
-          <ContactosSection />
-        </div>
-      </div>
-    );
-  }
+  // O onWheel do React regista o listener como passivo, o que torna
+  // preventDefault() ineficaz e deixa o gesto de trackpad acionar a
+  // navegação nativa (voltar página) do browser. Um listener nativo com
+  // passive:false é a única forma de o suprimir de facto.
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const listener = (e: WheelEvent) => wheelHandlerRef.current(e);
+    el.addEventListener("wheel", listener, { passive: false });
+    return () => el.removeEventListener("wheel", listener);
+  }, []);
 
-  const visiveis = evento.fotos.slice(photoStart, photoStart + itemsPerPage);
+  const totalFotos = evento?.fotos.length ?? 0;
+  const visiveis = evento ? evento.fotos.slice(photoStart, photoStart + itemsPerPage) : [];
   const podeRecuar = photoStart > 0;
-  const podeAvancar = photoStart + itemsPerPage < evento.fotos.length;
+  const podeAvancar = photoStart + itemsPerPage < totalFotos;
   // Mobile pagina página-a-página (não repete fotos já vistas no último
   // grupo, mesmo que fique incompleto); desktop desliza 1 foto de cada vez.
   const step = isDesktop ? 1 : itemsPerPage;
@@ -155,7 +142,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   // deltaY (gesto horizontal intencional) e ignora pinch-zoom (ctrlKey).
   // Cooldown por timestamp em vez de setTimeout — um gesto contínuo dispara
   // muitos eventos wheel, e só queremos navegar uma vez por gesto.
-  const handleWheel = (e: React.WheelEvent) => {
+  const handleWheel = (e: WheelEvent) => {
     if (e.ctrlKey) return;
     if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
     // Sem isto, o browser interpreta o deltaX como gesto de navegação
@@ -168,6 +155,41 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
     if (e.deltaX > 0) avancar();
     else recuar();
   };
+
+  // Mantém o listener nativo sempre a chamar a versão mais recente do
+  // handler (fecha sobre podeAvancar/podeRecuar/step atuais), sem recriar
+  // o addEventListener a cada render.
+  useEffect(() => {
+    wheelHandlerRef.current = handleWheel;
+  });
+
+  if (!evento) {
+    return (
+      <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
+        <section className="relative h-dvh w-full flex flex-col items-center justify-center gap-6 snap-start bg-black overflow-hidden">
+          <video
+            className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
+            src="/videos/smoke.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+          <p className="relative z-10 text-white/70 text-lg">Evento não encontrado.</p>
+          <Link
+            href="/eventos"
+            className="relative z-10 rounded-full bg-orange-500 px-6 py-3 text-white font-semibold hover:bg-orange-600 transition-all"
+          >
+            Voltar aos eventos
+          </Link>
+          <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" />
+        </section>
+        <div className="snap-start">
+          <ContactosSection />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
@@ -216,13 +238,13 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
             </div>
 
             <div
-              className="relative flex-1 min-h-52 md:min-h-44 max-h-104 md:max-h-136 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:max-h-152 flex items-center cursor-grab active:cursor-grabbing"
+              ref={carouselRef}
+              className="relative flex-1 min-h-52 md:min-h-44 max-h-104 md:max-h-136 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:max-h-152 overscroll-x-none flex items-center cursor-grab active:cursor-grabbing"
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              onWheel={handleWheel}
             >
               <button
                 onClick={recuar}
