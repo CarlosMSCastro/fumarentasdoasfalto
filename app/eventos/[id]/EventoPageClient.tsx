@@ -249,9 +249,9 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
               <button
                 onClick={recuar}
                 aria-label="Fotos anteriores"
-                className={`absolute left-[0%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeRecuar ? "" : "opacity-40"}`}
+                className={`absolute -left-[2%] md:left-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeRecuar ? "" : "opacity-40"}`}
               >
-                <ChevronLeft size={48} strokeWidth={2.5} className="md:w-16 md:h-16" />
+                <ChevronLeft size={68} strokeWidth={2} className="md:w-16 md:h-16 animate-bounce-x-left" />
               </button>
 
               <div
@@ -304,15 +304,22 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
               <button
                 onClick={avancar}
                 aria-label="Fotos seguintes"
-                className={`absolute right-[0%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeAvancar ? "" : "opacity-40"}`}
+                className={`absolute -right-[2%] md:right-[9%] top-1/2 -translate-y-1/2 z-10 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] ${podeAvancar ? "" : "opacity-40"}`}
               >
-                <ChevronRight size={48} strokeWidth={2.5} className="md:w-16 md:h-16" />
+                <ChevronRight size={68} strokeWidth={2} className="md:w-16 md:h-16 animate-bounce-x-right" />
               </button>
             </div>
 
-            <p className="text-center text-white/60 text-xs md:text-sm font-semibold tracking-widest mt-1 md:mt-3 shrink-0">
-              {Math.min(photoStart + itemsPerPage, evento.fotos.length)} / {evento.fotos.length}
-            </p>
+            <div className="flex justify-center items-center gap-1.5 mt-1 md:mt-3 shrink-0">
+              {evento.fotos.map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                    i >= photoStart && i < photoStart + itemsPerPage ? "bg-orange-500" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
