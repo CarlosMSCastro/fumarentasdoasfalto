@@ -33,11 +33,14 @@ const ARROW_CLEARANCE = 56;
 const SWIPE_THRESHOLD = 50;
 const MAX_SCALE = 4;
 const DRAG_THRESHOLD = 8;
+const WHEEL_DELTA_THRESHOLD = 20;
+const WHEEL_COOLDOWN_MS = 500;
 
 export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, onIndexChange }: EventoLightboxProps) {
   const total = fotos.length;
   const boxRef = useRef<HTMLDivElement>(null);
   const naturalRef = useRef<{ w: number; h: number } | null>(null);
+  const lastWheelNavRef = useRef(0);
   const [rect, setRect] = useState<Rect | null>(null);
   const [arrowPos, setArrowPos] = useState<ArrowPos | null>(null);
   const [prevIndex, setPrevIndex] = useState(index);
@@ -222,6 +225,18 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
     }
   };
 
+  // Swipe de trackpad (dois dedos), mesma abordagem do EventoPageClient.tsx.
+  const handleWheel = (e: React.WheelEvent) => {
+    if (e.ctrlKey) return;
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    if (Math.abs(e.deltaX) < WHEEL_DELTA_THRESHOLD) return;
+    const now = Date.now();
+    if (now - lastWheelNavRef.current < WHEEL_COOLDOWN_MS) return;
+    lastWheelNavRef.current = now;
+    if (e.deltaX > 0) goNext();
+    else goPrev();
+  };
+
   return (
     <div
       className={`fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center ${
@@ -240,6 +255,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onWheel={handleWheel}
       >
         {/* overflow-hidden isolado aqui (e não no boxRef) para não cortar o
             botão de fechar, que é propositadamente posicionado fora dos
