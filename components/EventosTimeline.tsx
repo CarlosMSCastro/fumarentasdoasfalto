@@ -166,7 +166,7 @@ export default function EventosTimeline() {
         aria-label="Recuar na timeline"
         className="absolute -left-1 md:left-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
       >
-        <ChevronLeft strokeWidth={1} className="w-8 h-8 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
+        <ChevronLeft strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
       </button>
       <button
         onPointerEnter={(e) => { if (e.pointerType === "mouse") startArrowScroll(1); }}
@@ -174,7 +174,7 @@ export default function EventosTimeline() {
         aria-label="Avançar na timeline"
         className="absolute -right-1 md:right-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
       >
-        <ChevronRight strokeWidth={1} className="w-8 h-8 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
+        <ChevronRight strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
       </button>
       <div
         ref={scrollRef}
@@ -187,7 +187,7 @@ export default function EventosTimeline() {
         }}
       >
         <div
-          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:pt-[70px] pb-4 md:pb-4 w-max mx-auto pl-1 pr-1 md:pl-[150px] md:pr-[150px]"
+          className="relative flex items-end gap-4 md:gap-8 pt-4 md:pt-[146px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:pt-[70px] pb-4 md:pb-4 w-max mx-auto md:pl-[150px] md:pr-[150px]"
         >
           {anos.map((ano) => (
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:min-h-[clamp(2rem,calc(98dvh_-_398px),27.5rem)] justify-end overflow-visible">
@@ -200,6 +200,11 @@ export default function EventosTimeline() {
                   const randomFlip = idHash % 4 === 0;
                   const pinOnRight = randomFlip ? highSide === "left" : highSide === "right";
                   const pinSide = pinOnRight ? "left-[78%]" : "left-[22%]";
+                  // Escurecimento por card (só mobile): cards da metade
+                  // esquerda da timeline escurecem à esquerda (perto da seta
+                  // de recuar), os da direita escurecem à direita — sem
+                  // precisar de saber a posição real do scroll.
+                  const isLeftHalf = globalIndex < eventos.length / 2;
                   globalIndex++;
                   const idx = carouselIndex[ev.id] ?? 0;
                   return (
@@ -246,6 +251,14 @@ export default function EventosTimeline() {
                             fill
                             sizes={ev.destaque ? "(max-width: 768px) 250px, 410px" : "(max-width: 768px) 224px, 366px"}
                             className="object-cover"
+                          />
+                          <div
+                            aria-hidden="true"
+                            className={`absolute inset-0 z-10 pointer-events-none md:hidden ${
+                              isLeftHalf
+                                ? "bg-[linear-gradient(to_right,rgba(0,0,0,0.75),transparent_40%)]"
+                                : "bg-[linear-gradient(to_left,rgba(0,0,0,0.75),transparent_40%)]"
+                            }`}
                           />
                           {hoveredId === ev.id && (
                             <>
