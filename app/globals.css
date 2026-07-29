@@ -95,6 +95,10 @@
   }
   html {
     @apply font-sans;
+    /* Sem isto, um swipe horizontal de trackpad sobre elementos não
+       scrolláveis (ex: carrossel de fotos do evento) é interpretado pelo
+       browser como o gesto nativo de voltar/avançar página. */
+    overscroll-behavior-x: none;
   }
 }
 
