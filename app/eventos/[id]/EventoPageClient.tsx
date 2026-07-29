@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
@@ -13,6 +14,8 @@ const WHEEL_DELTA_THRESHOLD = 20;
 const WHEEL_COOLDOWN_MS = 500;
 
 export default function EventoPageClient({ evento }: { evento: Evento | undefined }) {
+  const router = useRouter();
+  const [backClicked, setBackClicked] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [photoStart, setPhotoStart] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(2);
@@ -163,6 +166,13 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
     wheelHandlerRef.current = handleWheel;
   });
 
+  // Acende a laranja rapidamente antes de voltar, em vez de navegar logo.
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setBackClicked(true);
+    setTimeout(() => router.push("/eventos"), 200);
+  };
+
   if (!evento) {
     return (
       <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
@@ -224,7 +234,10 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
             <div className="px-[8%] md:px-[13%] shrink-0">
               <Link
                 href="/eventos"
-                className="inline-flex items-center md:pt-20 gap-2 self-start text-white/90 hover:text-orange-500 transition-colors text-xs md:text-sm font-semibold uppercase tracking-widest mb-1 md:mb-3"
+                onClick={handleBackClick}
+                className={`inline-flex items-center md:pt-20 gap-2 self-start transition-colors text-xs md:text-sm font-semibold uppercase tracking-widest mb-1 md:mb-3 ${
+                  backClicked ? "text-orange-500" : "text-white/90 hover:text-orange-500"
+                }`}
               >
                 <ArrowLeft size={18} />
                 Voltar aos eventos
