@@ -72,7 +72,7 @@ export default function FoundersSection() {
                 alt={fundador.nome}
                 fill
                 sizes="(max-width: 768px) 28vw, 10vw"
-                className={`object-cover transition-all duration-300 group-hover:brightness-75 ${activeIndex === i ? "brightness-75" : ""}`}
+                className={`object-cover transition-all duration-300 group-hover:brightness-70 ${activeIndex === i ? "brightness-70" : ""}`}
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/15 to-black/10" />
               <div className="absolute inset-0 flex items-end p-1 md:p-2.5">
