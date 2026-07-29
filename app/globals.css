@@ -109,3 +109,28 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Nudge horizontal para sugerir "swipe" nas setas da EventosTimeline —
+   mesmo timing/easing do animate-bounce do ScrollIndicator, mas a piscar
+   para a margem (translateX) em vez de para baixo (translateY). Mobile
+   apenas: desativado a partir do breakpoint md (768px). */
+@keyframes bounce-x-left {
+  0%, 100% { transform: translateX(0); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+  50% { transform: translateX(-25%); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+}
+@keyframes bounce-x-right {
+  0%, 100% { transform: translateX(0); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+  50% { transform: translateX(25%); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+}
+.animate-bounce-x-left {
+  animation: bounce-x-left 1s infinite;
+}
+.animate-bounce-x-right {
+  animation: bounce-x-right 1s infinite;
+}
+@media (min-width: 768px) {
+  .animate-bounce-x-left,
+  .animate-bounce-x-right {
+    animation: none;
+  }
+}

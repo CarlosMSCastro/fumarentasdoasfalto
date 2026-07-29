@@ -166,7 +166,7 @@ export default function EventosTimeline() {
         aria-label="Recuar na timeline"
         className="absolute -left-1 md:left-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
       >
-        <ChevronLeft strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
+        <ChevronLeft strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1 animate-bounce-x-left" />
       </button>
       <button
         onPointerEnter={(e) => { if (e.pointerType === "mouse") startArrowScroll(1); }}
@@ -174,7 +174,7 @@ export default function EventosTimeline() {
         aria-label="Avançar na timeline"
         className="absolute -right-1 md:right-[-115px] top-1/2 -translate-y-1/2 z-40 text-orange-500 hover:text-orange-400 hover:scale-110 transition-all drop-shadow-[0_0_10px_rgba(255,107,0,0.6)] cursor-pointer"
       >
-        <ChevronRight strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1" />
+        <ChevronRight strokeWidth={1} className="w-12 h-12 md:w-24 md:h-24 stroke-[2.5] md:stroke-1 animate-bounce-x-right" />
       </button>
       <div
         ref={scrollRef}
