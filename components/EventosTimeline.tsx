@@ -180,7 +180,7 @@ export default function EventosTimeline() {
         ref={scrollRef}
         onPointerDown={handleDragStart}
         onScroll={handleScroll}
-        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide cursor-grab active:cursor-grabbing [--edge-fade:4px] md:[--edge-fade:clamp(24px,8vw,100px)]"
+        className="w-full overflow-x-auto overflow-y-visible scrollbar-hide cursor-grab active:cursor-grabbing [--edge-fade:4px] md:[--edge-fade:clamp(24px,8vw,100px)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:pt-[200px] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:-mt-[200px]"
         style={{
           maskImage: "linear-gradient(to right, transparent 0px, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%)",
           WebkitMaskImage: "linear-gradient(to right, transparent 0px, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%)",
