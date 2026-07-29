@@ -9,6 +9,8 @@ import EventoLightbox from "@/components/EventoLightbox";
 import { formatarDataCompleta, type Evento } from "@/lib/eventos";
 
 const EDGE_BOUNCE_PX = 14;
+const WHEEL_DELTA_THRESHOLD = 20;
+const WHEEL_COOLDOWN_MS = 500;
 
 export default function EventoPageClient({ evento }: { evento: Evento | undefined }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -17,6 +19,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   const [isDesktop, setIsDesktop] = useState(false);
   const [navDirection, setNavDirection] = useState<"next" | "prev">("next");
   const [edgeBounce, setEdgeBounce] = useState(0);
+  const lastWheelNavRef = useRef(0);
   const touchStartX = useRef<number | null>(null);
   const mouseStartX = useRef<number | null>(null);
   const draggedRef = useRef(false);
@@ -148,6 +151,21 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
     else recuar();
   };
 
+  // Swipe de trackpad (dois dedos): só reage quando deltaX domina sobre
+  // deltaY (gesto horizontal intencional) e ignora pinch-zoom (ctrlKey).
+  // Cooldown por timestamp em vez de setTimeout — um gesto contínuo dispara
+  // muitos eventos wheel, e só queremos navegar uma vez por gesto.
+  const handleWheel = (e: React.WheelEvent) => {
+    if (e.ctrlKey) return;
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    if (Math.abs(e.deltaX) < WHEEL_DELTA_THRESHOLD) return;
+    const now = Date.now();
+    if (now - lastWheelNavRef.current < WHEEL_COOLDOWN_MS) return;
+    lastWheelNavRef.current = now;
+    if (e.deltaX > 0) avancar();
+    else recuar();
+  };
+
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <section className="relative h-dvh w-full overflow-hidden snap-start">
@@ -195,12 +213,13 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
             </div>
 
             <div
-              className="relative flex-1 min-h-52 md:min-h-44 max-h-104 md:max-h-136 flex items-center cursor-grab active:cursor-grabbing"
+              className="relative flex-1 min-h-52 md:min-h-44 max-h-104 md:max-h-136 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:max-h-152 flex items-center cursor-grab active:cursor-grabbing"
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
+              onWheel={handleWheel}
             >
               <button
                 onClick={recuar}
