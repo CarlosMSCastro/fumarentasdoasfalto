@@ -45,7 +45,7 @@ export default function ContactoSection() {
           </div>
           <div className="min-w-0 col-span-2 flex flex-col items-start justify-start gap-2">
             <p className="text-orange-500 uppercase tracking-widest text-base xl:text-lg font-bold">Quer ser membro?</p>
-            <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-8 py-3 font-bold uppercase tracking-widest text-white hover:bg-orange-600 transition-all text-base xl:text-lg">
+            <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" target="_blank" rel="noopener noreferrer" className="rounded-full bg-orange-500 px-8 py-3 font-bold uppercase tracking-widest text-white hover:bg-orange-600 transition-all text-base xl:text-lg">
               Formulário
             </a>
           </div>
@@ -76,7 +76,7 @@ export default function ContactoSection() {
           </div>
           <div className="p-0 flex-1 flex flex-col items-center justify-center gap-2 -mt-5">
             <p className="text-orange-500 uppercase tracking-widest text-md font-bold mb-1">Quer ser membro?</p>
-            <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-9 py-2 font-bold uppercase tracking-widest text-white text-sm hover:bg-orange-600 transition-all text-center">
+            <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" target="_blank" rel="noopener noreferrer" className="rounded-full bg-orange-500 px-9 py-2 font-bold uppercase tracking-widest text-white text-sm hover:bg-orange-600 transition-all text-center">
               Formulário
             </a>
           </div>

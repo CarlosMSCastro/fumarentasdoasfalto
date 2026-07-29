@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import eventosData from "@/data/eventos.json";
@@ -55,6 +56,8 @@ export default function EventosTimeline() {
   const [currentYear, setCurrentYear] = useState(anos[0]);
   const [carouselIndex, setCarouselIndex] = useState<Record<string, number>>({});
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [clickedCardId, setClickedCardId] = useState<string | null>(null);
+  const router = useRouter();
   let globalIndex = 0;
 
   useEffect(() => {
@@ -152,10 +155,17 @@ export default function EventosTimeline() {
   };
 
 
-  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>, ev: Evento) => {
     if (dragMovedRef.current) {
       e.preventDefault();
+      return;
     }
+    // No mobile, dá um "pop" rápido no card antes de navegar — no desktop
+    // (onde já há o hover-zoom) a navegação mantém-se instantânea.
+    if (window.innerWidth >= 768) return;
+    e.preventDefault();
+    setClickedCardId(ev.id);
+    setTimeout(() => router.push(`/eventos/${ev.id}`), 150);
   };
 
   return (
@@ -220,10 +230,10 @@ export default function EventosTimeline() {
                         setHoveredId(ev.id);
                       }}
                       onPointerLeave={() => setHoveredId(null)}
-                      onClick={handleCardClick}
+                      onClick={(e) => handleCardClick(e, ev)}
                     >
                       <div
-                        className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out origin-bottom ${rotate}
+                        className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all ${clickedCardId === ev.id ? "duration-150 scale-105" : "duration-700"} ease-out origin-bottom ${rotate}
                           ${hoverRotate} group-hover:z-20
                           ${ev.destaque
                             ? "w-62.5 md:w-80 md:group-hover:w-102.5 p-4 pb-8"

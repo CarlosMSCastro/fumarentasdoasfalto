@@ -28,7 +28,7 @@ export default function HeroSection() {
           Uma associação de apaixonados por motorizadas, principalmente antigas. Aberta a novos sócios e criadora de eventos.
         </p>
         <div className="pt-20 md:pt-22 flex gap-8 self-center">
-          <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" className="rounded-full bg-orange-500 px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-orange-600">
+          <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" target="_blank" rel="noopener noreferrer" className="rounded-full bg-orange-500 px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-orange-600">
             Novo Sócio
           </a>
           <a href="https://quolagest-wwit.quotagest.com/portal/login" className="rounded-full border border-white px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-white/10">
