@@ -31,7 +31,7 @@ export default function HeroSection() {
           <a href="https://app.quotagest.com/app/inscricao/628097740e7fe9b9" target="_blank" rel="noopener noreferrer" className="rounded-full bg-orange-500 px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-orange-600">
             Novo Sócio
           </a>
-          <a href="https://quolagest-wwit.quotagest.com/portal/login" className="rounded-full border border-white px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-white/10">
+          <a href="https://quolagest-wwit.quotagest.com/portal/login" target="_blank" rel="noopener noreferrer" className="rounded-full border border-white px-4 py-3 md:w-55 w-40 text-center md:text-lg text-md font-semibold text-white hover:bg-white/10">
             Portal do Sócio
           </a>
         </div>
