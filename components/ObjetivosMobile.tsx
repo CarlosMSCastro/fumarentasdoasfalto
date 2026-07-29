@@ -56,7 +56,7 @@ export default function ObjetivosMobile() {
           onClick={(e) => handleClick(e, cards[active].href)}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
-          className="absolute inset-0 rounded-sm overflow-hidden flex flex-col justify-between p-6"
+          className="absolute inset-0 rounded-sm overflow-hidden flex flex-col justify-between p-6 shadow-[0_25px_50px_rgba(0,0,0,0.75)]"
           style={{
             touchAction: 'pan-x',
             transition: "transform 0.3s ease, opacity 0.3s ease",
@@ -69,7 +69,7 @@ export default function ObjetivosMobile() {
             alt=""
             fill
             sizes="100vw"
-            className="object-cover opacity-95 brightness-[0.55]"
+            className="object-cover opacity-95 brightness-[0.75]"
           />
           <h3 className="relative z-10 text-5xl font-bold text-white">{cards[active].title}</h3>
           <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-5 py-4 rounded-full text-lg">
