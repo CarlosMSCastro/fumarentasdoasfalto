@@ -18,6 +18,20 @@ function agruparPorAno(lista: Evento[]) {
 const CAROUSEL_LIMIT = 4;
 const DRAG_THRESHOLD = 6;
 const ARROW_SCROLL_SPEED = 3;
+const CARD_SHADOW = "shadow-[0_18px_35px_rgba(0,0,0,100)]";
+// Sombreado subtil de cima para baixo, em todos os cartões.
+const CARD_BOTTOM_SHADE = "absolute inset-0 pointer-events-none bg-[linear-gradient(to_bottom,transparent_55%,rgba(0,0,0,0.22)_100%)]";
+// "Dog-ear": um pequeno triângulo real recortado (clip-path) num canto,
+// metade clara/metade escura — simula um canto de papel dobrado a sério,
+// com arestas nítidas em vez de um gradiente desfocado. Só 1 em cada 4
+// cartões tem, e o canto varia entre eles — ambos por idHash
+// (determinístico, não muda entre renders).
+const CARD_DOG_EARS = [
+  "absolute w-7 h-7 top-0 left-0 [clip-path:polygon(0_0,100%_0,0_100%)] bg-[linear-gradient(to_bottom_right,rgba(255,255,255,0.4),rgba(0,0,0,0.28))]",
+  "absolute w-7 h-7 top-0 right-0 [clip-path:polygon(100%_0,100%_100%,0_0)] bg-[linear-gradient(to_bottom_left,rgba(255,255,255,0.4),rgba(0,0,0,0.28))]",
+  "absolute w-7 h-7 bottom-0 left-0 [clip-path:polygon(0_100%,0_0,100%_100%)] bg-[linear-gradient(to_top_right,rgba(255,255,255,0.4),rgba(0,0,0,0.28))]",
+  "absolute w-7 h-7 bottom-0 right-0 [clip-path:polygon(100%_100%,0_100%,100%_0)] bg-[linear-gradient(to_top_left,rgba(255,255,255,0.4),rgba(0,0,0,0.28))]",
+];
 export default function EventosTimeline() {
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
@@ -184,6 +198,7 @@ export default function EventosTimeline() {
                   const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
                   const highSide = globalIndex % 2 === 0 ? "right" : "left";
                   const idHash = ev.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+                  const dogEar = idHash % 4 === 0 ? CARD_DOG_EARS[idHash % CARD_DOG_EARS.length] : null;
                   const randomFlip = idHash % 4 === 0;
                   const pinOnRight = randomFlip ? highSide === "left" : highSide === "right";
                   const pinSide = pinOnRight ? "left-[78%]" : "left-[22%]";
@@ -210,7 +225,7 @@ export default function EventosTimeline() {
                       onClick={(e) => handleCardClick(e, ev)}
                     >
                       <div
-                        className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f5f5f3] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all ${clickedCardId === ev.id ? "duration-150 scale-105" : "duration-700"} ease-out origin-bottom ${rotate}
+                        className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f6f2e6] ${CARD_SHADOW} transition-all ${clickedCardId === ev.id ? "duration-150 scale-105" : "duration-700"} ease-out origin-bottom ${rotate}
                           ${hoverRotate} group-hover:z-20
                           ${ev.destaque
                             ? "w-62.5 md:w-80 md:group-hover:w-102.5 p-4 pb-8"
@@ -291,6 +306,8 @@ export default function EventosTimeline() {
                             {formatarDataCompleta(ev.data)}
                           </span>
                         </div>
+                        {dogEar && <div aria-hidden="true" className={`${dogEar} pointer-events-none`} />}
+                        <div aria-hidden="true" className={CARD_BOTTOM_SHADE} />
                       </div>
                     </Link>
                   );

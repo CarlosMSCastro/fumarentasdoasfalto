@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart } from "lucide-react";
 import { scrollToContactosBypassingSnap } from "@/lib/scroll";
-import { terminarSessao } from "@/app/actions/auth";
+import AccountBadge from "@/components/AccountBadge";
 
 // lucide-react dropped brand/logo icons — these are small local stroke icons
 // (matching lucide's own visual style) so we don't need a whole extra icon
@@ -152,11 +152,7 @@ export default function Navbar({ session }: { session: Session | null }) {
             <InstagramIcon size={25} />
           </a>
           {session ? (
-            <form action={terminarSessao} className="hidden lg:block">
-              <Button type="submit" variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.8)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),3.8)] transition-all cursor-pointer">
-                Sair
-              </Button>
-            </form>
+            <AccountBadge session={session} className="hidden lg:flex" />
           ) : (
             <Link href="/login" className="hidden lg:block">
               <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.8)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),3.8)] transition-all">
@@ -202,13 +198,9 @@ export default function Navbar({ session }: { session: Session | null }) {
                     </Link>
                   </li>
                 ))}
-                <li className="w-25 mt-3">
+                <li className={session ? "mt-3" : "w-25 mt-3"}>
                   {session ? (
-                    <form action={terminarSessao}>
-                      <Button type="submit" className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all cursor-pointer">
-                        Sair
-                      </Button>
-                    </form>
+                    <AccountBadge session={session} onClick={() => setOpen(false)} />
                   ) : (
                     <Link href="/login" onClick={() => setOpen(false)}>
                       <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all">
