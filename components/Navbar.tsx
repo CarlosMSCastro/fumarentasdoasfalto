@@ -4,10 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import type { Session } from "next-auth";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart } from "lucide-react";
 import { scrollToContactosBypassingSnap } from "@/lib/scroll";
+import { terminarSessao } from "@/app/actions/auth";
 
 // lucide-react dropped brand/logo icons — these are small local stroke icons
 // (matching lucide's own visual style) so we don't need a whole extra icon
@@ -38,7 +40,7 @@ const links = [
   { href: "/", label: "Contacto", isContacto: true },
 ];
 
-export default function Navbar() {
+export default function Navbar({ session }: { session: Session | null }) {
   const [open, setOpen] = useState(false);
   const cartCount = 0;
   const [scrolled, setScrolled] = useState(false);
@@ -149,11 +151,19 @@ export default function Navbar() {
           <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <InstagramIcon size={25} />
           </a>
-          <Link href="#" className="hidden lg:block">
-            <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.8)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),3.8)] transition-all">
-              Login
-            </Button>
-          </Link>
+          {session ? (
+            <form action={terminarSessao} className="hidden lg:block">
+              <Button type="submit" variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.8)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),3.8)] transition-all cursor-pointer">
+                Sair
+              </Button>
+            </form>
+          ) : (
+            <Link href="/login" className="hidden lg:block">
+              <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.8)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),3.8)] transition-all">
+                Login
+              </Button>
+            </Link>
+          )}
           <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-foreground hover:text-primary transition-all">
             <FacebookIcon size={28} />
           </a>
@@ -193,11 +203,19 @@ export default function Navbar() {
                   </li>
                 ))}
                 <li className="w-25 mt-3">
-                  <Link href="/login" onClick={() => setOpen(false)}>
-                    <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all">
-                      Login
-                    </Button>
-                  </Link>
+                  {session ? (
+                    <form action={terminarSessao}>
+                      <Button type="submit" className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all cursor-pointer">
+                        Sair
+                      </Button>
+                    </form>
+                  ) : (
+                    <Link href="/login" onClick={() => setOpen(false)}>
+                      <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all">
+                        Login
+                      </Button>
+                    </Link>
+                  )}
                 </li>
               </ul>
             </SheetContent>

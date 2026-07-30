@@ -3,6 +3,7 @@ import { Rajdhani, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Map from "@/components/Map";
+import { auth } from "@/auth";
 
 const rajdhani = Rajdhani({
   weight: ["400", "600", "700"],
@@ -20,11 +21,13 @@ export const metadata: Metadata = {
   description: "Associação de apaixonados por motorizadas",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html
       lang="pt"
@@ -35,7 +38,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col">
-        <Navbar />
+        <Navbar session={session} />
         <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
           <Map />
         </div>
