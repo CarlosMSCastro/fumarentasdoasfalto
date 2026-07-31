@@ -178,12 +178,8 @@ export default function EventosTimeline() {
                 {grupos[ano].map((ev) => {
                   const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
                   const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
-                  const highSide = globalIndex % 2 === 0 ? "right" : "left";
                   const idHash = ev.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
                   const dogEar = idHash % 4 === 0 ? CARD_DOG_EARS[idHash % CARD_DOG_EARS.length] : null;
-                  const randomFlip = idHash % 4 === 0;
-                  const pinOnRight = randomFlip ? highSide === "left" : highSide === "right";
-                  const pinSide = pinOnRight ? "left-[78%]" : "left-[22%]";
                   // Escurecimento por card (só mobile): cards da metade
                   // esquerda da timeline escurecem à esquerda (perto da seta
                   // de recuar), os da direita escurecem à direita — sem
@@ -211,14 +207,6 @@ export default function EventosTimeline() {
                             : "w-56 md:w-71.25 md:group-hover:w-91.5 p-3 pb-6"
                           }`}
                       >
-                        <div className={`absolute -translate-x-1/2 -top-4.5 z-20 w-9 h-9 opacity-100 group-hover:opacity-0 transition-opacity duration-700 select-none pointer-events-none ${pinSide}`}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src="/pin.png"
-                            alt=""
-                            className={`w-full h-full object-contain ${ev.destaque ? "hue-rotate-[50deg] saturate-150 brightness-110" : ""}`}
-                          />
-                        </div>
                         <div
                           className={`relative w-full overflow-hidden transition-all duration-700 ease-out ${
                             ev.destaque
