@@ -2,9 +2,12 @@
 import Map from "@/components/Map";
 import Footer from "@/components/Footer";
 
+const EMAIL = "fumarentasdoasfalto@gmail.com";
+const ENDERECO_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Rua do Espírito Santo, 4760-485 Fradelos VNF")}`;
+
 export default function ContactoSection() {
   return (
-    <section className="flex flex-col relative overflow-hidden snap-start" id="contactos">
+    <section className="flex flex-col relative overflow-hidden snap-start min-h-dvh bg-background" id="contactos">
       <video
         className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-40 md:opacity-20 pointer-events-none scale-x-[-1]"
         src="/videos/smoke.mp4"
@@ -33,15 +36,15 @@ export default function ContactoSection() {
           <div className="min-w-0 col-span-3">
             <p className="text-orange-500 uppercase tracking-widest text-base xl:text-lg font-bold mb-4">Email</p>
             <div className="flex flex-col gap-2 text-white/70 text-base xl:text-xl">
-              <span className="wrap-break-word">fumarentasdoasfalto@gmail.com</span>
+              <a href={`mailto:${EMAIL}`} className="wrap-break-word hover:text-orange-500 transition-colors">{EMAIL}</a>
             </div>
           </div>
           <div className="min-w-0 col-span-2">
             <p className="text-orange-500 uppercase tracking-widest text-base xl:text-lg font-bold mb-4">Endereço</p>
-            <div className="flex flex-col gap-2 text-white/70 text-base xl:text-xl">
+            <a href={ENDERECO_MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex flex-col gap-2 text-white/70 text-base xl:text-xl hover:text-orange-500 transition-colors w-fit">
               <span>Rua do Espírito Santo</span>
               <span>4760-485 Fradelos VNF</span>
-            </div>
+            </a>
           </div>
           <div className="min-w-0 col-span-2 flex flex-col items-start justify-start gap-2">
             <p className="text-orange-500 uppercase tracking-widest text-base xl:text-lg font-bold">Quer ser membro?</p>
@@ -64,15 +67,15 @@ export default function ContactoSection() {
         </div>
         <div className="mx-[7%] pt-4">
           <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-2">Email</p>
-          <a href="mailto:fumarentasdoasfalto@gmail.com" className="text-white/70 text-lg hover:text-orange-500 transition-colors">fumarentasdoasfalto@gmail.com</a>
+          <a href={`mailto:${EMAIL}`} className="text-white/70 text-lg hover:text-orange-500 transition-colors">{EMAIL}</a>
         </div>
         <div className="flex gap-0 mx-[7%] pt-4">
           <div className="p-0 flex-1">
             <p className="text-orange-500 uppercase tracking-widest text-xl font-bold mb-4">Endereço</p>
-            <div className="flex flex-col gap-2 text-white/70 text-md">
+            <a href={ENDERECO_MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex flex-col gap-2 text-white/70 text-md hover:text-orange-500 transition-colors w-fit">
               <span>Rua do Espírito Santo</span>
               <span>4760-485 Fradelos VNF</span>
-            </div>
+            </a>
           </div>
           <div className="p-0 flex-1 flex flex-col items-center justify-center gap-2 -mt-5">
             <p className="text-orange-500 uppercase tracking-widest text-md font-bold mb-1">Quer ser membro?</p>

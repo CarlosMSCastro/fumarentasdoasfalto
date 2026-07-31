@@ -7,7 +7,6 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import ContactosSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import EventoLightbox from "@/components/EventoLightbox";
-import DroneVideoBackground from "@/components/DroneVideoBackground";
 import { formatarDataCompleta, type Evento } from "@/lib/eventos";
 
 const EDGE_BOUNCE_PX = 14;
@@ -161,15 +160,7 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   if (!evento) {
     return (
       <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
-        <section className="relative h-dvh w-full flex flex-col items-center justify-center gap-6 snap-start bg-black overflow-hidden">
-          <video
-            className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
-            src="/videos/smoke.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
+        <section className="relative h-dvh w-full flex flex-col items-center justify-center gap-6 snap-start overflow-hidden">
           <p className="relative z-10 text-white/70 text-lg">Evento não encontrado.</p>
           <Link
             href="/eventos"
@@ -189,8 +180,6 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <section className="relative h-dvh w-full overflow-hidden snap-start">
-        <DroneVideoBackground />
-
         <div className="flex h-full flex-col">
           <div className="relative z-0 w-full opacity-95 flex-1 min-h-0 flex flex-col justify-start pb-[clamp(4rem,6dvh,8rem)] md:pb-[clamp(6rem,7dvh,9dvh)] pt-40 md:pt-[clamp(7.5rem,7dvh,10rem)]">
             <div className="px-[8%] md:px-[13%] shrink-0">
