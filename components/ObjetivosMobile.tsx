@@ -41,7 +41,7 @@ export default function ObjetivosMobile() {
 
   return (
     <div className="w-full flex flex-col items-center md:hidden px-8" style={{ touchAction: 'pan-x' }}>
-      <div className="relative w-full h-[43vh] max-h-94.5 overflow-hidden rounded-sm">
+      <div className="relative w-full h-[43vh] max-h-94.5 overflow-hidden">
         <div
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
