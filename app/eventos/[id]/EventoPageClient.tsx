@@ -59,6 +59,11 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
   // Mobile pagina página-a-página (não repete fotos já vistas no último
   // grupo, mesmo que fique incompleto); desktop desliza 1 foto de cada vez.
   const step = isDesktop ? 1 : itemsPerPage;
+  // Pré-carrega as fotos da página seguinte/anterior para avançar/recuar
+  // não sentir a demora de arrancar o pedido de rede só no clique.
+  const proximas = evento ? evento.fotos.slice(photoStart + step, photoStart + step + itemsPerPage) : [];
+  const anteriores = evento ? evento.fotos.slice(Math.max(0, photoStart - step), Math.max(0, photoStart - step) + itemsPerPage) : [];
+  const paraPreCarregar = Array.from(new Set([...proximas, ...anteriores].filter((f) => !visiveis.includes(f))));
 
   // Pequeno "empurrão e volta" na direção tentada, para indicar visualmente
   // que não há mais fotos nesse sentido (em vez de não acontecer nada).
@@ -284,6 +289,21 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
                 />
               ))}
             </div>
+
+            {paraPreCarregar.length > 0 && (
+              <div className="absolute w-px h-px opacity-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                {paraPreCarregar.map((foto) => (
+                  <Image
+                    key={foto}
+                    src={`/eventos/${evento.pasta}/${foto}`}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 45vw, 27vw"
+                    loading="eager"
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
