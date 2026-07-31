@@ -15,7 +15,6 @@ function agruparPorAno(lista: Evento[]) {
   });
   return grupos;
 }
-const CAROUSEL_LIMIT = 4;
 const DRAG_THRESHOLD = 6;
 const ARROW_SCROLL_SPEED = 3;
 const CARD_SHADOW = "shadow-[0_18px_35px_rgba(0,0,0,100)]";
@@ -45,8 +44,6 @@ export default function EventosTimeline() {
   const dragStartScrollRef = useRef(0);
   const [currentEventId, setCurrentEventId] = useState<string | null>(null);
   const [currentYear, setCurrentYear] = useState(anos[0]);
-  const [carouselIndex, setCarouselIndex] = useState<Record<string, number>>({});
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [clickedCardId, setClickedCardId] = useState<string | null>(null);
   const router = useRouter();
   let globalIndex = 0;
@@ -80,21 +77,6 @@ export default function EventosTimeline() {
       arrowScrollRef.current = null;
     }
   };
-
-  useEffect(() => {
-    if (!hoveredId) return;
-    const ev = eventos.find((e) => e.id === hoveredId);
-    const total = ev ? Math.min(ev.fotos.length, CAROUSEL_LIMIT) : 0;
-    if (!ev || total <= 1) return;
-    const interval = setInterval(() => {
-      setCarouselIndex((prev) => {
-        const current = prev[hoveredId] ?? 0;
-        const next = (current + 1) % total;
-        return { ...prev, [hoveredId]: next };
-      });
-    }, 1800);
-    return () => clearInterval(interval);
-  }, [hoveredId]);
 
   useEffect(() => {
     const handleWindowPointerMove = (e: PointerEvent) => {
@@ -208,7 +190,6 @@ export default function EventosTimeline() {
                   // precisar de saber a posição real do scroll.
                   const isLeftHalf = globalIndex < eventos.length / 2;
                   globalIndex++;
-                  const idx = carouselIndex[ev.id] ?? 0;
                   return (
                     <Link
                       key={ev.id}
@@ -219,9 +200,7 @@ export default function EventosTimeline() {
                       onPointerEnter={(e) => {
                         if (e.pointerType !== "mouse") return;
                         setCurrentEventId(ev.id);
-                        setHoveredId(ev.id);
                       }}
-                      onPointerLeave={() => setHoveredId(null)}
                       onClick={(e) => handleCardClick(e, ev)}
                     >
                       <div
@@ -262,34 +241,6 @@ export default function EventosTimeline() {
                                 : "bg-[linear-gradient(to_left,rgba(0,0,0,0.75),transparent_40%)]"
                             }`}
                           />
-                          {hoveredId === ev.id && (
-                            <>
-                              {ev.fotos.slice(0, CAROUSEL_LIMIT).map((foto, i) => (
-                                <Image
-                                  key={i}
-                                  src={`/eventos/${ev.pasta}/${foto}`}
-                                  alt={`${ev.titulo} - foto ${i + 1}`}
-                                  fill
-                                  sizes={ev.destaque ? "410px" : "366px"}
-                                  className={`object-cover opacity-0 transition-opacity duration-700 ${
-                                    i === idx ? "md:group-hover:opacity-100" : ""
-                                  }`}
-                                />
-                              ))}
-                              {Math.min(ev.fotos.length, CAROUSEL_LIMIT) > 1 && (
-                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 opacity-0 transition-opacity duration-700 md:group-hover:opacity-100">
-                                  {ev.fotos.slice(0, CAROUSEL_LIMIT).map((_, i) => (
-                                    <div
-                                      key={i}
-                                      className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                                        i === idx ? "bg-orange-500" : "bg-white/50"
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
-                              )}
-                            </>
-                          )}
                           <div className="absolute bottom-2 right-2 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
                             <span className="flex items-center justify-center w-13 h-13 rounded-full bg-orange-500 text-white shadow-lg">
                               <ArrowUpRight size={28} strokeWidth={2.5} />

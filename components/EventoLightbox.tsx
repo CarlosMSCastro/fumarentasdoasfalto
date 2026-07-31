@@ -278,6 +278,28 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
           />
         </div>
 
+        {/* Pré-carrega a foto anterior/seguinte (invisível, 1x1) para que o
+            avançar/recuar no lightbox use o cache do browser em vez de
+            arrancar o pedido de rede só no momento do clique. */}
+        {total > 1 && (
+          <div className="absolute w-px h-px opacity-0 pointer-events-none overflow-hidden" aria-hidden="true">
+            <Image
+              src={`/eventos/${pasta}/${fotos[(index - 1 + total) % total]}`}
+              alt=""
+              fill
+              sizes="90vw"
+              loading="eager"
+            />
+            <Image
+              src={`/eventos/${pasta}/${fotos[(index + 1) % total]}`}
+              alt=""
+              fill
+              sizes="90vw"
+              loading="eager"
+            />
+          </div>
+        )}
+
         {total > 1 && arrowPos && (
           <>
             <button
