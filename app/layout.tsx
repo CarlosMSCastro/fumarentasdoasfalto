@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rajdhani, Geist_Mono } from "next/font/google";
+import { Rajdhani } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Map from "@/components/Map";
@@ -9,11 +9,6 @@ const rajdhani = Rajdhani({
   weight: ["400", "600", "700"],
   subsets: ["latin"],
   variable: "--font-sans",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +28,7 @@ export default async function RootLayout({
   return (
     <html
       lang="pt"
-      className={`${rajdhani.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${rajdhani.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://maps.googleapis.com" />

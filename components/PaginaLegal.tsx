@@ -1,4 +1,3 @@
-"use client";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 

@@ -33,7 +33,6 @@ export default function EventoConteudo({ evento }: { evento: Evento }) {
         className="relative block w-full aspect-square overflow-hidden rounded-sm cursor-pointer"
       >
         <Image
-          key={heroFoto}
           src={`/eventos/${evento.pasta}/${heroFoto}`}
           alt={`${evento.titulo} - foto ${heroIndex + 1}`}
           fill

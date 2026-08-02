@@ -4,7 +4,7 @@ import ScrollIndicator from "@/components/ScrollIndicator";
 export default function HeroSection() {
   return (
     <section className="relative h-dvh w-full overflow-hidden snap-start snap-always">
-      {/* Conteúdo — o fundo é o <HeroObjetivosBackground /> partilhado com a ObjetivosSection */}
+      {/* Conteúdo — o fundo é o <PageBackground /> partilhado com a ObjetivosSection */}
       <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-[8%] md:px-[15%] mt-15">
         <p className="text-white/80 text-lg uppercase tracking-widest mb-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Bem-vindo</p>
         <h1 className="text-5xl font-bold text-white md:text-6xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">

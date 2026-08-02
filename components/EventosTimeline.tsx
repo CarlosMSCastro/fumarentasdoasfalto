@@ -36,6 +36,7 @@ export default function EventosTimeline() {
   const anos = Object.keys(grupos).sort();
   const scrollRef = useRef<HTMLDivElement>(null);
   const arrowScrollRef = useRef<number | null>(null);
+  const scrollRafRef = useRef<number | null>(null);
   const yearRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const monthRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const isDraggingRef = useRef(false);
@@ -55,6 +56,7 @@ export default function EventosTimeline() {
     }
     return () => {
       if (arrowScrollRef.current) cancelAnimationFrame(arrowScrollRef.current);
+      if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
     };
   }, []);
 
@@ -117,23 +119,30 @@ export default function EventosTimeline() {
   // inteiro) — grupos de anos com larguras muito diferentes faziam o
   // indicador mostrar um ano que não correspondia ao cartão realmente
   // centrado no ecrã.
+  // Só recalcula uma vez por frame (rAF), em vez de a cada evento nativo de
+  // scroll (que dispara muitas vezes durante scroll/drag contínuo) — evita
+  // repetir a leitura de offsetLeft/offsetWidth de todos os eventos por tick.
   const handleScroll = () => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const containerCenter = container.scrollLeft + container.clientWidth / 2;
-    let closest = anos[0];
-    let closestDist = Infinity;
-    eventos.forEach((ev) => {
-      const el = monthRefs.current[ev.id];
-      if (!el) return;
-      const elCenter = el.offsetLeft + el.offsetWidth / 2;
-      const dist = Math.abs(elCenter - containerCenter);
-      if (dist < closestDist) {
-        closestDist = dist;
-        closest = ev.data.split("-")[0];
-      }
+    if (scrollRafRef.current) return;
+    scrollRafRef.current = requestAnimationFrame(() => {
+      scrollRafRef.current = null;
+      const container = scrollRef.current;
+      if (!container) return;
+      const containerCenter = container.scrollLeft + container.clientWidth / 2;
+      let closest = anos[0];
+      let closestDist = Infinity;
+      eventos.forEach((ev) => {
+        const el = monthRefs.current[ev.id];
+        if (!el) return;
+        const elCenter = el.offsetLeft + el.offsetWidth / 2;
+        const dist = Math.abs(elCenter - containerCenter);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closest = ev.data.split("-")[0];
+        }
+      });
+      setCurrentYear(closest);
     });
-    setCurrentYear(closest);
   };
 
 
