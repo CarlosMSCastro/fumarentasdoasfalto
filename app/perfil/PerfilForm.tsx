@@ -1,8 +1,10 @@
 "use client";
 import Image from "next/image";
+import { LogOut } from "lucide-react";
 import { useActionState } from "react";
 import { atualizarPerfil } from "@/app/actions/perfil";
 import { terminarSessao } from "@/app/actions/auth";
+import { getHighResAvatarUrl } from "@/lib/avatar";
 import type { users } from "@/lib/db/schema";
 
 type User = typeof users.$inferSelect;
@@ -19,27 +21,44 @@ export default function PerfilForm({ user }: { user: User }) {
   const initials = getInitials(user.name, user.email);
 
   return (
-    <div className="w-full max-w-4xl">
-      <div className="flex items-center gap-4 mb-10">
-        <span className="relative shrink-0 w-16 h-16 rounded-full overflow-hidden border border-white/20">
-          {user.image ? (
-            <Image src={user.image} alt="" fill sizes="64px" className="object-cover" />
-          ) : (
-            <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-lg font-bold">
-              {initials}
-            </span>
-          )}
-        </span>
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold text-white/90 truncate">{user.name || "A tua conta"}</h1>
-          <p className="text-white/60 text-sm truncate">{user.email}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <div className="w-full max-w-6xl pt-16 md:pt-28">
+      <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10">
         <div>
           <h2 className="text-sm uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
           <p className="text-white/60 text-sm">Ainda não tens encomendas.</p>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <span className="relative shrink-0 w-20 h-20 rounded-full overflow-hidden border border-white/20">
+              {user.image ? (
+                <Image src={getHighResAvatarUrl(user.image)!} alt="" fill sizes="80px" className="object-cover" />
+              ) : (
+                <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-2xl font-bold">
+                  {initials}
+                </span>
+              )}
+            </span>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-white/90 truncate">{user.name || "A tua conta"}</h1>
+              <p className="text-white/60 text-sm truncate">{user.email}</p>
+            </div>
+          </div>
+
+          <div className="mt-2 pt-4 border-t border-white/10">
+            <h2 className="text-sm uppercase tracking-widest text-primary font-bold mb-3">Sócio</h2>
+            <dl className="space-y-2 text-sm">
+              <div className="flex justify-between gap-4">
+                <dt className="text-white/60">Sócio desde</dt>
+                <dd className="text-white/90">—</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-white/60">Estado da quota</dt>
+                <dd className="text-white/90">—</dd>
+              </div>
+            </dl>
+            <p className="text-xs text-white/40 italic mt-3">Ligação ao Quotaguest ainda por fazer.</p>
+          </div>
         </div>
 
         <form action={action} className="flex flex-col gap-4">
@@ -54,7 +73,7 @@ export default function PerfilForm({ user }: { user: User }) {
             <input id="addressLine" name="addressLine" type="text" defaultValue={user.addressLine ?? ""}
               className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-[7rem_1fr] gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="postalCode" className="text-sm text-white/70">Código postal</label>
               <input id="postalCode" name="postalCode" type="text" defaultValue={user.postalCode ?? ""}
@@ -76,10 +95,11 @@ export default function PerfilForm({ user }: { user: User }) {
         </form>
       </div>
 
-      <form action={terminarSessao} className="mt-10">
+      <form action={terminarSessao} className="mt-10 flex justify-end">
         <button type="submit"
-          className="rounded-full border border-white/20 px-6 py-2.5 text-white/80 hover:text-white hover:border-white/40 transition-all cursor-pointer text-sm">
-          Sair
+          className="flex items-center gap-2 rounded-full bg-red-500 border border-red-500 px-6 py-3 font-bold uppercase tracking-widest text-sm text-white hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer">
+          <LogOut size={18} strokeWidth={2.5} />
+          Logout
         </button>
       </form>
     </div>
