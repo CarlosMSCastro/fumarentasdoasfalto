@@ -113,20 +113,24 @@ export default function EventosTimeline() {
     dragStartScrollRef.current = container.scrollLeft;
   };
 
+  // Calcula a partir do EVENTO mais próximo do centro (não do grupo de ano
+  // inteiro) — grupos de anos com larguras muito diferentes faziam o
+  // indicador mostrar um ano que não correspondia ao cartão realmente
+  // centrado no ecrã.
   const handleScroll = () => {
     const container = scrollRef.current;
     if (!container) return;
     const containerCenter = container.scrollLeft + container.clientWidth / 2;
     let closest = anos[0];
     let closestDist = Infinity;
-    anos.forEach((ano) => {
-      const el = yearRefs.current[ano];
+    eventos.forEach((ev) => {
+      const el = monthRefs.current[ev.id];
       if (!el) return;
       const elCenter = el.offsetLeft + el.offsetWidth / 2;
       const dist = Math.abs(elCenter - containerCenter);
       if (dist < closestDist) {
         closestDist = dist;
-        closest = ano;
+        closest = ev.data.split("-")[0];
       }
     });
     setCurrentYear(closest);
@@ -143,7 +147,7 @@ export default function EventosTimeline() {
     if (window.innerWidth >= 768) return;
     e.preventDefault();
     setClickedCardId(ev.id);
-    setTimeout(() => router.push(`/eventos/${ev.id}`), 150);
+    setTimeout(() => router.push(`/eventos/${ev.id}`, { scroll: false }), 150);
   };
 
   return (
@@ -195,6 +199,7 @@ export default function EventosTimeline() {
                     <Link
                       key={ev.id}
                       href={`/eventos/${ev.id}`}
+                      scroll={false}
                       className={`group relative shrink-0 cursor-pointer ${
                         ev.destaque ? "w-62.5 md:w-80" : "w-56 md:w-71.25"
                       }`}
@@ -262,7 +267,7 @@ export default function EventosTimeline() {
                   <div
                     key={i}
                     ref={(el) => { monthRefs.current[ev.id] = el; }}
-                    className={`text-center shrink-0 ${ev.destaque ? "w-52.5 md:w-60" : "w-18.75 md:w-21.25"} text-sm md:text-md uppercase tracking-wide font-semibold transition-colors duration-300 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] ${
+                    className={`text-center shrink-0 ${ev.destaque ? "w-62.5 md:w-80" : "w-56 md:w-71.25"} text-sm md:text-md uppercase tracking-wide font-semibold transition-colors duration-300 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] ${
                       ev.id === currentEventId ? "text-orange-500" : "text-white/90"
                     }`}
                   >
