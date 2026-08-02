@@ -1,10 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import EventoConteudo from "@/components/EventoConteudo";
 import type { Evento } from "@/lib/eventos";
+
+const emptySubscribe = () => () => {};
+// Deteta se já estamos no cliente sem o anti-padrão de dar setState dentro
+// de um useEffect — getServerSnapshot devolve false na SSR/primeiro render,
+// getSnapshot devolve true assim que corre no browser.
+function useMounted() {
+  return useSyncExternalStore(emptySubscribe, () => true, () => false);
+}
 
 export default function EventoModal({ evento }: { evento: Evento }) {
   const router = useRouter();
@@ -12,8 +20,7 @@ export default function EventoModal({ evento }: { evento: Evento }) {
   const closedRef = useRef(false);
   // Portal direto para o body: foge da árvore do template.tsx (que anima
   // opacidade em cada navegação) para o modal não herdar esse fade lento.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   const requestClose = useCallback(() => {
     setClosing(true);
