@@ -61,7 +61,7 @@ export default function EventoModal({ evento }: { evento: Evento }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-xl md:max-w-2xl [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:max-w-[62vh] ${
+        className={`relative w-full max-w-xl [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:max-w-[62vh] ${
           closing ? "animate-out zoom-out-95 fade-out fill-mode-forwards duration-200" : "animate-in zoom-in-95 fade-in duration-200"
         }`}
       >

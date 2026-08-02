@@ -26,7 +26,7 @@ export default function EventoConteudo({ evento }: { evento: Evento }) {
   };
 
   return (
-    <div className="max-w-xl mx-auto rounded-sm bg-[#f8f0d9] shadow-[0_25px_60px_rgba(0,0,0,0.8)] p-3 md:p-5">
+    <div className="rounded-sm bg-[#f8f0d9] shadow-[0_25px_60px_rgba(0,0,0,0.8)] p-3 md:p-5">
       <button
         onClick={() => setLightboxIndex(heroIndex)}
         aria-label={`Ver foto ${heroIndex + 1} em tamanho grande`}
