@@ -54,7 +54,9 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
             Voltar aos eventos
           </Link>
 
-          <EventoConteudo evento={evento} />
+          <div className="max-w-xl mx-auto">
+            <EventoConteudo evento={evento} />
+          </div>
         </div>
 
         <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" compact />
