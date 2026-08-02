@@ -5,7 +5,7 @@ import { scrollToContactosBypassingSnap } from "@/lib/scroll";
 
 const cards = [
   { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
-  { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/reparacao", bg: "/mecanica.jpg" },
+  { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/reparacao", bg: "/05.jpg" },
   { title: "Workshops e Palestras", sub: "Aprende, ensina, evolui", href: "/eventos", bg: "/worksh.jpg" },
 ];
 
@@ -53,7 +53,7 @@ export default function ObjetivosMobile() {
               key={`${card.href}-${i}`}
               href={card.href}
               onClick={(e) => handleClick(e, card.href)}
-              className="relative w-full h-full shrink-0 flex flex-col justify-between p-6 shadow-[0_25px_50px_rgba(0,0,0,0.75)]"
+              className="relative w-full h-full shrink-0 flex flex-col justify-between p-6 rounded-sm overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.75)]"
             >
               <Image
                 src={card.bg}

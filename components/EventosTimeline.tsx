@@ -16,7 +16,7 @@ function agruparPorAno(lista: Evento[]) {
   return grupos;
 }
 const DRAG_THRESHOLD = 6;
-const ARROW_SCROLL_SPEED = 3;
+const ARROW_SCROLL_SPEED = 420; // px por segundo (independente do refresh rate)
 const CARD_SHADOW = "shadow-[0_18px_35px_rgba(0,0,0,100)]";
 // Sombreado subtil de cima para baixo, em todos os cartões.
 const CARD_BOTTOM_SHADE = "absolute inset-0 pointer-events-none bg-[linear-gradient(to_bottom,transparent_55%,rgba(0,0,0,0.22)_100%)]";
@@ -62,10 +62,15 @@ export default function EventosTimeline() {
   // distinto do auto-scroll por proximidade à margem que foi removido.
   const startArrowScroll = (direction: 1 | -1) => {
     if (arrowScrollRef.current) cancelAnimationFrame(arrowScrollRef.current);
-    const step = () => {
+    let lastTime: number | null = null;
+    const step = (time: number) => {
       const container = scrollRef.current;
       if (!container) return;
-      container.scrollLeft += direction * ARROW_SCROLL_SPEED;
+      if (lastTime !== null) {
+        const dt = (time - lastTime) / 1000;
+        container.scrollLeft += direction * ARROW_SCROLL_SPEED * dt;
+      }
+      lastTime = time;
       arrowScrollRef.current = requestAnimationFrame(step);
     };
     arrowScrollRef.current = requestAnimationFrame(step);
@@ -176,8 +181,8 @@ export default function EventosTimeline() {
             <div key={ano} ref={(el) => { yearRefs.current[ano] = el; }} className="flex flex-col items-center shrink-0 min-h-110 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:min-h-[clamp(2rem,calc(98dvh_-_398px),27.5rem)] justify-end overflow-visible">
               <div className="flex items-end gap-2 md:gap-3 mb-5 [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:mb-4 h-[clamp(14rem,64dvh,27rem)] md:h-[clamp(18rem,calc(98dvh_-_250px),32rem)] [@media(min-width:768px)_and_(max-width:1728px)_and_(max-height:950px)]:h-[clamp(1rem,calc(98dvh_-_439px),30rem)] z-30">
                 {grupos[ano].map((ev) => {
-                  const rotate = globalIndex % 2 === 0 ? "-rotate-4" : "rotate-3";
-                  const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-4" : "group-hover:-rotate-3";
+                  const rotate = globalIndex % 2 === 0 ? "-rotate-2" : "rotate-1.5";
+                  const hoverRotate = globalIndex % 2 === 0 ? "group-hover:rotate-2" : "group-hover:-rotate-1.5";
                   const idHash = ev.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
                   const dogEar = idHash % 4 === 0 ? CARD_DOG_EARS[idHash % CARD_DOG_EARS.length] : null;
                   // Escurecimento por card (só mobile): cards da metade
@@ -200,7 +205,7 @@ export default function EventosTimeline() {
                       onClick={(e) => handleCardClick(e, ev)}
                     >
                       <div
-                        className={`absolute left-1/2 -translate-x-1/2 bottom-0 bg-[#f6f2e6] ${CARD_SHADOW} transition-all ${clickedCardId === ev.id ? "duration-150 scale-105" : "duration-700"} ease-out origin-bottom ${rotate}
+                        className={`absolute left-1/2 -translate-x-1/2 bottom-0 rounded-sm bg-[#f8f0d9] ${CARD_SHADOW} transition-all ${clickedCardId === ev.id ? "duration-150 scale-105" : "duration-700"} ease-out origin-bottom ${rotate}
                           ${hoverRotate} group-hover:z-20
                           ${ev.destaque
                             ? "w-62.5 md:w-80 md:group-hover:w-102.5 p-4 pb-8"

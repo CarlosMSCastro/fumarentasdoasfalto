@@ -252,9 +252,9 @@ export default function EventoPageClient({ evento }: { evento: Evento | undefine
                           setLightboxIndex(realIndex);
                         }}
                         aria-label={`Ver foto ${realIndex + 1} em tamanho grande`}
-                        className="relative h-full w-full rounded-lg cursor-pointer shadow-[0_15px_30px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:scale-105 hover:z-10"
+                        className="relative h-full w-full rounded-sm cursor-pointer shadow-[0_15px_30px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:z-10"
                       >
-                        <div className="relative h-full w-full overflow-hidden rounded-lg">
+                        <div className="relative h-full w-full overflow-hidden rounded-sm">
                           <Image
                             src={`/eventos/${evento.pasta}/${foto}`}
                             alt={`${evento.titulo} - foto ${realIndex + 1}`}
