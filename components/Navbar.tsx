@@ -200,7 +200,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 ))}
                 <li className={session ? "mt-3" : "w-25 mt-3"}>
                   {session ? (
-                    <AccountBadge session={session} onClick={() => setOpen(false)} />
+                    <AccountBadge session={session} onClick={() => setOpen(false)} vertical />
                   ) : (
                     <Link href="/login" onClick={() => setOpen(false)}>
                       <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all">
