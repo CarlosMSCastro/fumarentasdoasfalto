@@ -50,12 +50,22 @@ export default function FoundersSection() {
                     className="object-cover"
                   />
                   <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_bottom,transparent_55%,rgba(0,0,0,0.22)_100%)]" />
+                  {/* Mobile só: cargo aparece sobre a foto ao tocar (não há
+                      hover no telemóvel) — no desktop o cargo troca com o
+                      nome na legenda por baixo, ver mais abaixo. */}
+                  <span
+                    className={`md:hidden absolute inset-0 flex items-center justify-center text-center px-1 text-white font-bold uppercase leading-[1.1] text-[9px] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] transition-opacity duration-300 pointer-events-none ${
+                      activeIndex === i ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {fundador.cargo}
+                  </span>
                 </div>
                 <div className="relative shrink-0 px-1 pb-1 md:px-1.5 md:pb-2 text-center">
-                  <span className={`block text-black/85 font-bold uppercase leading-[1.1] text-[10px] sm:text-[9px] md:text-xs transition-opacity duration-300 group-hover:opacity-0 ${activeIndex === i ? "opacity-0" : ""}`}>
+                  <span className="block text-black/85 font-bold uppercase leading-[1.1] text-[10px] sm:text-[9px] md:text-xs md:transition-opacity md:duration-300 md:group-hover:opacity-0">
                     {fundador.nome}
                   </span>
-                  <span className={`absolute inset-x-0 bottom-1 md:bottom-2 flex items-center justify-center text-orange-600 font-bold uppercase leading-[1.1] text-[8px] sm:text-[7px] md:text-[10px] opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${activeIndex === i ? "opacity-100" : ""}`}>
+                  <span className="hidden md:flex absolute inset-x-0 bottom-2 items-center justify-center text-orange-600 font-bold uppercase leading-[1.1] text-[10px] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     {fundador.cargo}
                   </span>
                 </div>
