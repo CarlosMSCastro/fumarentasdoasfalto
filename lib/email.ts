@@ -18,3 +18,18 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
     `,
   });
 }
+
+// Enviado para o email NOVO (não para o atual) — confirma que quem pediu a
+// troca tem mesmo acesso à caixa de correio desse endereço.
+export async function sendEmailChangeConfirmation(to: string, confirmUrl: string) {
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "Confirma o teu novo email — Fumarentas do Asfalto",
+    html: `
+      <p>Pediste para alterar o email da tua conta para este endereço.</p>
+      <p><a href="${confirmUrl}">Clica aqui para confirmares a alteração</a></p>
+      <p>Este link expira dentro de 1 hora. Se não pediste isto, ignora este email.</p>
+    `,
+  });
+}
