@@ -5,11 +5,42 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import EventoLightbox from "@/components/EventoLightbox";
 import { formatarDataCompleta, type Evento } from "@/lib/eventos";
 
+const SWIPE_THRESHOLD = 40;
+
 export default function EventoConteudo({ evento }: { evento: Evento }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   const heroFoto = evento.fotos[heroIndex];
   const filmstripRef = useRef<HTMLDivElement>(null);
+  const heroTouchStartXRef = useRef<number | null>(null);
+  const heroDraggedRef = useRef(false);
+
+  // Swipe na foto principal (mobile) muda a foto em vez de abrir o
+  // lightbox — só abre se não tiver havido arrasto suficiente para contar
+  // como swipe.
+  const handleHeroTouchStart = (e: React.TouchEvent) => {
+    heroTouchStartXRef.current = e.touches[0].clientX;
+    heroDraggedRef.current = false;
+  };
+
+  const handleHeroTouchEnd = (e: React.TouchEvent) => {
+    const startX = heroTouchStartXRef.current;
+    heroTouchStartXRef.current = null;
+    if (startX === null) return;
+    const deltaX = e.changedTouches[0].clientX - startX;
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
+    heroDraggedRef.current = true;
+    const total = evento.fotos.length;
+    setHeroIndex((prev) => (deltaX < 0 ? (prev + 1) % total : (prev - 1 + total) % total));
+  };
+
+  const handleHeroClick = () => {
+    if (heroDraggedRef.current) {
+      heroDraggedRef.current = false;
+      return;
+    }
+    setLightboxIndex(heroIndex);
+  };
 
   // Roda do rato normal só manda scroll vertical — converte para horizontal
   // nesta tira, senão não há forma de a deslizar com um rato normal.
@@ -28,7 +59,9 @@ export default function EventoConteudo({ evento }: { evento: Evento }) {
   return (
     <div className="rounded-sm bg-[#f8f0d9] shadow-[0_25px_60px_rgba(0,0,0,0.8)] p-3 md:p-5">
       <button
-        onClick={() => setLightboxIndex(heroIndex)}
+        onClick={handleHeroClick}
+        onTouchStart={handleHeroTouchStart}
+        onTouchEnd={handleHeroTouchEnd}
         aria-label={`Ver foto ${heroIndex + 1} em tamanho grande`}
         className="relative block w-full aspect-square overflow-hidden rounded-sm cursor-pointer"
       >
