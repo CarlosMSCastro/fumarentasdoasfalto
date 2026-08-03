@@ -1,6 +1,7 @@
 "use server";
 
 import { randomBytes } from "node:crypto";
+import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcryptjs";
 import { put } from "@vercel/blob";
@@ -24,6 +25,7 @@ export async function atualizarPerfil(_prevState: PerfilFormState, formData: For
   const city = String(formData.get("city") ?? "").trim();
 
   await db.update(users).set({ phone, addressLine, postalCode, city }).where(eq(users.id, session.user.id));
+  revalidatePath("/perfil");
 
   return { success: true };
 }
@@ -91,6 +93,7 @@ export async function atualizarFoto(_prevState: PerfilFormState, formData: FormD
   });
 
   await db.update(users).set({ image: blob.url }).where(eq(users.id, session.user.id));
+  revalidatePath("/perfil");
 
   return { success: true };
 }
