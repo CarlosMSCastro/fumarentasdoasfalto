@@ -34,7 +34,7 @@ function ProdutoImagem({ produto }: { produto: Produto }) {
 
 export default function LojaGrid() {
   return (
-    <div className="w-full mx-auto flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 md:p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 content-start">
+    <div className="w-full mx-auto flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 md:p-4 grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-6 content-start">
       {produtos.map((produto, i) => {
         const rotate = i % 2 === 0 ? "-rotate-2" : "rotate-1.5";
         const hoverRotate = i % 2 === 0 ? "group-hover:rotate-2" : "group-hover:-rotate-1.5";
@@ -42,7 +42,7 @@ export default function LojaGrid() {
         return (
           <div
             key={produto.id}
-            className={`group relative flex flex-col min-h-52 sm:min-h-56 md:min-h-0 rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out hover:z-10 ${rotate} ${hoverRotate}`}
+            className={`group relative flex flex-col min-h-36 md:min-h-0 rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out hover:z-10 ${rotate} ${hoverRotate}`}
           >
             <div className="relative aspect-square m-2 overflow-hidden rounded-sm">
               <ProdutoImagem produto={produto} />
