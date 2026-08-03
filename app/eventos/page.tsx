@@ -12,6 +12,18 @@ export default function EventosPage() {
             <div className="relative z-0 pt-[clamp(3rem,12dvh,8.75rem)] md:pt-[clamp(9.5rem,9dvh,11.25rem)] text-right px-[8%] md:px-[15%]">
               <p className="text-white/90 text-xl uppercase tracking-widest mb-0">Os nossos</p>
               <h1 className="text-4xl md:text-6xl font-bold text-[#f8f0d9]">Eventos</h1>
+              <p className="text-white/70 text-sm md:text-base max-w-md ml-auto mt-2">
+                Para veres os próximos eventos e novidades, consulta a nossa{" "}
+                <a
+                  href="https://www.facebook.com/profile.php?id=61569646445995"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  página de Facebook
+                </a>
+                .
+              </p>
             </div>
             <EventosTimeline />
           </div>
