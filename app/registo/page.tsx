@@ -12,7 +12,7 @@ export default function RegistoPage() {
   return (
     <AuthPageBackground>
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-white/90 mb-8 text-center">Criar conta</h1>
+        <h1 className="text-3xl font-bold text-[#f8f0d9] mb-8 pt-21 text-center">Criar conta</h1>
         <div className="flex flex-col gap-3">
           <form action={entrarComGoogle}>
             <button type="submit"

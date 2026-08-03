@@ -62,7 +62,7 @@ export default function ObjetivosMobile() {
                 sizes="100vw"
                 className="object-cover opacity-95 brightness-[0.75]"
               />
-              <h3 className="relative z-10 text-5xl font-bold text-white">{card.title}</h3>
+              <h3 className="relative z-10 text-5xl font-bold text-[#f8f0d9]">{card.title}</h3>
               <div className="relative z-10 self-end bg-orange-500 text-white font-bold px-5 py-4 rounded-full text-lg">
                 →
               </div>

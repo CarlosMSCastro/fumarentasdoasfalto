@@ -23,9 +23,9 @@ export default function PerfilForm({ user }: { user: User }) {
   return (
     <div className="w-full max-w-6xl pt-16 md:pt-28">
       <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10">
-        <div>
-          <h2 className="text-sm uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
-          <p className="text-white/60 text-sm">Ainda não tens encomendas.</p>
+        <div className="md:pt-30">
+          <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
+          <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -40,14 +40,14 @@ export default function PerfilForm({ user }: { user: User }) {
               )}
             </span>
             <div className="min-w-0">
-              <h1 className="text-2xl font-bold text-white/90 truncate">{user.name || "A tua conta"}</h1>
-              <p className="text-white/60 text-sm truncate">{user.email}</p>
+              <h1 className="text-3xl font-bold text-[#f8f0d9] truncate">{user.name || "A tua conta"}</h1>
+              <p className="text-white/60 text-base truncate">{user.email}</p>
             </div>
           </div>
 
           <div className="mt-2 pt-4 border-t border-white/10">
-            <h2 className="text-sm uppercase tracking-widest text-primary font-bold mb-3">Sócio</h2>
-            <dl className="space-y-2 text-sm">
+            <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Sócio</h2>
+            <dl className="space-y-2 text-base">
               <div className="flex justify-between gap-4">
                 <dt className="text-white/60">Sócio desde</dt>
                 <dd className="text-white/90">—</dd>
@@ -57,37 +57,37 @@ export default function PerfilForm({ user }: { user: User }) {
                 <dd className="text-white/90">—</dd>
               </div>
             </dl>
-            <p className="text-xs text-white/40 italic mt-3">Ligação ao Quotaguest ainda por fazer.</p>
+            <p className="text-sm text-white/40 italic mt-3">Ligação ao Quotaguest ainda por fazer.</p>
           </div>
         </div>
 
-        <form action={action} className="flex flex-col gap-4">
-          <h2 className="text-sm uppercase tracking-widest text-primary font-bold">Morada</h2>
+        <form action={action} className="flex flex-col gap-4 md:pt-30">
+          <h2 className="text-base uppercase tracking-widest text-primary font-bold">Morada</h2>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="phone" className="text-sm text-white/70">Telefone</label>
+            <label htmlFor="phone" className="text-base text-white/70">Telefone</label>
             <input id="phone" name="phone" type="tel" defaultValue={user.phone ?? ""}
               className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="addressLine" className="text-sm text-white/70">Morada</label>
+            <label htmlFor="addressLine" className="text-base text-white/70">Morada</label>
             <input id="addressLine" name="addressLine" type="text" defaultValue={user.addressLine ?? ""}
               className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
           </div>
           <div className="grid grid-cols-[7rem_1fr] gap-4">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="postalCode" className="text-sm text-white/70">Código postal</label>
+              <label htmlFor="postalCode" className="text-base text-white/70">Código postal</label>
               <input id="postalCode" name="postalCode" type="text" defaultValue={user.postalCode ?? ""}
                 className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="city" className="text-sm text-white/70">Cidade</label>
+              <label htmlFor="city" className="text-base text-white/70">Cidade</label>
               <input id="city" name="city" type="text" defaultValue={user.city ?? ""}
                 className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
             </div>
           </div>
           {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
           {state?.success && <p className="text-sm text-primary">Morada atualizada.</p>}
-          <p className="text-xs text-white/50 italic">* A morada será automaticamente usada para futuras encomendas.</p>
+          <p className="text-sm text-white/50 italic">* A morada será automaticamente usada para futuras encomendas.</p>
           <button type="submit" disabled={pending}
             className="self-start rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 cursor-pointer">
             {pending ? "A guardar..." : "Guardar morada"}

@@ -31,7 +31,7 @@ export default function ObjetivosDesktop() {
             className="object-cover brightness-[0.70] group-hover:brightness-60 group-hover:scale-150 transition-all duration-500"
           />
         </div>
-        <h3 className="relative z-10 text-xl md:text-4xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] group-hover:text-orange-500 group-hover:text-4xl md:group-hover:text-4xl transition-all duration-300">{item.title}</h3>
+        <h3 className="relative z-10 text-xl md:text-4xl font-bold text-[#f8f0d9] drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] group-hover:text-orange-500 group-hover:text-4xl md:group-hover:text-4xl transition-all duration-300">{item.title}</h3>
         <div className="relative z-10 self-end bg-white/40 group-hover:bg-orange-500 text-white font-bold px-4 py-3 rounded-full transition-all duration-500">
           →
         </div>

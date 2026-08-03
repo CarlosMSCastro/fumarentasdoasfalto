@@ -10,7 +10,7 @@ export default function EsqueciMeDaPasswordPage() {
   return (
     <AuthPageBackground>
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-white/90 mb-8 text-center">Recuperar password</h1>
+        <h1 className="text-3xl font-bold text-[#f8f0d9] mb-8 text-center">Recuperar password</h1>
         {state?.success ? (
           <p className="text-white/70 text-center">
             Se existir uma conta com esse email, enviámos um link para a redefinires. Verifica a tua caixa de entrada.

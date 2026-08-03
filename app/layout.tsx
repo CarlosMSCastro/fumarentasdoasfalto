@@ -3,6 +3,7 @@ import { Rajdhani } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Map from "@/components/Map";
+import SharedBackground from "@/components/SharedBackground";
 import { auth } from "@/auth";
 
 const rajdhani = Rajdhani({
@@ -39,6 +40,7 @@ export default async function RootLayout({
         <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
           <Map />
         </div>
+        <SharedBackground />
         {children}
         {modal}
       </body>

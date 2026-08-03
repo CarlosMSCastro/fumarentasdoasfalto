@@ -19,7 +19,7 @@ export default function ContactoSection() {
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-black to-transparent z-10 pointer-events-none" />
       {/* Título */}
       <div className="mx-auto w-full px-[8%] lg:px-[13%] mt-30 relative z-30">
-        <h2 className="text-4xl lg:text-6xl font-bold text-white/80">Contactos</h2>
+        <h2 className="text-4xl lg:text-6xl font-bold text-[#f8f0d9]">Contactos</h2>
       </div>
 
       {/* Grid + CTA — desktop */}

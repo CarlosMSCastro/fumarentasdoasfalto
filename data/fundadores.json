@@ -2,7 +2,7 @@
   { "nome": "Tiago Rocha", "cargo": "Presidente Direção", "foto": "TiagoRocha.jpg" },
   { "nome": "Joaquim Rocha", "cargo": "Presidente Conselho Fiscal", "foto": "JoaquimRocha.jpg" },
   { "nome": "Bruno Campos", "cargo": "Presidente Assembleia Geral", "foto": "BrunoCampos.jpg" },
-  { "nome": "Rui Azevedo", "cargo": "Vice-Presidente Assembleia Geral", "foto": "RuiAzevedo.jpg" },
+  { "nome": "Rui Azevedo", "cargo": "Vice-Presidente Assembleia", "foto": "RuiAzevedo.jpg" },
   { "nome": "Tiago Marques", "cargo": "Secretário Assembleia Geral", "foto": "TiagoMarques.jpg" },
   { "nome": "André Ferreira", "cargo": "Vogal", "foto": "AndreFerreira.jpg" },
   { "nome": "André Silva", "cargo": "Vogal", "foto": "AndreSilva.jpg" },

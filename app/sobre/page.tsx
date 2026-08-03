@@ -1,24 +1,17 @@
 import ContactoSection from "@/components/ContactosSection";
 import FoundersSection from "@/components/FoundersSection";
-import PageBackground from "@/components/PageBackground";
 import ScrollIndicator from "@/components/ScrollIndicator";
 
 export default function SobrePage() {
   return (
     <>
-      <PageBackground
-        src="/sobremimwallpaper2.jpg"
-        gradientX="bg-linear-to-l from-black/75 via-black/55 to-black/5"
-        gradientY="bg-linear-to-b from-black/0 via-black/0 to-black/0"
-        gradientTop="bg-linear-to-t from-black/0 via-black/0 to-black/30"
-      />
       <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
         <section className="relative h-dvh w-full overflow-hidden snap-start">
-          {/* Fundo partilhado com a FoundersSection — ver <PageBackground /> */}
+          {/* Fundo partilhado com a Home e o Eventos — ver <SharedBackground /> no layout raiz */}
           {/* Conteúdo */}
           <div className="relative z-10 flex h-full flex-col items-end justify-center text-right px-[8%] md:px-[15%]">
             <p className="text-white/50 text-2xl md:text-4xl uppercase tracking-widest mt-3 mb-1">A nossa</p>
-            <h1 className="text-4xl font-bold text-white md:text-7xl mb-6">
+            <h1 className="text-4xl font-bold text-[#f8f0d9] md:text-7xl mb-6">
               HISTÓRIA
             </h1>
             <p className="text-white/95 text-lg md:text-xl max-w-xl mb-3">

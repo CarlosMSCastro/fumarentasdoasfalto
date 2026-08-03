@@ -4,10 +4,10 @@ import ScrollIndicator from "@/components/ScrollIndicator";
 export default function HeroSection() {
   return (
     <section className="relative h-dvh w-full overflow-hidden snap-start snap-always">
-      {/* Conteúdo — o fundo é o <PageBackground /> partilhado com a ObjetivosSection */}
+      {/* Conteúdo — o fundo é o <SharedBackground /> (layout raiz), partilhado com a ObjetivosSection, o Sobre e o Eventos */}
       <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-[8%] md:px-[15%] mt-15">
         <p className="text-white/80 text-lg uppercase tracking-widest mb-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Bem-vindo</p>
-        <h1 className="text-5xl font-bold text-white md:text-6xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
+        <h1 className="text-5xl font-bold text-[#f8f0d9] md:text-6xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
           FUMARENTAS DO ASFALTO
         </h1>
         <p className="mt-4 text-lg text-white/80 max-w-lg drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
