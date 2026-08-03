@@ -17,6 +17,11 @@ const rajdhani = Rajdhani({
 export const metadata: Metadata = {
   title: "Fumarentas do Asfalto",
   description: "Associação de apaixonados por motorizadas",
+  verification: {
+    other: {
+      "facebook-domain-verification": "9f5ktdm0h8uw3erskbxw3ur4xkk0qm",
+    },
+  },
 };
 
 export default async function RootLayout({
