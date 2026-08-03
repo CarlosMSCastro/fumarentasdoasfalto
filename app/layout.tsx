@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Map from "@/components/Map";
 import SharedBackground from "@/components/SharedBackground";
 import RotateDevicePrompt from "@/components/RotateDevicePrompt";
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import { auth } from "@/auth";
 
 const rajdhani = Rajdhani({
@@ -37,14 +38,16 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col">
-        <Navbar session={session} />
-        <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
-          <Map />
-        </div>
-        <SharedBackground />
-        {children}
-        {modal}
-        <RotateDevicePrompt />
+        <SessionProviderWrapper session={session}>
+          <Navbar />
+          <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
+            <Map />
+          </div>
+          <SharedBackground />
+          {children}
+          {modal}
+          <RotateDevicePrompt />
+        </SessionProviderWrapper>
       </body>
     </html>
   );
