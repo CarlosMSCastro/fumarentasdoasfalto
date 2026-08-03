@@ -5,9 +5,10 @@ import { entrar, entrarComGoogle, entrarComFacebook } from "@/app/actions/auth";
 import GoogleIcon from "@/components/GoogleIcon";
 import FacebookLoginIcon from "@/components/FacebookLoginIcon";
 import AuthPageBackground from "@/components/AuthPageBackground";
+import SubmitButton from "@/components/SubmitButton";
 
 export default function LoginPage() {
-  const [state, action, pending] = useActionState(entrar, undefined);
+  const [state, action] = useActionState(entrar, undefined);
 
   return (
     <AuthPageBackground>
@@ -15,18 +16,22 @@ export default function LoginPage() {
         <h1 className="text-3xl font-bold text-[#f8f0d9] mb-8 pt-20 md:pt-0 text-center">Entrar</h1>
         <div className="flex flex-col gap-3">
           <form action={entrarComGoogle}>
-            <button type="submit"
-              className="w-full flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-2.5 font-semibold text-white hover:bg-white/10 transition-all cursor-pointer">
+            <SubmitButton
+              pendingText="A continuar..."
+              className="w-full flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-2.5 font-semibold text-white hover:bg-white/10 transition-all cursor-pointer"
+            >
               <GoogleIcon />
               Continuar com Google
-            </button>
+            </SubmitButton>
           </form>
           <form action={entrarComFacebook}>
-            <button type="submit"
-              className="w-full flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-2.5 font-semibold text-white hover:bg-white/10 transition-all cursor-pointer">
+            <SubmitButton
+              pendingText="A continuar..."
+              className="w-full flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-2.5 font-semibold text-white hover:bg-white/10 transition-all cursor-pointer"
+            >
               <FacebookLoginIcon />
               Continuar com Facebook
-            </button>
+            </SubmitButton>
           </form>
         </div>
         <div className="flex items-center gap-3 my-6">
@@ -49,10 +54,12 @@ export default function LoginPage() {
               className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
           </div>
           {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
-          <button type="submit" disabled={pending}
-            className="mt-2 rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 cursor-pointer">
-            {pending ? "A entrar..." : "Entrar"}
-          </button>
+          <SubmitButton
+            pendingText="A entrar..."
+            className="mt-2 rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all cursor-pointer"
+          >
+            Entrar
+          </SubmitButton>
         </form>
         <p className="mt-6 text-center text-sm text-white/60">
           Ainda não tens conta? <Link href="/registo" className="text-primary hover:underline">Regista-te</Link>

@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { atualizarPerfil } from "@/app/actions/perfil";
 import { terminarSessao } from "@/app/actions/auth";
 import { getHighResAvatarUrl } from "@/lib/avatar";
+import SubmitButton from "@/components/SubmitButton";
 import type { users } from "@/lib/db/schema";
 
 type User = typeof users.$inferSelect;
@@ -96,11 +97,13 @@ export default function PerfilForm({ user }: { user: User }) {
       </div>
 
       <form action={terminarSessao} className="mt-10 flex justify-end">
-        <button type="submit"
-          className="flex items-center gap-2 rounded-full bg-red-500 border border-red-500 px-6 py-3 font-bold uppercase tracking-widest text-sm text-white hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer">
+        <SubmitButton
+          pendingText="A sair..."
+          className="flex items-center gap-2 rounded-full bg-red-500 border border-red-500 px-6 py-3 font-bold uppercase tracking-widest text-sm text-white hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer"
+        >
           <LogOut size={18} strokeWidth={2.5} />
           Logout
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );
