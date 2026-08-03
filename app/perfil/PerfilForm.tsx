@@ -23,7 +23,7 @@ export default function PerfilForm({ user }: { user: User }) {
   return (
     <div className="w-full max-w-6xl pt-16 md:pt-28">
       <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10">
-        <div className="md:pt-30">
+        <div className="order-last md:order-none md:pt-30">
           <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
           <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
         </div>
