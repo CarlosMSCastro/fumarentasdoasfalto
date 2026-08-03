@@ -67,10 +67,10 @@ export default function LojaGrid() {
               )}
             </div>
             <div className="shrink-0 px-2 pb-1.5 pt-1 text-center">
-              <p className="text-black/85 font-bold uppercase leading-tight text-sm md:text-base truncate">
+              <p className="text-black/85 font-bold uppercase leading-tight text-xs md:text-base line-clamp-2">
                 {produto.nome}
               </p>
-              <p className="text-primary font-bold text-sm md:text-base">{formatarPreco(produto.preco)}</p>
+              <p className="text-primary font-bold text-xs md:text-base">{formatarPreco(produto.preco)}</p>
             </div>
           </div>
         );
