@@ -12,7 +12,7 @@ export default function LoginPage() {
   return (
     <AuthPageBackground>
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-[#f8f0d9] mb-8 text-center">Entrar</h1>
+        <h1 className="text-3xl font-bold text-[#f8f0d9] mb-8 pt-20 md:pt-0 text-center">Entrar</h1>
         <div className="flex flex-col gap-3">
           <form action={entrarComGoogle}>
             <button type="submit"
