@@ -15,7 +15,7 @@ export default function RotateDevicePrompt() {
       className="hidden [@media(max-height:500px)_and_(orientation:landscape)]:flex fixed inset-0 z-[200] bg-black flex-col items-center justify-center gap-4 px-8 text-center"
     >
       <Smartphone size={48} className="text-primary rotate-90" strokeWidth={1.5} />
-      <p className="text-white text-lg font-semibold">Roda o teu telemóvel para a vertical para veres o site melhor.</p>
+      <p className="text-white text-lg font-semibold">Roda o teu telemóvel para a vertical.</p>
     </div>
   );
 }
