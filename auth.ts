@@ -68,10 +68,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, profile }) {
+    async jwt({ token, user, profile, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+      }
+      // trigger:"update" é despoletado pelo useSession().update() no
+      // cliente (ver atualizarFoto em app/actions/perfil.ts + PerfilForm) —
+      // o JWT é estático entre logins, por isso é a única forma de refletir
+      // no Navbar uma foto trocada a meio da sessão sem obrigar a re-login.
+      if (trigger === "update" && token.id) {
+        const [dbUser] = await db.select({ image: users.image }).from(users).where(eq(users.id, token.id as string)).limit(1);
+        if (dbUser) token.picture = dbUser.image;
       }
       // token.picture já vem pré-preenchido pelo Auth.js a partir de
       // user.image (a foto guardada na BD). Para contas que ligaram

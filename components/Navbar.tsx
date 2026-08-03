@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import type { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart } from "lucide-react";
@@ -40,7 +40,8 @@ const links = [
   { href: "/", label: "Contacto", isContacto: true },
 ];
 
-export default function Navbar({ session }: { session: Session | null }) {
+export default function Navbar() {
+  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const cartCount = 0;
   const [scrolled, setScrolled] = useState(false);

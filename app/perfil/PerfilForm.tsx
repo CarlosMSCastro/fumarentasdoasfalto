@@ -1,7 +1,8 @@
 "use client";
 import Image from "next/image";
 import { LogOut, ChevronDown } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto } from "@/app/actions/perfil";
 import { terminarSessao } from "@/app/actions/auth";
 import { getHighResAvatarUrl } from "@/lib/avatar";
@@ -23,6 +24,16 @@ export default function PerfilForm({ user }: { user: User }) {
   const [emailState, emailAction] = useActionState(pedirAlteracaoEmail, undefined);
   const [fotoState, fotoAction] = useActionState(atualizarFoto, undefined);
   const initials = getInitials(user.name, user.email);
+  const { update: updateSession } = useSession();
+
+  // O JWT da sessão fica preso à foto do login (ver auth.ts) — depois de um
+  // upload bem sucedido é preciso forçar o refresh para o Navbar deixar de
+  // mostrar a foto/iniciais antigas.
+  useEffect(() => {
+    if (fotoState?.success) {
+      updateSession();
+    }
+  }, [fotoState, updateSession]);
 
   return (
     <div className="w-full max-w-6xl pt-16 md:pt-28">
