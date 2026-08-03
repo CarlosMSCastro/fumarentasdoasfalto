@@ -36,7 +36,7 @@ const links = [
   { href: "/", label: "Início" },
   { href: "/sobre", label: "Sobre" },
   { href: "/eventos", label: "Eventos" },
-  { href: "#", label: "Loja" },
+  { href: "/loja", label: "Loja" },
   { href: "/", label: "Contacto", isContacto: true },
 ];
 
