@@ -3,11 +3,11 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import SmokeVideo from "@/components/SmokeVideo";
 
-const EXACT_ROUTES = ["/", "/sobre", "/eventos"];
+const EXACT_ROUTES = ["/", "/sobre", "/eventos", "/loja"];
 const PREFIX_ROUTES = ["/eventos/"];
 
-// Foto + vídeo de fumo + gradientes, tudo partilhado entre Home, Sobre e
-// Eventos — vive no layout raiz (fora do {children}, tal como a <Navbar />),
+// Foto + vídeo de fumo + gradientes, tudo partilhado entre Home, Sobre,
+// Eventos e Loja — vive no layout raiz (fora do {children}, tal como a <Navbar />),
 // por isso não é apanhado pelo fade de transição de página nem
 // desmontado/reiniciado ao navegar entre estas páginas. O gradiente
 // horizontal é simétrico (escurece os dois lados) de propósito: a Home tem
