@@ -77,13 +77,13 @@ export default function Navbar({ session }: { session: Session | null }) {
 
   const getLinkClass = (link: typeof links[number]) => {
     if (link.isContacto) {
-      return inContactos ? "text-primary" : "text-foreground hover:text-primary";
+      return inContactos ? "text-primary" : "text-[#f8f0d9] hover:text-primary";
     }
     if (inContactos) {
-      return "text-foreground hover:text-primary";
+      return "text-[#f8f0d9] hover:text-primary";
     }
-    const isActive = link.href !== "/" && (pathname === link.href || pathname.startsWith(`${link.href}/`));
-    return isActive ? "text-primary" : "text-foreground hover:text-primary";
+    const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(`${link.href}/`));
+    return isActive ? "text-primary" : "text-[#f8f0d9] hover:text-primary";
   };
 
   return (
@@ -130,7 +130,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                   else window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className={`drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.8)] hover:drop-shadow-[0_0_10px_rgba(var(--primary-rgb),5)] transition-all text-lg font-bold uppercase tracking-wide hover:tracking-widest ${getLinkClass(link)}`}>
+              className={`drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.8)] hover:drop-shadow-[0_0_10px_rgba(var(--primary-rgb),5)] transition-all text-xl font-bold uppercase tracking-wide hover:tracking-widest ${getLinkClass(link)}`}>
                 {link.label}
               </Link>
             </li>
@@ -139,16 +139,16 @@ export default function Navbar({ session }: { session: Session | null }) {
 
         {/* Direita: Carrinho + Login */}
         <div className="flex items-center lg:gap-8 gap-4 shrink-0 ml-auto lg:ml-0">
-          <Link href="#" className="relative text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
+          <Link href="#" className="relative text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <ShoppingCart size={28} />
             <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               {cartCount}
             </span>
           </Link>
-          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
+          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <FacebookIcon size={25} />
           </a>
-          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-foreground hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
+          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <InstagramIcon size={25} />
           </a>
           {session ? (
@@ -160,14 +160,14 @@ export default function Navbar({ session }: { session: Session | null }) {
               </Button>
             </Link>
           )}
-          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-foreground hover:text-primary transition-all">
+          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-[#f8f0d9] hover:text-primary transition-all">
             <FacebookIcon size={28} />
           </a>
-          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="lg:hidden text-foreground hover:text-primary transition-all">
+          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="lg:hidden text-[#f8f0d9] hover:text-primary transition-all">
             <InstagramIcon size={28} />
           </a>
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger className="lg:hidden p-0 text-foreground hover:text-primary transition-colors">
+            <SheetTrigger className="lg:hidden p-0 text-[#f8f0d9] hover:text-primary transition-colors">
               <Menu size={32} />
             </SheetTrigger>
             <SheetContent side="right" className="w-35! bg-black/70 backdrop-blur-sm border-white/10 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3">
@@ -193,7 +193,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                         }, 300);
                       }
                     }}
-                    className={`drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.2)] hover:drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.8)] transition-all text-lg font-bold uppercase tracking-widest ${getLinkClass(link)}`}>
+                    className={`drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.2)] hover:drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.8)] transition-all text-xl font-bold uppercase tracking-widest ${getLinkClass(link)}`}>
                       {link.label}
                     </Link>
                   </li>

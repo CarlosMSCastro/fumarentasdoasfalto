@@ -13,7 +13,7 @@ export default function RedefinirPasswordPage() {
   return (
     <AuthPageBackground>
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-white/90 mb-8 text-center">Nova password</h1>
+        <h1 className="text-3xl font-bold text-[#f8f0d9] mb-8 text-center">Nova password</h1>
         <form action={action} className="flex flex-col gap-4">
           <input type="hidden" name="token" value={token} />
           <div className="flex flex-col gap-1.5">

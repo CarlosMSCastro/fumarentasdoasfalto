@@ -30,7 +30,7 @@ export default function AccountBadge({ session, className = "", onClick, vertica
 
   return (
     <Link href="/perfil" onClick={onClick}
-      className={`flex text-foreground hover:text-primary transition-all group ${
+      className={`flex text-[#f8f0d9] hover:text-primary transition-all group ${
         vertical ? "flex-col items-center text-center gap-1.5" : "items-center gap-2.5"
       } ${className}`}>
       <span className="relative shrink-0 w-10 h-10 rounded-full overflow-hidden border border-white/20 group-hover:border-primary transition-all">
@@ -42,7 +42,7 @@ export default function AccountBadge({ session, className = "", onClick, vertica
           </span>
         )}
       </span>
-      <span className="font-bold uppercase tracking-wide text-sm">
+      <span className="font-bold uppercase tracking-wide text-base">
         {name || "Minha Conta"}
       </span>
     </Link>
