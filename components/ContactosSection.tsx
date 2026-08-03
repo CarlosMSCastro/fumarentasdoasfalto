@@ -1,6 +1,7 @@
 "use client";
 import Map from "@/components/Map";
 import Footer from "@/components/Footer";
+import SmokeVideo from "@/components/SmokeVideo";
 
 const EMAIL = "fumarentasdoasfalto@gmail.com";
 const ENDERECO_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Rua do Espírito Santo, 4760-485 Fradelos VNF")}`;
@@ -8,14 +9,7 @@ const ENDERECO_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${enc
 export default function ContactoSection() {
   return (
     <section className="flex flex-col relative overflow-hidden snap-start min-h-dvh bg-background" id="contactos">
-      <video
-        className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-40 md:opacity-20 pointer-events-none scale-x-[-1]"
-        src="/videos/smoke.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+      <SmokeVideo className="absolute inset-0 z-20 w-full h-full object-cover object-[center_top] md:object-center opacity-40 md:opacity-20 pointer-events-none scale-x-[-1]" />
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-black to-transparent z-10 pointer-events-none" />
       {/* Título */}
       <div className="mx-auto w-full px-[8%] lg:px-[13%] mt-30 relative z-30">

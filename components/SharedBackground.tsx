@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import SmokeVideo from "@/components/SmokeVideo";
 
 const EXACT_ROUTES = ["/", "/sobre", "/eventos"];
 const PREFIX_ROUTES = ["/eventos/"];
@@ -23,14 +24,7 @@ export default function SharedBackground() {
       <div className="absolute inset-0 bg-linear-to-r from-black/50 via-black/10 to-black/50" />
       <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/25 to-black/65" />
       <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/10 to-black/25" />
-      <video
-        className="absolute inset-0 w-full h-full object-cover opacity-65 pointer-events-none mix-blend-screen"
-        src="/videos/smoke.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+      <SmokeVideo className="absolute inset-0 w-full h-full object-cover opacity-65 pointer-events-none mix-blend-screen" />
     </div>
   );
 }
