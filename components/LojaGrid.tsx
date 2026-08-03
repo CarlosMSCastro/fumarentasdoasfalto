@@ -42,7 +42,7 @@ export default function LojaGrid() {
         return (
           <div
             key={produto.id}
-            className={`group relative flex flex-col min-h-36 md:min-h-0 rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out hover:z-10 ${rotate} ${hoverRotate}`}
+            className={`group relative flex flex-col min-h-44 md:min-h-0 rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-700 ease-out hover:z-10 ${rotate} ${hoverRotate}`}
           >
             <div className="relative aspect-square m-2 overflow-hidden rounded-sm">
               <ProdutoImagem produto={produto} />
