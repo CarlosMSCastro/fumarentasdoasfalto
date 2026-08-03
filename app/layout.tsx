@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Map from "@/components/Map";
 import SharedBackground from "@/components/SharedBackground";
+import RotateDevicePrompt from "@/components/RotateDevicePrompt";
 import { auth } from "@/auth";
 
 const rajdhani = Rajdhani({
@@ -43,6 +44,7 @@ export default async function RootLayout({
         <SharedBackground />
         {children}
         {modal}
+        <RotateDevicePrompt />
       </body>
     </html>
   );
