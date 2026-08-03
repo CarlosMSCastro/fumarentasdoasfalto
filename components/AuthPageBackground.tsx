@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Footer from "@/components/Footer";
+import SmokeVideo from "@/components/SmokeVideo";
 
 // Fundo partilhado por /login, /registo, /esqueci-me-da-password e
 // /redefinir-password — mesmo wallpaper/gradientes/fumo que a FoundersSection
@@ -25,14 +26,7 @@ export default function AuthPageBackground({ children, align = "center" }: AuthP
       <div className="absolute inset-0 bg-linear-to-l from-black/55 via-black/65 to-black/65" />
       <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/30 to-black/65" />
       <div className="absolute inset-0 bg-linear-to-t from-black/0 via-black/30 to-black/75" />
-      <video
-        className="absolute inset-0 w-full h-full object-cover opacity-65 pointer-events-none mix-blend-screen"
-        src="/videos/smoke.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+      <SmokeVideo className="absolute inset-0 w-full h-full object-cover opacity-65 pointer-events-none mix-blend-screen" />
 
       <div className="relative z-10 flex-1 flex items-center px-6 py-24">
         <div className={`w-full max-w-7xl mx-auto flex ${align === "end" ? "justify-end" : "justify-center"}`}>
