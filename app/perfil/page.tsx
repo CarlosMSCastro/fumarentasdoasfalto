@@ -14,7 +14,7 @@ export default async function PerfilPage() {
   if (!user) redirect("/login");
 
   return (
-    <AuthPageBackground align="end">
+    <AuthPageBackground align="end" verticalAlign="start">
       <PerfilForm user={user} />
     </AuthPageBackground>
   );

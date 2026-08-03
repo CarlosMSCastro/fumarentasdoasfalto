@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { hash } from "bcryptjs";
 import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
-import { users, verificationTokens } from "@/lib/db/schema";
+import { users, verificationTokens, emailChangeRequests } from "@/lib/db/schema";
 import { signIn, signOut } from "@/auth";
 import { sendPasswordResetEmail } from "@/lib/email";
 
@@ -97,6 +97,19 @@ export async function redefinirPassword(_prevState: AuthFormState, formData: For
   const passwordHash = await hash(password, 10);
   await db.update(users).set({ passwordHash }).where(eq(users.email, record.identifier));
   await db.delete(verificationTokens).where(eq(verificationTokens.token, token));
+
+  redirect("/login");
+}
+
+export async function confirmarAlteracaoEmail(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const token = String(formData.get("token") ?? "");
+  if (!token) return { error: "Link inválido." };
+
+  const [request] = await db.select().from(emailChangeRequests).where(eq(emailChangeRequests.token, token)).limit(1);
+  if (!request || request.expires < new Date()) return { error: "Link inválido ou expirado. Pede a alteração novamente no teu perfil." };
+
+  await db.update(users).set({ email: request.newEmail }).where(eq(users.id, request.userId));
+  await db.delete(emailChangeRequests).where(eq(emailChangeRequests.token, token));
 
   redirect("/login");
 }

@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
-import { LogOut } from "lucide-react";
+import { LogOut, ChevronDown } from "lucide-react";
 import { useActionState } from "react";
-import { atualizarPerfil } from "@/app/actions/perfil";
+import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto } from "@/app/actions/perfil";
 import { terminarSessao } from "@/app/actions/auth";
 import { getHighResAvatarUrl } from "@/lib/avatar";
 import SubmitButton from "@/components/SubmitButton";
@@ -18,31 +18,53 @@ function getInitials(name?: string | null, email?: string | null): string {
 }
 
 export default function PerfilForm({ user }: { user: User }) {
-  const [state, action, pending] = useActionState(atualizarPerfil, undefined);
+  const [state, action] = useActionState(atualizarPerfil, undefined);
+  const [passwordState, passwordAction] = useActionState(alterarPassword, undefined);
+  const [emailState, emailAction] = useActionState(pedirAlteracaoEmail, undefined);
+  const [fotoState, fotoAction] = useActionState(atualizarFoto, undefined);
   const initials = getInitials(user.name, user.email);
 
   return (
     <div className="w-full max-w-6xl pt-16 md:pt-28">
-      <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10">
-        <div className="order-last md:order-none md:pt-30">
+      <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10 items-start">
+        <div className="order-last md:order-none pt-4 border-t border-white/10 md:mt-26">
           <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
           <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
         </div>
 
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <span className="relative shrink-0 w-20 h-20 rounded-full overflow-hidden border border-white/20">
+            <span className="group/avatar relative shrink-0 w-20 h-20 rounded-full overflow-hidden border border-white/20">
               {user.image ? (
                 <Image src={getHighResAvatarUrl(user.image)!} alt="" fill sizes="80px" className="object-cover" />
               ) : (
-                <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-2xl font-bold">
-                  {initials}
-                </span>
+                <>
+                  <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-2xl font-bold">
+                    {initials}
+                  </span>
+                  <label
+                    htmlFor="foto-upload"
+                    className="absolute inset-0 flex items-center justify-center text-center px-1 bg-black/75 text-white text-[10px] font-semibold uppercase tracking-wide opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    Carregar foto
+                  </label>
+                  <form action={fotoAction}>
+                    <input
+                      id="foto-upload"
+                      name="foto"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => e.currentTarget.form?.requestSubmit()}
+                    />
+                  </form>
+                </>
               )}
             </span>
             <div className="min-w-0">
               <h1 className="text-3xl font-bold text-[#f8f0d9] truncate">{user.name || "A tua conta"}</h1>
               <p className="text-white/60 text-base truncate">{user.email}</p>
+              {fotoState?.error && <p className="text-sm text-red-400 mt-1">{fotoState.error}</p>}
             </div>
           </div>
 
@@ -60,9 +82,66 @@ export default function PerfilForm({ user }: { user: User }) {
             </dl>
             <p className="text-sm text-white/40 italic mt-3">Ligação ao Quotaguest ainda por fazer.</p>
           </div>
+
+          {user.passwordHash && (
+            <details className="group mt-2">
+              <summary className="text-base uppercase tracking-widest text-primary font-bold cursor-pointer list-none flex items-center justify-between">
+                Alterar password
+                <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
+              </summary>
+              <form action={passwordAction} className="flex flex-col gap-4 mt-4">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="passwordAtual" className="text-base text-white/70">Password atual</label>
+                <input id="passwordAtual" name="passwordAtual" type="password" required autoComplete="current-password"
+                  className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="novaPassword" className="text-base text-white/70">Nova password</label>
+                <input id="novaPassword" name="novaPassword" type="password" required minLength={8} autoComplete="new-password"
+                  className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="confirmarPassword" className="text-base text-white/70">Confirmar nova password</label>
+                <input id="confirmarPassword" name="confirmarPassword" type="password" required minLength={8} autoComplete="new-password"
+                  className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
+              </div>
+              {passwordState?.error && <p className="text-sm text-red-400">{passwordState.error}</p>}
+              {passwordState?.success && <p className="text-sm text-primary">Password alterada.</p>}
+              <SubmitButton
+                pendingText="A guardar..."
+                className="self-start rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all cursor-pointer"
+              >
+                Alterar password
+              </SubmitButton>
+              </form>
+            </details>
+          )}
+
+          <details className="group mt-2">
+            <summary className="text-base uppercase tracking-widest text-primary font-bold cursor-pointer list-none flex items-center justify-between">
+              Alterar email
+              <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
+            </summary>
+            <form action={emailAction} className="flex flex-col gap-4 mt-4">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="novoEmail" className="text-base text-white/70">Novo email</label>
+                <input id="novoEmail" name="novoEmail" type="email" required autoComplete="email"
+                  className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
+              </div>
+              {emailState?.error && <p className="text-sm text-red-400">{emailState.error}</p>}
+              {emailState?.success && <p className="text-sm text-primary">Enviámos um link de confirmação para o novo email.</p>}
+              <SubmitButton
+                pendingText="A enviar..."
+                className="self-start rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all cursor-pointer"
+              >
+                Alterar email
+              </SubmitButton>
+            </form>
+          </details>
         </div>
 
-        <form action={action} className="flex flex-col gap-4 md:pt-30">
+        <div className="pt-4 border-t border-white/10 md:mt-26">
+        <form action={action} className="flex flex-col gap-4">
           <h2 className="text-base uppercase tracking-widest text-primary font-bold">Morada</h2>
           <div className="flex flex-col gap-1.5">
             <label htmlFor="phone" className="text-base text-white/70">Telefone</label>
@@ -89,22 +168,38 @@ export default function PerfilForm({ user }: { user: User }) {
           {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
           {state?.success && <p className="text-sm text-primary">Morada atualizada.</p>}
           <p className="text-sm text-white/50 italic">* A morada será automaticamente usada para futuras encomendas.</p>
-          <button type="submit" disabled={pending}
-            className="self-start rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 cursor-pointer">
-            {pending ? "A guardar..." : "Guardar morada"}
-          </button>
+          <SubmitButton
+            pendingText="A guardar..."
+            className="self-start rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all cursor-pointer"
+          >
+            Guardar morada
+          </SubmitButton>
+        </form>
+
+        {/* Desktop: preso dentro da coluna da Morada, não é afetado pelos
+            accordions da coluna do meio (items-start no grid). */}
+        <form action={terminarSessao} className="hidden md:flex justify-end mt-6">
+          <SubmitButton
+            pendingText="A sair..."
+            className="flex items-center gap-2 rounded-full bg-red-500 border border-red-500 px-6 py-3 font-bold uppercase tracking-widest text-sm text-white hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer"
+          >
+            <LogOut size={18} strokeWidth={2.5} />
+            Logout
+          </SubmitButton>
+        </form>
+        </div>
+
+        {/* Mobile: fora do grid, no fundo do ecrã, depois do Histórico. */}
+        <form action={terminarSessao} className="md:hidden order-[10000] flex justify-center mt-6">
+          <SubmitButton
+            pendingText="A sair..."
+            className="flex items-center gap-2 rounded-full bg-red-500 border border-red-500 px-6 py-3 font-bold uppercase tracking-widest text-sm text-white hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer"
+          >
+            <LogOut size={18} strokeWidth={2.5} />
+            Logout
+          </SubmitButton>
         </form>
       </div>
-
-      <form action={terminarSessao} className="mt-10 flex justify-end">
-        <SubmitButton
-          pendingText="A sair..."
-          className="flex items-center gap-2 rounded-full bg-red-500 border border-red-500 px-6 py-3 font-bold uppercase tracking-widest text-sm text-white hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer"
-        >
-          <LogOut size={18} strokeWidth={2.5} />
-          Logout
-        </SubmitButton>
-      </form>
     </div>
   );
 }

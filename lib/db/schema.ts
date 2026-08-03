@@ -54,3 +54,20 @@ export const verificationTokens = pgTable(
   },
   (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })]
 );
+
+// Pedido de alteração de email pendente de confirmação — precisa de guardar
+// o email novo por utilizador (a verificationToken genérica só tem
+// identifier+token, sem campo para "qual é o valor novo"), por isso é uma
+// tabela à parte em vez de reaproveitar aquela.
+export const emailChangeRequests = pgTable(
+  "email_change_request",
+  {
+    userId: uuid("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    newEmail: text("new_email").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.token] })]
+);
