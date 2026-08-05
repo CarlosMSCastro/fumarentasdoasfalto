@@ -63,7 +63,7 @@ function ProdutoCard({
     // breakpoints), nunca reage ao hover/tap — é o que evita que o
     // crescimento de um card empurre/estique os vizinhos (grid stretch por
     // defeito).
-    <div className="group relative aspect-[4/5] w-[75%] mx-auto md:w-full">
+    <div className="group relative aspect-[4/5]">
       {/* Card visível: sempre absolute, ancorado ao fundo (bottom:0, "top"
           nunca definido — fica "auto" por omissão) e sem altura própria
           explícita. A altura é sempre intrínseca ao conteúdo (foto + texto,
@@ -83,7 +83,7 @@ function ProdutoCard({
           onToggle();
         }}
         className={`absolute inset-x-0 bottom-0 h-auto origin-bottom flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out cursor-pointer md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate} ${
-          ativo ? "z-30 -inset-x-[20%] shadow-[0_28px_55px_rgba(0,0,0,100)]" : ""
+          ativo ? "z-30 -inset-x-[32%] shadow-[0_28px_55px_rgba(0,0,0,100)]" : ""
         }`}
       >
         <div className="relative aspect-square m-2 overflow-hidden rounded-sm">
@@ -112,9 +112,9 @@ function ProdutoCard({
               }`}
             >
               <div className="overflow-hidden">
-                <div className="flex flex-col gap-1.5 pt-2">
+                <div className="flex flex-col gap-1 pt-1 md:gap-1.5 md:pt-2">
                   {temOpcoes && (
-                    <div className="flex items-center justify-center gap-1.5 flex-wrap pb-0.5">
+                    <div className="flex items-center justify-center gap-1 flex-wrap md:gap-1.5 md:pb-0.5">
                       {produto.cores?.map((cor) => (
                         <button
                           key={cor}
@@ -124,7 +124,7 @@ function ProdutoCard({
                             e.stopPropagation();
                             setCorSelecionada(cor);
                           }}
-                          className={`w-5 h-5 rounded-full shadow-sm cursor-pointer hover:scale-110 transition-transform ${
+                          className={`w-4 h-4 md:w-5 md:h-5 rounded-full shadow-sm cursor-pointer hover:scale-110 transition-transform ${
                             corSelecionada === cor
                               ? "ring-2 ring-offset-2 ring-offset-[#f8f0d9] ring-black/80"
                               : "border border-black/25"
@@ -140,7 +140,7 @@ function ProdutoCard({
                             e.stopPropagation();
                             setTamanhoSelecionado(tam);
                           }}
-                          className={`h-6 px-2.5 flex items-center justify-center rounded-full text-[10px] font-bold uppercase tracking-wide cursor-pointer transition-colors ${
+                          className={`h-4.5 px-1.5 md:h-6 md:px-2.5 flex items-center justify-center rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wide cursor-pointer transition-colors ${
                             tamanhoSelecionado === tam
                               ? "bg-black/85 text-white border border-black/85"
                               : "border border-black/30 text-black/80 hover:bg-black/85 hover:text-white hover:border-black/85"
@@ -153,13 +153,13 @@ function ProdutoCard({
                   )}
                   <button
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full rounded-full border border-black/30 text-black/80 text-[11px] font-bold uppercase tracking-wide py-1.5 hover:bg-black/85 hover:text-white hover:border-black/85 transition-colors cursor-pointer"
+                    className="w-full rounded-full border border-black/30 text-black/80 text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-0.5 md:py-1.5 hover:bg-black/85 hover:text-white hover:border-black/85 transition-colors cursor-pointer"
                   >
                     Adicionar ao carrinho
                   </button>
                   <button
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full rounded-full bg-primary text-white text-[11px] font-bold uppercase tracking-wide py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer"
+                    className="w-full rounded-full bg-primary text-white text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-0.5 md:py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer"
                   >
                     Comprar agora
                   </button>
