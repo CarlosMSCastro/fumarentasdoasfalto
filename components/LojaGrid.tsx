@@ -177,7 +177,7 @@ export default function LojaGrid() {
   const [ativoIndex, setAtivoIndex] = useState<number | null>(null);
 
   return (
-    <div className="w-full mx-auto flex-1 min-h-0 p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-8 content-start">
+    <div className="w-full mx-auto flex-1 min-h-0 p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-x-3 gap-y-10 md:gap-8 content-start">
       {produtos.map((produto, i) => (
         <ProdutoCard
           key={produto.id}
