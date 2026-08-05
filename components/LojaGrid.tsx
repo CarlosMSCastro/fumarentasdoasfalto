@@ -83,7 +83,7 @@ function ProdutoCard({
           onToggle();
         }}
         className={`absolute inset-x-0 bottom-0 h-auto origin-bottom flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out cursor-pointer md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate} ${
-          ativo ? "z-30 -inset-x-[14%] shadow-[0_28px_55px_rgba(0,0,0,100)]" : ""
+          ativo ? "z-30 -inset-x-[20%] shadow-[0_28px_55px_rgba(0,0,0,100)]" : ""
         }`}
       >
         <div className="relative aspect-square m-2 overflow-hidden rounded-sm">
@@ -177,7 +177,7 @@ export default function LojaGrid() {
   const [ativoIndex, setAtivoIndex] = useState<number | null>(null);
 
   return (
-    <div className="w-full mx-auto flex-1 min-h-0 p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-8 content-start">
+    <div className="w-full mx-auto flex-1 min-h-0 p-3 md:p-16 grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-8 content-start">
       {produtos.map((produto, i) => (
         <ProdutoCard
           key={produto.id}
