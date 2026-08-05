@@ -55,11 +55,12 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
     <div className="group relative min-h-44 md:aspect-[4/5] md:min-h-0">
       {/* Card visível: em mobile ocupa a célula normalmente (static); a
           partir de md passa a absolute, ocupando a célula por omissão e
-          crescendo para fora dela (largura + altura) no hover, sobrepondo
-          os vizinhos — mesma técnica do EventosTimeline, sem afetar o
-          dimensionamento da grid. */}
+          ancorada ao fundo (bottom:0 fixo) — no hover o "top" desprende-se
+          e a altura passa a ser ditada pelo conteúdo, por isso cresce para
+          CIMA (sobrepondo o título acima), tal como no EventosTimeline,
+          sem afetar o dimensionamento da grid. */}
       <div
-        className={`static md:absolute md:inset-0 h-full md:h-auto flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:-top-[10%] md:group-hover:bottom-auto md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate}`}
+        className={`static md:absolute md:inset-0 h-full md:h-auto origin-bottom flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:top-auto md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate}`}
       >
         <div className="relative aspect-square m-2 overflow-hidden rounded-sm">
           <ProdutoImagem produto={produto} />
@@ -133,7 +134,7 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
 
 export default function LojaGrid() {
   return (
-    <div className="w-full mx-auto flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-8 content-start">
+    <div className="w-full mx-auto flex-1 min-h-0 overflow-y-auto overflow-x-hidden md:overflow-visible p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-8 content-start">
       {produtos.map((produto, i) => (
         <ProdutoCard key={produto.id} produto={produto} index={i} />
       ))}
