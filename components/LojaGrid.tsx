@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingBag } from "lucide-react";
 import { getProdutos, formatarPreco, type Produto } from "@/lib/produtos";
 
@@ -63,7 +63,7 @@ function ProdutoCard({
     // breakpoints), nunca reage ao hover/tap — é o que evita que o
     // crescimento de um card empurre/estique os vizinhos (grid stretch por
     // defeito).
-    <div className="group relative aspect-[4/5]">
+    <div data-loja-card className="group relative aspect-[4/5]">
       {/* Card visível: sempre absolute, ancorado ao fundo (bottom:0, "top"
           nunca definido — fica "auto" por omissão) e sem altura própria
           explícita. A altura é sempre intrínseca ao conteúdo (foto + texto,
@@ -82,8 +82,8 @@ function ProdutoCard({
           if (window.matchMedia("(hover: hover)").matches) return;
           onToggle();
         }}
-        className={`absolute inset-x-0 bottom-0 h-auto origin-bottom flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out cursor-pointer md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate} ${
-          ativo ? "z-30 -inset-x-[32%] shadow-[0_28px_55px_rgba(0,0,0,100)]" : ""
+        className={`absolute bottom-0 h-auto origin-bottom flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out cursor-pointer md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate} ${
+          ativo ? "z-30 -inset-x-[32%] shadow-[0_28px_55px_rgba(0,0,0,100)]" : "inset-x-0"
         }`}
       >
         <div className="relative aspect-square m-2 overflow-hidden rounded-sm">
@@ -175,6 +175,19 @@ function ProdutoCard({
 
 export default function LojaGrid() {
   const [ativoIndex, setAtivoIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (ativoIndex === null) return;
+    // Tocar fora de qualquer card (mobile) fecha o que estiver aberto. Um
+    // toque DENTRO de um card (o mesmo ou outro) não faz nada aqui — quem
+    // trata isso é o onClick de cada card (toggle / trocar para o novo).
+    const fecharSeForaDeUmCard = (e: PointerEvent) => {
+      const alvo = e.target as HTMLElement | null;
+      if (!alvo?.closest("[data-loja-card]")) setAtivoIndex(null);
+    };
+    document.addEventListener("pointerdown", fecharSeForaDeUmCard);
+    return () => document.removeEventListener("pointerdown", fecharSeForaDeUmCard);
+  }, [ativoIndex]);
 
   return (
     <div className="w-full mx-auto flex-1 min-h-0 p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-x-3 gap-y-10 md:gap-8 content-start">
