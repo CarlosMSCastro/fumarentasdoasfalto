@@ -52,10 +52,18 @@ export default function FoundersSection() {
                   <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_bottom,transparent_55%,rgba(0,0,0,0.22)_100%)]" />
                   {/* Mobile só: cargo aparece sobre a foto ao tocar (não há
                       hover no telemóvel) — no desktop o cargo troca com o
-                      nome na legenda por baixo, ver mais abaixo. */}
-                  <span
-                    className={`md:hidden absolute inset-0 flex items-center justify-center text-center px-1 text-white font-bold uppercase leading-[1.1] text-[9px] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] transition-opacity duration-300 pointer-events-none ${
+                      nome na legenda por baixo, ver mais abaixo. Ao tocar, a
+                      foto escurece e o texto do cargo aumenta para ficar
+                      legível e em destaque. */}
+                  <div
+                    aria-hidden="true"
+                    className={`md:hidden absolute inset-0 pointer-events-none bg-black/55 transition-opacity duration-300 ${
                       activeIndex === i ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                  <span
+                    className={`md:hidden absolute inset-0 flex items-center justify-center text-center px-1 text-white font-bold uppercase leading-[1.1] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] transition-all duration-300 pointer-events-none ${
+                      activeIndex === i ? "opacity-100 text-sm" : "opacity-0 text-[9px]"
                     }`}
                   >
                     {fundador.cargo}
