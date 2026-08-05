@@ -41,7 +41,17 @@ function ProdutoImagem({ produto }: { produto: Produto }) {
   );
 }
 
-function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
+function ProdutoCard({
+  produto,
+  index,
+  ativo,
+  onToggle,
+}: {
+  produto: Produto;
+  index: number;
+  ativo: boolean;
+  onToggle: () => void;
+}) {
   const rotate = index % 2 === 0 ? "-rotate-2" : "rotate-1.5";
   const hoverRotate = index % 2 === 0 ? "group-hover:rotate-2" : "group-hover:-rotate-1.5";
   const temOpcoes = !!(produto.tamanhos?.length || produto.cores?.length);
@@ -49,18 +59,32 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(produto.tamanhos?.[0]);
 
   return (
-    // Célula da grid: tamanho fixo (aspect-ratio no desktop), nunca reage ao
-    // hover — é o que evita que o crescimento de um card empurre/estique os
-    // vizinhos (grid stretch por defeito).
-    <div className="group relative min-h-44 md:aspect-[4/5] md:min-h-0">
-      {/* Card visível: em mobile ocupa a célula normalmente (static); a
-          partir de md passa a absolute, ocupando a célula por omissão e
-          ancorada ao fundo (bottom:0 fixo) — no hover o "top" desprende-se
-          e a altura passa a ser ditada pelo conteúdo, por isso cresce para
-          CIMA (sobrepondo o título acima), tal como no EventosTimeline,
-          sem afetar o dimensionamento da grid. */}
+    // Célula da grid: tamanho fixo (aspect-ratio, igual em todos os
+    // breakpoints), nunca reage ao hover/tap — é o que evita que o
+    // crescimento de um card empurre/estique os vizinhos (grid stretch por
+    // defeito).
+    <div className="group relative aspect-[4/5]">
+      {/* Card visível: sempre absolute, ancorado ao fundo (bottom:0, "top"
+          nunca definido — fica "auto" por omissão) e sem altura própria
+          explícita. A altura é sempre intrínseca ao conteúdo (foto + texto,
+          rodapé colapsado a 0fr em repouso), por isso crescer/encolher é só
+          o conteúdo (rodapé) a mudar de tamanho — não há transição própria
+          no "top", que ia lutar com essa reflow e causar o salto ao
+          encolher. Mesma técnica do EventosTimeline. No desktop o gatilho é
+          :hover (md:group-hover:*); no mobile, sem hover, o mesmo estado é
+          replicado ao tocar (prop `ativo`, ver LojaGrid). */}
       <div
-        className={`static md:absolute md:inset-0 h-full md:h-auto origin-bottom flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:top-auto md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate}`}
+        onClick={() => {
+          // Em desktop (rato, suporta hover) o crescimento já é tratado pelo
+          // :hover — um click aqui não deve "fixar" o card aberto. Só faz
+          // toggle em dispositivos sem hover (touch), que é o caso que este
+          // clique resolve.
+          if (window.matchMedia("(hover: hover)").matches) return;
+          onToggle();
+        }}
+        className={`absolute inset-x-0 bottom-0 h-auto origin-bottom flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] transition-all duration-500 ease-out cursor-pointer md:group-hover:z-30 md:group-hover:-inset-x-[14%] md:group-hover:shadow-[0_28px_55px_rgba(0,0,0,100)] ${rotate} ${hoverRotate} ${
+          ativo ? "z-30 -inset-x-[14%] shadow-[0_28px_55px_rgba(0,0,0,100)]" : ""
+        }`}
       >
         <div className="relative aspect-square m-2 overflow-hidden rounded-sm">
           <ProdutoImagem produto={produto} />
@@ -78,10 +102,15 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
           <p className="text-primary font-bold text-xs md:text-base">{formatarPreco(produto.preco)}</p>
 
           {/* Carrinho/checkout ainda não existem — botões só de momento
-              visuais, sem onClick. A seleção de cor/tamanho já é real
-              (estado local do card), só não alimenta nenhum carrinho. */}
+              visuais, sem onClick real (mas com stopPropagation para não
+              fechar o card ao tocar neles). A seleção de cor/tamanho já é
+              real (estado local do card), só não alimenta nenhum carrinho. */}
           {produto.disponivel && (
-            <div className="grid grid-rows-[0fr] md:group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
+            <div
+              className={`grid transition-[grid-template-rows] duration-500 ease-out md:group-hover:grid-rows-[1fr] ${
+                ativo ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              }`}
+            >
               <div className="overflow-hidden">
                 <div className="flex flex-col gap-1.5 pt-2">
                   {temOpcoes && (
@@ -91,7 +120,10 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
                           key={cor}
                           type="button"
                           title={cor}
-                          onClick={() => setCorSelecionada(cor)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCorSelecionada(cor);
+                          }}
                           className={`w-5 h-5 rounded-full shadow-sm cursor-pointer hover:scale-110 transition-transform ${
                             corSelecionada === cor
                               ? "ring-2 ring-offset-2 ring-offset-[#f8f0d9] ring-black/80"
@@ -104,7 +136,10 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
                         <button
                           key={tam}
                           type="button"
-                          onClick={() => setTamanhoSelecionado(tam)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTamanhoSelecionado(tam);
+                          }}
                           className={`h-6 px-2.5 flex items-center justify-center rounded-full text-[10px] font-bold uppercase tracking-wide cursor-pointer transition-colors ${
                             tamanhoSelecionado === tam
                               ? "bg-black/85 text-white border border-black/85"
@@ -116,10 +151,16 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
                       ))}
                     </div>
                   )}
-                  <button className="w-full rounded-full border border-black/30 text-black/80 text-[11px] font-bold uppercase tracking-wide py-1.5 hover:bg-black/85 hover:text-white hover:border-black/85 transition-colors cursor-pointer">
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full rounded-full border border-black/30 text-black/80 text-[11px] font-bold uppercase tracking-wide py-1.5 hover:bg-black/85 hover:text-white hover:border-black/85 transition-colors cursor-pointer"
+                  >
                     Adicionar ao carrinho
                   </button>
-                  <button className="w-full rounded-full bg-primary text-white text-[11px] font-bold uppercase tracking-wide py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer">
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full rounded-full bg-primary text-white text-[11px] font-bold uppercase tracking-wide py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer"
+                  >
                     Comprar agora
                   </button>
                 </div>
@@ -133,10 +174,18 @@ function ProdutoCard({ produto, index }: { produto: Produto; index: number }) {
 }
 
 export default function LojaGrid() {
+  const [ativoIndex, setAtivoIndex] = useState<number | null>(null);
+
   return (
-    <div className="w-full mx-auto flex-1 min-h-0 overflow-y-auto overflow-x-hidden md:overflow-visible p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-8 content-start">
+    <div className="w-full mx-auto flex-1 min-h-0 p-3 md:p-16 grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-8 content-start">
       {produtos.map((produto, i) => (
-        <ProdutoCard key={produto.id} produto={produto} index={i} />
+        <ProdutoCard
+          key={produto.id}
+          produto={produto}
+          index={i}
+          ativo={ativoIndex === i}
+          onToggle={() => setAtivoIndex((atual) => (atual === i ? null : i))}
+        />
       ))}
     </div>
   );
