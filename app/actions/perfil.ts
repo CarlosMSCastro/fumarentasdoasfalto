@@ -9,6 +9,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { users, emailChangeRequests } from "@/lib/db/schema";
 import { sendEmailChangeConfirmation } from "@/lib/email";
+import { findSocioByCodigoOuNif } from "@/lib/quotagest";
 
 export type PerfilFormState = { error?: string; success?: boolean } | undefined;
 
@@ -69,6 +70,22 @@ export async function pedirAlteracaoEmail(_prevState: PerfilFormState, formData:
 
   const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/confirmar-email?token=${token}`;
   await sendEmailChangeConfirmation(novoEmail, confirmUrl);
+
+  return { success: true };
+}
+
+export async function procurarSocio(_prevState: PerfilFormState, formData: FormData): Promise<PerfilFormState> {
+  const session = await auth();
+  if (!session?.user) return { error: "Sessão expirada. Entra novamente." };
+
+  const query = String(formData.get("codigoOuNif") ?? "").trim();
+  if (!query) return { error: "Introduz o número de sócio ou o NIF." };
+
+  const socio = await findSocioByCodigoOuNif(query).catch(() => null);
+  if (!socio) return { error: "Não encontrámos nenhum sócio com esse número ou NIF." };
+
+  await db.update(users).set({ quotagestId: socio.id }).where(eq(users.id, session.user.id));
+  revalidatePath("/perfil");
 
   return { success: true };
 }
