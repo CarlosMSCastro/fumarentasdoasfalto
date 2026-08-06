@@ -15,6 +15,13 @@
       "when": 1785723724220,
       "tag": "0001_bumpy_spiral",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785900830187,
+      "tag": "0002_glossy_nick_fury",
+      "breakpoints": true
     }
   ]
 }

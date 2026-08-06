@@ -9,7 +9,9 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart } from "lucide-react";
 import { scrollToContactosBypassingSnap } from "@/lib/scroll";
+import { useCart } from "@/lib/cart";
 import AccountBadge from "@/components/AccountBadge";
+import CartSheet from "@/components/CartSheet";
 
 // lucide-react dropped brand/logo icons — these are small local stroke icons
 // (matching lucide's own visual style) so we don't need a whole extra icon
@@ -43,7 +45,7 @@ const links = [
 export default function Navbar() {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
-  const cartCount = 0;
+  const { contagem: cartCount, setSheetAberta } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [inContactos, setInContactos] = useState(false);
   const [navTransparentZone, setNavTransparentZone] = useState(false);
@@ -140,12 +142,20 @@ export default function Navbar() {
 
         {/* Direita: Carrinho + Login */}
         <div className="flex items-center lg:gap-8 gap-4 shrink-0 ml-auto lg:ml-0">
-          <Link href="#" className="relative text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
+          <button
+            type="button"
+            onClick={() => setSheetAberta(true)}
+            aria-label="Abrir carrinho"
+            className="relative text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)] cursor-pointer"
+          >
             <ShoppingCart size={28} />
-            <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              {cartCount}
-            </span>
-          </Link>
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
+          <CartSheet />
           <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <FacebookIcon size={25} />
           </a>

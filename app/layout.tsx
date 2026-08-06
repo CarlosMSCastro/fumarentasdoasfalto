@@ -6,6 +6,7 @@ import Map from "@/components/Map";
 import SharedBackground from "@/components/SharedBackground";
 import RotateDevicePrompt from "@/components/RotateDevicePrompt";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import { CartProvider } from "@/lib/cart";
 import { auth } from "@/auth";
 
 const rajdhani = Rajdhani({
@@ -44,14 +45,16 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <SessionProviderWrapper session={session}>
-          <Navbar />
-          <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
-            <Map />
-          </div>
-          <SharedBackground />
-          {children}
-          {modal}
-          <RotateDevicePrompt />
+          <CartProvider>
+            <Navbar />
+            <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
+              <Map />
+            </div>
+            <SharedBackground />
+            {children}
+            {modal}
+            <RotateDevicePrompt />
+          </CartProvider>
         </SessionProviderWrapper>
       </body>
     </html>

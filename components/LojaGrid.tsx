@@ -1,8 +1,10 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ShoppingBag } from "lucide-react";
 import { getProdutos, formatarPreco, type Produto } from "@/lib/produtos";
+import { useCart } from "@/lib/cart";
 
 const produtos = getProdutos();
 
@@ -57,6 +59,17 @@ function ProdutoCard({
   const temOpcoes = !!(produto.tamanhos?.length || produto.cores?.length);
   const [corSelecionada, setCorSelecionada] = useState(produto.cores?.[0]);
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(produto.tamanhos?.[0]);
+  const { adicionar } = useCart();
+  const router = useRouter();
+
+  const itemCarrinho = {
+    produtoId: produto.id,
+    nome: produto.nome,
+    preco: produto.preco,
+    imagemSrc: `/loja/${produto.pasta}/${produto.capa}`,
+    cor: corSelecionada,
+    tamanho: tamanhoSelecionado,
+  };
 
   return (
     // Célula da grid: tamanho fixo (aspect-ratio, igual em todos os
@@ -101,10 +114,8 @@ function ProdutoCard({
           </p>
           <p className="text-primary font-bold text-xs md:text-base">{formatarPreco(produto.preco)}</p>
 
-          {/* Carrinho/checkout ainda não existem — botões só de momento
-              visuais, sem onClick real (mas com stopPropagation para não
-              fechar o card ao tocar neles). A seleção de cor/tamanho já é
-              real (estado local do card), só não alimenta nenhum carrinho. */}
+          {/* stopPropagation em todos os botões para não fechar/alternar o
+              card ao tocar neles. */}
           {produto.disponivel && (
             <div
               className={`grid transition-[grid-template-rows] duration-500 ease-out md:group-hover:grid-rows-[1fr] ${
@@ -152,13 +163,20 @@ function ProdutoCard({
                     </div>
                   )}
                   <button
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      adicionar(itemCarrinho);
+                    }}
                     className="w-full rounded-full border border-black/30 text-black/80 text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-0.5 md:py-1.5 hover:bg-black/85 hover:text-white hover:border-black/85 transition-colors cursor-pointer"
                   >
                     Adicionar ao carrinho
                   </button>
                   <button
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      adicionar(itemCarrinho);
+                      router.push("/checkout");
+                    }}
                     className="w-full rounded-full bg-primary text-white text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-0.5 md:py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer"
                   >
                     Comprar agora
