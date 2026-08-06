@@ -17,6 +17,10 @@ export const users = pgTable("user", {
   addressLine: text("address_line"),
   postalCode: text("postal_code"),
   city: text("city"),
+  // Preenchido depois de encontrarmos a correspondência no Quotagest (por
+  // email automaticamente, ou por código/NIF inserido manualmente) — evita
+  // ter de repetir a pesquisa a cada visita ao perfil.
+  quotagestId: text("quotagest_id"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 

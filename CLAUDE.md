@@ -31,7 +31,7 @@ No test suite is configured.
 - Rajdhani (Google Font) as the primary UI font, loaded in `app/layout.tsx`
 - Google Maps JavaScript API via `@googlemaps/js-api-loader`, requires `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in `.env.local`
 - Auth.js (`next-auth` v5 beta) + Drizzle ORM against Neon Postgres — see "Authentication" below
-- Deploy: Vercel, `main` branch is production, `test` branch is staging
+- Deploy: Vercel, `main` branch is production (only branch currently in use — no separate staging branch)
 
 ## Architecture
 
@@ -73,6 +73,7 @@ Per the README backlog: loja (store/cart/checkout/payment), Facebook Graph API e
 Content that will eventually be managed via Sanity (events, founders, products) should be structured with that migration in mind: keep data shape simple and flat (e.g. arrays of objects with clear field names), separate from component logic, so swapping a static array for a Sanity fetch later is a small change, not a rewrite.
 
 ## Regras de comportamento
+- **Nunca faças `git commit` (nem `push`) por iniciativa própria — nem depois de terminar uma tarefa, nem "para não perder o trabalho". Só commits quando o utilizador pedir explicitamente essa ação, nessa conversa.**
 - Não tentes redimensionar a janela física do browser (é bloqueado por segurança e causa loops inúteis)
 - Para testar diferentes tamanhos de ecrã, usa emulação de viewport/dispositivo, não resize de janela
 - Evita múltiplos screenshots sucessivos durante ajustes — implementa, depois faz UMA verificação visual final

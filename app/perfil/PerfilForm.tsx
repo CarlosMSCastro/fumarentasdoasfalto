@@ -3,11 +3,12 @@ import Image from "next/image";
 import { LogOut, ChevronDown } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto } from "@/app/actions/perfil";
+import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto, procurarSocio } from "@/app/actions/perfil";
 import { terminarSessao } from "@/app/actions/auth";
 import { getHighResAvatarUrl } from "@/lib/avatar";
 import SubmitButton from "@/components/SubmitButton";
 import type { users } from "@/lib/db/schema";
+import type { QuotagestSocio } from "@/lib/quotagest";
 
 type User = typeof users.$inferSelect;
 
@@ -18,10 +19,16 @@ function getInitials(name?: string | null, email?: string | null): string {
   return source.slice(0, 2).toUpperCase();
 }
 
-export default function PerfilForm({ user }: { user: User }) {
+function formatDataEntrada(dataEntrada: string | null): string {
+  if (!dataEntrada) return "—";
+  return new Date(dataEntrada).toLocaleDateString("pt-PT", { year: "numeric", month: "long", day: "numeric" });
+}
+
+export default function PerfilForm({ user, socio }: { user: User; socio: QuotagestSocio | null }) {
   const [state, action] = useActionState(atualizarPerfil, undefined);
   const [passwordState, passwordAction] = useActionState(alterarPassword, undefined);
   const [emailState, emailAction] = useActionState(pedirAlteracaoEmail, undefined);
+  const [socioState, socioAction] = useActionState(procurarSocio, undefined);
   const [fotoState, fotoAction] = useActionState(atualizarFoto, undefined);
   const initials = getInitials(user.name, user.email);
   const { update: updateSession } = useSession();
@@ -81,17 +88,45 @@ export default function PerfilForm({ user }: { user: User }) {
 
           <div className="mt-2 pt-4 border-t border-white/10">
             <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Sócio</h2>
-            <dl className="space-y-2 text-base">
-              <div className="flex justify-between gap-4">
-                <dt className="text-white/60">Sócio desde</dt>
-                <dd className="text-white/90">—</dd>
+            {socio ? (
+              <dl className="space-y-2 text-base">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-white/60">Sócio desde</dt>
+                  <dd className="text-white/90">{formatDataEntrada(socio.dataEntrada)}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-white/60">Estado da quota</dt>
+                  <dd className={socio.quotaEmDia ? "text-white/90" : "text-red-400"}>
+                    {socio.quotaEmDia ? "Em dia" : "Em atraso"}
+                  </dd>
+                </div>
+              </dl>
+            ) : (
+              <div>
+                <p className="text-sm text-white/40 italic">
+                  Não encontrámos uma inscrição de sócio associada a este email.
+                </p>
+                <details className="group mt-2">
+                  <summary className="text-sm text-primary/80 hover:text-primary cursor-pointer list-none underline underline-offset-2 w-fit">
+                    És sócio e não aparece?
+                  </summary>
+                  <form action={socioAction} className="flex flex-col gap-3 mt-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="codigoOuNif" className="text-base text-white/70">Número de sócio ou NIF</label>
+                      <input id="codigoOuNif" name="codigoOuNif" type="text" required
+                        className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
+                    </div>
+                    {socioState?.error && <p className="text-sm text-red-400">{socioState.error}</p>}
+                    <SubmitButton
+                      pendingText="A procurar..."
+                      className="self-start rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all cursor-pointer"
+                    >
+                      Procurar
+                    </SubmitButton>
+                  </form>
+                </details>
               </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-white/60">Estado da quota</dt>
-                <dd className="text-white/90">—</dd>
-              </div>
-            </dl>
-            <p className="text-sm text-white/40 italic mt-3">Ligação ao Quotaguest ainda por fazer.</p>
+            )}
           </div>
 
           {user.passwordHash && (

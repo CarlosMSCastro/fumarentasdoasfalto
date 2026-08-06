@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export interface CartItem {
   produtoId: string;
@@ -45,8 +45,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [carregado, setCarregado] = useState(false);
   const [sheetAberta, setSheetAberta] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Leitura do localStorage tem de ficar num efeito (não dá para ler no
@@ -67,18 +65,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, carregado]);
 
-  useEffect(() => {
-    return () => {
-      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    };
-  }, []);
-
-  const mostrarToast = (mensagem: string) => {
-    setToast(mensagem);
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    toastTimeoutRef.current = setTimeout(() => setToast(null), 2500);
-  };
-
   const adicionar: CartContextValue["adicionar"] = (item, quantidade = 1) => {
     const chave = chaveItem(item);
     setItems((atual) => {
@@ -88,7 +74,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...atual, { ...item, quantidade }];
     });
-    mostrarToast(`${item.nome} adicionado ao carrinho`);
+    setSheetAberta(true);
   };
 
   const remover: CartContextValue["remover"] = (chave) => {
@@ -113,14 +99,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{ items, adicionar, remover, atualizarQuantidade, limpar, chaveItem, contagem, subtotal, sheetAberta, setSheetAberta }}
     >
       {children}
-      <div
-        aria-live="polite"
-        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-100 rounded-full bg-black/85 text-[#f8f0d9] text-sm font-semibold px-5 py-2.5 shadow-lg transition-all duration-300 pointer-events-none ${
-          toast ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-        }`}
-      >
-        {toast}
-      </div>
     </CartContext.Provider>
   );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "quotagest_id" text;
