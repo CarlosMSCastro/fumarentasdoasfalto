@@ -16,9 +16,13 @@ interface AuthPageBackgroundProps {
   // colapsáveis), senão o conteúdo "recentra" e salta sempre que algo
   // expande/colapsa.
   verticalAlign?: "center" | "start";
+  // false quando a página já traz o próprio Footer a seguir (ex: perfil,
+  // que agora encosta a <ContactosSection /> — essa secção já inclui um
+  // Footer, então o daqui ficaria duplicado).
+  footer?: boolean;
 }
 
-export default function AuthPageBackground({ children, align = "center", verticalAlign = "center" }: AuthPageBackgroundProps) {
+export default function AuthPageBackground({ children, align = "center", verticalAlign = "center", footer = true }: AuthPageBackgroundProps) {
   return (
     <div className="relative min-h-dvh w-full flex flex-col overflow-hidden">
       <div className="fixed inset-0 overflow-hidden -z-10" aria-hidden="true">
@@ -40,7 +44,7 @@ export default function AuthPageBackground({ children, align = "center", vertica
           {children}
         </div>
       </div>
-      <Footer />
+      {footer && <Footer />}
     </div>
   );
 }
