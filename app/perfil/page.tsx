@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { getSocioByEmail, getSocioById, type QuotagestSocio } from "@/lib/quotagest";
 import AuthPageBackground from "@/components/AuthPageBackground";
+import ContactoSection from "@/components/ContactosSection";
+import ScrollIndicator from "@/components/ScrollIndicator";
 import PerfilForm from "./PerfilForm";
 
 type User = typeof users.$inferSelect;
@@ -35,8 +37,24 @@ export default async function PerfilPage() {
   const socio = await resolveSocio(user).catch(() => null);
 
   return (
-    <AuthPageBackground align="end" verticalAlign="start">
-      <PerfilForm user={user} socio={socio} />
-    </AuthPageBackground>
+    <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
+      {/* snap-start aqui é só para dar ao scroll-snap mandatory um ponto de
+          descanso no topo (senão o único snap-start é o da ContactosSection
+          e o browser salta logo para lá ao carregar) — o bloco continua com
+          scroll livre lá dentro, não fica preso a h-dvh. */}
+      <div className="snap-start">
+        <AuthPageBackground align="end" verticalAlign="start" footer={false}>
+          <PerfilForm user={user} socio={socio} />
+        </AuthPageBackground>
+        {/* O conteúdo tem altura variável (não é h-dvh como as outras
+            páginas), por isso o indicador vai relative logo a seguir ao
+            conteúdo em vez de absolute-bottom preso ao ecrã — ver mobile
+            do PaginaLegal.tsx para o mesmo padrão. -mt-16 cancela parte do
+            py-24 (padding de baixo) do AuthPageBackground para aproximar
+            do botão de logout, que é a última peça do formulário. */}
+        <ScrollIndicator targetId="contactos" className="relative -mt-16 mb-6 z-20 w-full flex justify-center" />
+      </div>
+      <ContactoSection />
+    </div>
   );
 }
