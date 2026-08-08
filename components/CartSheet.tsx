@@ -34,16 +34,16 @@ export default function CartSheet() {
               <p className="text-sm">O teu carrinho está vazio.</p>
             </div>
           ) : (
-            <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+            <div className="flex-1 min-h-0 overflow-y-auto px-5 pt-6 pb-4 flex flex-col gap-4">
               {items.map((item) => {
                 const chave = chaveItem(item);
                 return (
                   <div key={chave} className="flex gap-3">
-                    <div className="relative w-16 h-16 shrink-0 rounded-sm overflow-hidden bg-[#f8f0d9]">
-                      <Image src={item.imagemSrc} alt={item.nome} fill sizes="64px" className="object-cover" />
+                    <div className="relative w-20 h-20 shrink-0 rounded-sm overflow-hidden bg-[#f8f0d9]">
+                      <Image src={item.imagemSrc} alt={item.nome} fill sizes="80px" className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col gap-1">
-                      <p className="text-[#f8f0d9] text-sm font-semibold leading-tight line-clamp-2">{item.nome}</p>
+                      <p className="text-[#f8f0d9] text-base font-semibold leading-tight line-clamp-2">{item.nome}</p>
                       {(item.cor || item.tamanho) && (
                         <p className="text-white/50 text-xs">{[item.cor, item.tamanho].filter(Boolean).join(" · ")}</p>
                       )}
@@ -65,7 +65,7 @@ export default function CartSheet() {
                             <Plus size={12} />
                           </button>
                         </div>
-                        <span className="text-primary text-sm font-bold">{formatarPreco(item.preco * item.quantidade)}</span>
+                        <span className="text-primary text-base font-bold">{formatarPreco(item.preco * item.quantidade)}</span>
                       </div>
                     </div>
                     <button
