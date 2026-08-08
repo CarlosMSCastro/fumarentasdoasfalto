@@ -69,11 +69,16 @@ export default function FoundersSection() {
                     {fundador.cargo}
                   </span>
                 </div>
-                <div className="relative shrink-0 px-1 pb-1 md:px-1.5 md:pb-2 text-center">
+                <div className="relative shrink-0 px-1 pb-1 md:px-1.5 md:pb-2 md:min-h-[1.75rem] text-center">
                   <span className="block text-black/85 font-bold uppercase leading-[1.1] text-[10px] sm:text-[9px] md:text-xs md:transition-opacity md:duration-300 md:group-hover:opacity-0">
                     {fundador.nome}
                   </span>
-                  <span className="hidden md:flex absolute inset-x-0 bottom-2 items-center justify-center text-orange-600 font-bold uppercase leading-[1.1] text-[10px] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  {/* inset-0 + min-h no pai acima em vez de bottom-2: um cargo
+                      com 2 linhas (nomes de cargo compridos, em janelas mais
+                      estreitas) crescia para cima a partir do bottom-2 e
+                      invadia a foto — agora fica centrado dentro de uma
+                      caixa alta o suficiente para as 2 linhas. */}
+                  <span className="hidden md:flex absolute inset-0 items-center justify-center px-1.5 text-orange-600 font-bold uppercase leading-[1.1] text-[10px] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     {fundador.cargo}
                   </span>
                 </div>
