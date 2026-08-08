@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ShoppingBag } from "lucide-react";
 import { getProdutos, formatarPreco, type Produto } from "@/lib/produtos";
@@ -60,7 +59,6 @@ function ProdutoCard({
   const [corSelecionada, setCorSelecionada] = useState(produto.cores?.[0]);
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(produto.tamanhos?.[0]);
   const { adicionar } = useCart();
-  const router = useRouter();
 
   const itemCarrinho = {
     produtoId: produto.id,
@@ -167,19 +165,9 @@ function ProdutoCard({
                       e.stopPropagation();
                       adicionar(itemCarrinho);
                     }}
-                    className="w-full rounded-full border border-black/30 text-black/80 text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-0.5 md:py-1.5 hover:bg-black/85 hover:text-white hover:border-black/85 transition-colors cursor-pointer"
-                  >
-                    Adicionar ao carrinho
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      adicionar(itemCarrinho);
-                      router.push("/checkout");
-                    }}
                     className="w-full rounded-full bg-primary text-white text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-0.5 md:py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer"
                   >
-                    Comprar agora
+                    Adicionar ao carrinho
                   </button>
                 </div>
               </div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { CreditCard, Landmark, Smartphone, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { formatarPreco } from "@/lib/produtos";
 import { PORTES_EUROS } from "@/lib/encomendas";
@@ -18,10 +18,15 @@ interface DadosIniciais {
   cidade: string;
 }
 
-const METODOS: { valor: DadosEncomenda["metodoPagamento"]; label: string; icon: typeof Landmark }[] = [
-  { valor: "multibanco", label: "Multibanco", icon: Landmark },
-  { valor: "mbway", label: "MB WAY", icon: Smartphone },
-  { valor: "cartao", label: "Cartão", icon: CreditCard },
+// width/height = dimensões reais dos ficheiros — o Next precisa deles para
+// calcular o aspect-ratio; o tamanho visual é controlado via className
+// (h-* w-auto), mantendo a proporção nativa de cada logo em vez de os
+// espremer todos na mesma caixa (ficavam com pesos visuais muito desiguais:
+// o Multibanco é vertical, o MB WAY é horizontal).
+const METODOS: { valor: DadosEncomenda["metodoPagamento"]; label: string; logo: string; width: number; height: number }[] = [
+  { valor: "multibanco", label: "Multibanco", logo: "/pagamento/Multibanco.png", width: 1920, height: 2268 },
+  { valor: "mbway", label: "MB WAY", logo: "/pagamento/Mbway.png", width: 1280, height: 622 },
+  { valor: "cartao", label: "Cartão", logo: "/pagamento/card.webp", width: 400, height: 400 },
 ];
 
 export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
@@ -214,19 +219,19 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
         <div className="flex flex-col gap-1.5 pt-1">
           <span className="text-white/60 text-xs">Método de pagamento</span>
           <div className="grid grid-cols-3 gap-2">
-            {METODOS.map(({ valor, label, icon: Icon }) => (
+            {METODOS.map(({ valor, label, logo, width, height }) => (
               <button
                 key={valor}
                 type="button"
                 onClick={() => setMetodoPagamento(valor)}
-                className={`flex flex-col items-center justify-center gap-1 rounded-md border py-2 text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer ${
-                  metodoPagamento === valor
-                    ? "bg-primary border-primary text-white"
-                    : "border-white/20 text-white/70 hover:bg-white/10"
+                aria-label={label}
+                className={`flex items-center justify-center rounded-md border py-2.5 transition-colors cursor-pointer ${
+                  metodoPagamento === valor ? "bg-primary/15 border-primary" : "border-white/20 hover:bg-white/10"
                 }`}
               >
-                <Icon size={16} />
-                {label}
+                <span className="flex items-center justify-center rounded-sm bg-[#f8f0d9] px-2.5 py-1.5">
+                  <Image src={logo} alt={label} width={width} height={height} className="h-5 md:h-6 w-auto object-contain" />
+                </span>
               </button>
             ))}
           </div>
