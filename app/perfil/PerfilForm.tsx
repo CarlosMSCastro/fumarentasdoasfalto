@@ -7,10 +7,31 @@ import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto, p
 import { terminarSessao } from "@/app/actions/auth";
 import { getHighResAvatarUrl } from "@/lib/avatar";
 import SubmitButton from "@/components/SubmitButton";
-import type { users } from "@/lib/db/schema";
+import type { users, orders, orderItems } from "@/lib/db/schema";
 import type { QuotagestSocio } from "@/lib/quotagest";
+import { formatarPreco } from "@/lib/produtos";
 
 type User = typeof users.$inferSelect;
+
+export type Encomenda = typeof orders.$inferSelect & { items: (typeof orderItems.$inferSelect)[] };
+
+const ESTADO_LABEL: Record<Encomenda["status"], string> = {
+  pendente: "Pendente",
+  pago: "Pago",
+  cancelado: "Cancelado",
+  expirado: "Expirado",
+};
+
+const ESTADO_CLASSE: Record<Encomenda["status"], string> = {
+  pendente: "text-yellow-400",
+  pago: "text-white/90",
+  cancelado: "text-red-400",
+  expirado: "text-red-400",
+};
+
+function formatDataEncomenda(data: Date): string {
+  return data.toLocaleDateString("pt-PT", { year: "numeric", month: "long", day: "numeric" });
+}
 
 function getInitials(name?: string | null, email?: string | null): string {
   const source = name?.trim() || email?.trim() || "?";
@@ -24,7 +45,7 @@ function formatDataEntrada(dataEntrada: string | null): string {
   return new Date(dataEntrada).toLocaleDateString("pt-PT", { year: "numeric", month: "long", day: "numeric" });
 }
 
-export default function PerfilForm({ user, socio }: { user: User; socio: QuotagestSocio | null }) {
+export default function PerfilForm({ user, socio, encomendas }: { user: User; socio: QuotagestSocio | null; encomendas: Encomenda[] }) {
   const [state, action] = useActionState(atualizarPerfil, undefined);
   const [passwordState, passwordAction] = useActionState(alterarPassword, undefined);
   const [emailState, emailAction] = useActionState(pedirAlteracaoEmail, undefined);
@@ -47,7 +68,37 @@ export default function PerfilForm({ user, socio }: { user: User; socio: Quotage
       <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10 items-start">
         <div className="order-last md:order-none pt-4 border-t border-white/10 md:mt-26">
           <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
-          <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
+          {encomendas.length === 0 ? (
+            <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {encomendas.map((encomenda) => (
+                <li key={encomenda.id} className="rounded-md border border-white/10 p-3 text-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-white/90 font-semibold">#{encomenda.id.slice(0, 8)}</span>
+                    <span className={`text-xs font-bold uppercase tracking-wide ${ESTADO_CLASSE[encomenda.status]}`}>
+                      {ESTADO_LABEL[encomenda.status]}
+                    </span>
+                  </div>
+                  <p className="text-white/40 text-xs mt-0.5">{formatDataEncomenda(encomenda.createdAt)}</p>
+                  <ul className="mt-2 flex flex-col gap-0.5">
+                    {encomenda.items.map((item) => (
+                      <li key={item.id} className="text-white/70 text-xs">
+                        {item.quantidade}× {item.nome}
+                        {(item.cor || item.tamanho) && (
+                          <span className="text-white/40"> · {[item.cor, item.tamanho].filter(Boolean).join(" · ")}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10 text-white/90 font-bold text-sm">
+                    <span>Total</span>
+                    <span>{formatarPreco(encomenda.totalCentimos / 100)}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -117,6 +168,11 @@ export default function PerfilForm({ user, socio }: { user: User; socio: Quotage
                         className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-primary" />
                     </div>
                     {socioState?.error && <p className="text-sm text-red-400">{socioState.error}</p>}
+                    {socioState?.success && (
+                      <p className="text-sm text-primary">
+                        Enviámos um email de confirmação para o endereço registado nesse sócio. Confirma lá a associação.
+                      </p>
+                    )}
                     <SubmitButton
                       pendingText="A procurar..."
                       className="self-start rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-[var(--primary-hover)] transition-all cursor-pointer"

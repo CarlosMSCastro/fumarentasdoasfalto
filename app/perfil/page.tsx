@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { eq, inArray, desc } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { users, orders, orderItems } from "@/lib/db/schema";
 import { getSocioByEmail, getSocioById, type QuotagestSocio } from "@/lib/quotagest";
 import AuthPageBackground from "@/components/AuthPageBackground";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
-import PerfilForm from "./PerfilForm";
+import PerfilForm, { type Encomenda } from "./PerfilForm";
 
 type User = typeof users.$inferSelect;
 
@@ -24,6 +24,25 @@ async function resolveSocio(user: User): Promise<QuotagestSocio | null> {
   return socio;
 }
 
+// Sem relations definidas no schema (ver lib/db/schema.ts) — duas queries
+// simples (encomendas do user, depois os items dessas encomendas) em vez de
+// um join, mais fácil de agrupar em memória do que lidar com linhas
+// duplicadas de um LEFT JOIN.
+async function getEncomendas(userId: string): Promise<Encomenda[]> {
+  const encomendasDoUser = await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
+  if (encomendasDoUser.length === 0) return [];
+
+  const items = await db
+    .select()
+    .from(orderItems)
+    .where(inArray(orderItems.orderId, encomendasDoUser.map((e) => e.id)));
+
+  return encomendasDoUser.map((encomenda) => ({
+    ...encomenda,
+    items: items.filter((item) => item.orderId === encomenda.id),
+  }));
+}
+
 export default async function PerfilPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
@@ -35,6 +54,7 @@ export default async function PerfilPage() {
   // configurada, a página de perfil continua a funcionar — só a secção
   // "Sócio" fica sem dados (ver fallback no PerfilForm).
   const socio = await resolveSocio(user).catch(() => null);
+  const encomendas = await getEncomendas(user.id);
 
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
@@ -44,7 +64,7 @@ export default async function PerfilPage() {
           scroll livre lá dentro, não fica preso a h-dvh. */}
       <div className="snap-start">
         <AuthPageBackground align="end" verticalAlign="start" footer={false}>
-          <PerfilForm user={user} socio={socio} />
+          <PerfilForm user={user} socio={socio} encomendas={encomendas} />
         </AuthPageBackground>
         {/* O conteúdo tem altura variável (não é h-dvh como as outras
             páginas), por isso o indicador vai relative logo a seguir ao

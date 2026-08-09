@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { formatarPreco } from "@/lib/produtos";
@@ -36,6 +36,10 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [resultado, setResultado] = useState<EncomendaResultado | null>(null);
+  // Guard síncrono contra duplo-submit — `loading` só desativa o botão depois
+  // do React re-renderizar, o que deixa uma janela para um clique/Enter
+  // duplo muito rápido disparar dois pedidos antes disso acontecer.
+  const submetendoRef = useRef(false);
 
   const portes = items.length > 0 ? PORTES_EUROS : 0;
   const total = subtotal + portes;
@@ -48,6 +52,8 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submetendoRef.current) return;
+    submetendoRef.current = true;
     setErro(null);
     setLoading(true);
     try {
@@ -70,6 +76,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
       setResultado(res);
     } finally {
       setLoading(false);
+      submetendoRef.current = false;
     }
   };
 

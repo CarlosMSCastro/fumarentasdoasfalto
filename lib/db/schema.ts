@@ -76,6 +76,27 @@ export const emailChangeRequests = pgTable(
   (t) => [primaryKey({ columns: [t.token] })]
 );
 
+// Pedido de associação a um sócio do Quotagest pendente de confirmação —
+// número de sócio/NIF não são segredo (são previsíveis/conhecidos dentro da
+// associação), por isso a associação não pode ser imediata: fica pendente
+// até o dono do email registado no Quotagest para esse sócio confirmar o
+// link, senão davas para qualquer pessoa "roubar" o registo de sócio de
+// outra. Tabela dedicada em vez da verificationToken genérica pelo mesmo
+// motivo do emailChangeRequests acima — precisa de guardar qual é o
+// quotagestId, não só um identifier+token.
+export const socioLinkRequests = pgTable(
+  "socio_link_request",
+  {
+    userId: uuid("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    quotagestId: text("quotagest_id").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.token] })]
+);
+
 export const orderStatusEnum = pgEnum("order_status", ["pendente", "pago", "cancelado", "expirado"]);
 export const metodoPagamentoEnum = pgEnum("metodo_pagamento", ["multibanco", "mbway", "cartao"]);
 

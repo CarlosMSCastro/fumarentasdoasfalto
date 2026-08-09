@@ -7,13 +7,14 @@ import { compare, hash } from "bcryptjs";
 import { put } from "@vercel/blob";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { users, emailChangeRequests } from "@/lib/db/schema";
-import { sendEmailChangeConfirmation } from "@/lib/email";
+import { users, emailChangeRequests, socioLinkRequests } from "@/lib/db/schema";
+import { sendEmailChangeConfirmation, sendSocioLinkConfirmation } from "@/lib/email";
 import { findSocioByCodigoOuNif } from "@/lib/quotagest";
 
 export type PerfilFormState = { error?: string; success?: boolean } | undefined;
 
 const EMAIL_CHANGE_TOKEN_TTL_MS = 60 * 60 * 1000;
+const SOCIO_LINK_TOKEN_TTL_MS = 60 * 60 * 1000;
 const MAX_FOTO_SIZE_BYTES = 5 * 1024 * 1024;
 
 export async function atualizarPerfil(_prevState: PerfilFormState, formData: FormData): Promise<PerfilFormState> {
@@ -74,6 +75,12 @@ export async function pedirAlteracaoEmail(_prevState: PerfilFormState, formData:
   return { success: true };
 }
 
+// Não associa de imediato — número de sócio e NIF não são segredo (dá para
+// adivinhar/saber o de outra pessoa dentro da associação), por isso manda
+// primeiro um email de confirmação para o endereço que o Quotagest tem
+// registado para esse sócio (não para o email da conta que pediu isto).
+// A associação só acontece em confirmarLigacaoSocio, quando o link for
+// clicado.
 export async function procurarSocio(_prevState: PerfilFormState, formData: FormData): Promise<PerfilFormState> {
   const session = await auth();
   if (!session?.user) return { error: "Sessão expirada. Entra novamente." };
@@ -83,9 +90,29 @@ export async function procurarSocio(_prevState: PerfilFormState, formData: FormD
 
   const socio = await findSocioByCodigoOuNif(query).catch(() => null);
   if (!socio) return { error: "Não encontrámos nenhum sócio com esse número ou NIF." };
+  if (!socio.email) return { error: "Este registo de sócio não tem email associado — contacta a associação para ligar a conta manualmente." };
 
-  await db.update(users).set({ quotagestId: socio.id }).where(eq(users.id, session.user.id));
-  revalidatePath("/perfil");
+  const token = randomBytes(32).toString("hex");
+  const expires = new Date(Date.now() + SOCIO_LINK_TOKEN_TTL_MS);
+  await db.insert(socioLinkRequests).values({ userId: session.user.id, quotagestId: socio.id, token, expires });
+
+  const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/confirmar-socio?token=${token}`;
+  await sendSocioLinkConfirmation(socio.email, confirmUrl, socio.nome);
+
+  return { success: true };
+}
+
+export async function confirmarLigacaoSocio(_prevState: PerfilFormState, formData: FormData): Promise<PerfilFormState> {
+  const token = String(formData.get("token") ?? "");
+  if (!token) return { error: "Link inválido." };
+
+  const [request] = await db.select().from(socioLinkRequests).where(eq(socioLinkRequests.token, token)).limit(1);
+  if (!request || request.expires < new Date()) {
+    return { error: "Link inválido ou expirado. Pede a associação novamente no teu perfil." };
+  }
+
+  await db.update(users).set({ quotagestId: request.quotagestId }).where(eq(users.id, request.userId));
+  await db.delete(socioLinkRequests).where(eq(socioLinkRequests.token, token));
 
   return { success: true };
 }

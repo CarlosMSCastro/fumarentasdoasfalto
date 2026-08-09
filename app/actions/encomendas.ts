@@ -5,10 +5,18 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { orders, orderItems } from "@/lib/db/schema";
 import { PORTES_EUROS } from "@/lib/encomendas";
+import { getProdutoById } from "@/lib/produtos";
 import { gerarReferenciaMultibanco, pedirPagamentoMbway, gerarLinkPagamentoCartao } from "@/lib/eupago";
+
+const MAX_QUANTIDADE_POR_ITEM = 20;
 
 export interface ItemEncomenda {
   produtoId: string;
+  // nome/preco vêm do carrinho no cliente só para o resumo visual do
+  // checkout — nunca são usados para calcular o total. criarEncomenda
+  // recalcula sempre os dois a partir de data/produtos.json (fonte da
+  // verdade), senão bastava editar o localStorage para pagar o que se
+  // quisesse por uma encomenda.
   nome: string;
   preco: number;
   quantidade: number;
@@ -39,8 +47,26 @@ export async function criarEncomenda(itens: ItemEncomenda[], dados: DadosEncomen
     return { error: "Para MBWAY, indica um número de telemóvel português válido." };
   }
 
+  // Recalcula cada item a partir do catálogo — nunca confiar no nome/preço
+  // que vem do cliente (ver comentário em ItemEncomenda).
+  const itensValidados: { produtoId: string; nome: string; preco: number; quantidade: number; cor?: string; tamanho?: string }[] = [];
+  for (const item of itens) {
+    const produto = getProdutoById(item.produtoId);
+    if (!produto) return { error: "Um dos produtos do carrinho já não existe. Atualiza a página e tenta novamente." };
+    if (!produto.disponivel) return { error: `"${produto.nome}" já não está disponível.` };
+
+    const quantidade = Math.floor(item.quantidade);
+    if (!Number.isFinite(quantidade) || quantidade < 1 || quantidade > MAX_QUANTIDADE_POR_ITEM) {
+      return { error: `Quantidade inválida para "${produto.nome}".` };
+    }
+    if (item.cor && !produto.cores?.includes(item.cor)) return { error: `Cor inválida para "${produto.nome}".` };
+    if (item.tamanho && !produto.tamanhos?.includes(item.tamanho)) return { error: `Tamanho inválido para "${produto.nome}".` };
+
+    itensValidados.push({ produtoId: produto.id, nome: produto.nome, preco: produto.preco, quantidade, cor: item.cor, tamanho: item.tamanho });
+  }
+
   const session = await auth();
-  const subtotal = itens.reduce((soma, i) => soma + i.preco * i.quantidade, 0);
+  const subtotal = itensValidados.reduce((soma, i) => soma + i.preco * i.quantidade, 0);
   const portes = PORTES_EUROS;
   const total = subtotal + portes;
 
@@ -62,7 +88,7 @@ export async function criarEncomenda(itens: ItemEncomenda[], dados: DadosEncomen
     .returning();
 
   await db.insert(orderItems).values(
-    itens.map((item) => ({
+    itensValidados.map((item) => ({
       orderId: encomenda.id,
       produtoId: item.produtoId,
       nome: item.nome,
