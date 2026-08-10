@@ -236,13 +236,11 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
                 type="button"
                 onClick={() => setMetodoPagamento(valor)}
                 aria-label={label}
-                className={`flex items-center justify-center rounded-md border py-2.5 transition-colors cursor-pointer ${
-                  metodoPagamento === valor ? "bg-primary/15 border-primary" : "border-white/20 hover:bg-white/10"
+                className={`flex items-center justify-center rounded-sm bg-[#f8f0d9] px-3 py-2.5 transition-opacity cursor-pointer ${
+                  metodoPagamento === valor ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100"
                 }`}
               >
-                <span className="flex items-center justify-center rounded-sm bg-[#f8f0d9] px-2.5 py-1.5">
-                  <Image src={logo} alt={label} width={width} height={height} className="h-5 md:h-6 w-auto object-contain" />
-                </span>
+                <Image src={logo} alt={label} width={width} height={height} className="h-8 md:h-9 w-auto object-contain" />
               </button>
             ))}
           </div>
