@@ -1,40 +1,26 @@
-// Integração com o Eupago — ainda NÃO configurada. Falta:
-//   1. Uma SubEntidade nova no Eupago, específica para a Loja (separada da
-//      que o QuotaGuest usa para as quotas dos sócios), com o callback a
-//      apontar para /api/pagamentos/eupago-callback.
-//   2. As credenciais dessa SubEntidade (Client ID / Client Secret / Chave /
-//      Entidade / SubEntidade) nas variáveis de ambiente abaixo.
-//   3. Confirmar na documentação real da API do Eupago o formato exato dos
-//      pedidos/respostas de cada método — os esqueletos abaixo ainda não
-//      foram validados contra a API real, só têm a forma que vamos
-//      preencher assim que houver acesso.
+import { createHmac, timingSafeEqual } from "crypto";
+
+// Integração com a API REST do Eupago (eupago.readme.io). Autenticação é
+// uma única "Chave API" por canal (formato xxxx-xxxx-xxxx-xxxx-xxxx,
+// visível no backoffice em Channels → Channel Listing) — não o
+// client_id/client_secret/entidade/subentidade que um esqueleto anterior
+// deste ficheiro assumia (essa forma é da SOAP API antiga, incompatível
+// com estes endpoints). Por decisão do utilizador (2026-08-09), a Loja
+// reutiliza por agora o mesmo canal que o Quotagest usa para as quotas dos
+// sócios — não há uma SubEntidade dedicada.
 //
-// Este ficheiro existe para isolar tudo isto num único sítio: o resto do
-// código (server actions, checkout) já pode chamar estas funções, e o dia
-// em que as credenciais chegarem só se mexe aqui dentro.
+// Multibanco usa a chave no corpo do pedido (API REST "legada"); MB WAY e
+// Cartão usam-na num header Authorization (API v1.02). Ver cada função.
 
-interface CredenciaisEupago {
-  clientId: string;
-  clientSecret: string;
-  chave: string;
-  entidade: string;
-  subEntidade: string;
-}
+const SANDBOX = process.env.EUPAGO_SANDBOX === "true";
+const HOST = SANDBOX ? "sandbox.eupago.pt" : "clientes.eupago.pt";
 
-function lerCredenciais(): CredenciaisEupago {
-  const { EUPAGO_CLIENT_ID, EUPAGO_CLIENT_SECRET, EUPAGO_CHAVE, EUPAGO_ENTIDADE, EUPAGO_SUBENTIDADE } = process.env;
-  if (!EUPAGO_CLIENT_ID || !EUPAGO_CLIENT_SECRET || !EUPAGO_CHAVE || !EUPAGO_ENTIDADE || !EUPAGO_SUBENTIDADE) {
-    throw new Error(
-      "Pagamentos ainda não estão configurados (faltam as credenciais EUPAGO_* no ambiente). Ver lib/eupago.ts."
-    );
+function lerChave(): string {
+  const chave = process.env.EUPAGO_API_KEY;
+  if (!chave) {
+    throw new Error("Pagamentos ainda não estão configurados (falta EUPAGO_API_KEY no ambiente). Ver lib/eupago.ts.");
   }
-  return {
-    clientId: EUPAGO_CLIENT_ID,
-    clientSecret: EUPAGO_CLIENT_SECRET,
-    chave: EUPAGO_CHAVE,
-    entidade: EUPAGO_ENTIDADE,
-    subEntidade: EUPAGO_SUBENTIDADE,
-  };
+  return chave;
 }
 
 export interface PedidoPagamento {
@@ -47,27 +33,99 @@ export interface ReferenciaMultibanco {
   entidade: string;
   referencia: string;
   valor: number;
-  validade?: string;
 }
 
 export interface PedidoMbway {
   referencia: string;
+  transactionID: string;
 }
 
-// TODO: preencher a chamada real assim que tivermos a SubEntidade da Loja e a documentação da API.
 export async function gerarReferenciaMultibanco(pedido: PedidoPagamento): Promise<ReferenciaMultibanco> {
-  lerCredenciais();
-  throw new Error(`gerarReferenciaMultibanco: integração Eupago por implementar (pedido ${pedido.identificador}).`);
+  const chave = lerChave();
+  const res = await fetch(`https://${HOST}/clientes/rest_api/multibanco/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chave,
+      valor: pedido.valor.toFixed(2),
+      id: pedido.identificador,
+      per_dup: 0, // só permite 1 pagamento por referência
+    }),
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || json?.sucesso !== true) {
+    throw new Error(`gerarReferenciaMultibanco: Eupago recusou o pedido (${json?.resposta ?? res.status}).`);
+  }
+  return { entidade: json.entidade, referencia: json.referencia, valor: pedido.valor };
 }
 
-// TODO: preencher a chamada real (pedido "push" para o telemóvel do cliente).
 export async function pedirPagamentoMbway(pedido: PedidoPagamento & { telemovel: string }): Promise<PedidoMbway> {
-  lerCredenciais();
-  throw new Error(`pedirPagamentoMbway: integração Eupago por implementar (pedido ${pedido.identificador}).`);
+  const chave = lerChave();
+  const res = await fetch(`https://${HOST}/api/v1.02/mbway/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `ApiKey ${chave}` },
+    body: JSON.stringify({
+      payment: {
+        identifier: pedido.identificador,
+        customerPhone: pedido.telemovel,
+        countryCode: "+351",
+        amount: { value: pedido.valor, currency: "EUR" },
+      },
+    }),
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || json?.transactionStatus !== "Success") {
+    throw new Error(`pedirPagamentoMbway: Eupago recusou o pedido (${json?.text ?? res.status}).`);
+  }
+  return { referencia: json.reference, transactionID: json.transactionID };
 }
 
-// TODO: preencher — normalmente devolve um URL de checkout alojado pelo Eupago para redirecionar o cliente.
-export async function gerarLinkPagamentoCartao(pedido: PedidoPagamento): Promise<{ url: string }> {
-  lerCredenciais();
-  throw new Error(`gerarLinkPagamentoCartao: integração Eupago por implementar (pedido ${pedido.identificador}).`);
+export async function gerarLinkPagamentoCartao(
+  pedido: PedidoPagamento & { email: string; successUrl: string; failUrl: string; backUrl: string }
+): Promise<{ url: string }> {
+  const chave = lerChave();
+  const res = await fetch(`https://${HOST}/api/v1.02/creditcard/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `ApiKey ${chave}` },
+    body: JSON.stringify({
+      payment: {
+        identifier: pedido.identificador,
+        amount: { value: pedido.valor, currency: "EUR" },
+        successUrl: pedido.successUrl,
+        failUrl: pedido.failUrl,
+        backUrl: pedido.backUrl,
+        lang: "PT",
+      },
+      customer: { email: pedido.email, notify: true },
+    }),
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || json?.transactionStatus !== "Success" || !json?.redirectUrl) {
+    throw new Error(`gerarLinkPagamentoCartao: Eupago recusou o pedido (${json?.text ?? res.status}).`);
+  }
+  return { url: json.redirectUrl };
+}
+
+// Confirma que um pedido recebido em app/api/pagamentos/eupago-callback veio
+// mesmo do Eupago (header X-Signature, HMAC-SHA256 em base64 sobre o corpo
+// bruto do pedido) — sem isto, qualquer pessoa podia chamar o callback a
+// mandar marcar encomendas como pagas. A chave usada aqui não está 100%
+// confirmada pela documentação (não diz explicitamente se é a mesma Chave
+// API ou um segredo de webhook à parte) — usa EUPAGO_WEBHOOK_SECRET se
+// existir, senão cai para EUPAGO_API_KEY. Por testar com uma transação real
+// antes de confiar cegamente nisto em produção.
+export function verificarAssinaturaWebhook(corpoBruto: string, assinaturaBase64: string | null): boolean {
+  if (!assinaturaBase64) return false;
+  const chave = process.env.EUPAGO_WEBHOOK_SECRET || process.env.EUPAGO_API_KEY;
+  if (!chave) return false;
+
+  const esperada = createHmac("sha256", chave).update(corpoBruto).digest();
+  let recebida: Buffer;
+  try {
+    recebida = Buffer.from(assinaturaBase64, "base64");
+  } catch {
+    return false;
+  }
+  if (recebida.length !== esperada.length) return false;
+  return timingSafeEqual(esperada, recebida);
 }

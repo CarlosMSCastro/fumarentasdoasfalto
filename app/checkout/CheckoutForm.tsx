@@ -26,13 +26,16 @@ interface DadosIniciais {
 const METODOS: { valor: DadosEncomenda["metodoPagamento"]; label: string; logo: string; width: number; height: number }[] = [
   { valor: "multibanco", label: "Multibanco", logo: "/pagamento/Multibanco.png", width: 1920, height: 2268 },
   { valor: "mbway", label: "MB WAY", logo: "/pagamento/Mbway.png", width: 1280, height: 622 },
-  { valor: "cartao", label: "Cartão", logo: "/pagamento/card.webp", width: 400, height: 400 },
 ];
 
 export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
   const { items, subtotal, limpar } = useCart();
   const [dados, setDados] = useState<DadosIniciais>(initial);
   const [metodoPagamento, setMetodoPagamento] = useState<DadosEncomenda["metodoPagamento"]>("multibanco");
+  // Separado do "Telefone" de contacto — nem sempre é o mesmo número (ex.
+  // conta MB WAY de outra pessoa), e o telefone de contacto pode nem estar
+  // preenchido no perfil.
+  const [telemovelMbway, setTelemovelMbway] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [resultado, setResultado] = useState<EncomendaResultado | null>(null);
@@ -66,7 +69,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
           cor: item.cor,
           tamanho: item.tamanho,
         })),
-        { ...dados, metodoPagamento }
+        { ...dados, metodoPagamento, telemovelMbway: metodoPagamento === "mbway" ? telemovelMbway : undefined }
       );
       if ("error" in res) {
         setErro(res.error);
@@ -105,6 +108,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
             <p className="text-xs uppercase tracking-widest text-black/50 mb-1">Referência Multibanco</p>
             <p className="font-bold text-lg">Entidade {resultado.referenciaMb.entidade}</p>
             <p className="font-bold text-lg">Referência {resultado.referenciaMb.referencia}</p>
+            <p className="font-bold text-lg">Valor {formatarPreco(resultado.referenciaMb.valor)}</p>
           </div>
         )}
 
@@ -152,7 +156,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
             />
           </label>
           <label className="flex flex-col gap-1 col-span-2 sm:col-span-1">
-            <span className="text-white/60 text-xs">Telefone{metodoPagamento === "mbway" && " (MB WAY)"}</span>
+            <span className="text-white/60 text-xs">Telefone</span>
             <input
               required
               type="tel"
@@ -225,7 +229,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
 
         <div className="flex flex-col gap-1.5 pt-1">
           <span className="text-white/60 text-xs">Método de pagamento</span>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {METODOS.map(({ valor, label, logo, width, height }) => (
               <button
                 key={valor}
@@ -243,6 +247,20 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
             ))}
           </div>
         </div>
+
+        {metodoPagamento === "mbway" && (
+          <label className="flex flex-col gap-1">
+            <span className="text-white/60 text-xs">Número MB WAY</span>
+            <input
+              required
+              type="tel"
+              placeholder="9XXXXXXXX"
+              value={telemovelMbway}
+              onChange={(e) => setTelemovelMbway(e.target.value)}
+              className="rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+            />
+          </label>
+        )}
 
         {erro && <p className="text-sm text-red-400">{erro}</p>}
 

@@ -7,6 +7,7 @@ import { orders, orderItems } from "@/lib/db/schema";
 import { PORTES_EUROS } from "@/lib/encomendas";
 import { getProdutoById } from "@/lib/produtos";
 import { gerarReferenciaMultibanco, pedirPagamentoMbway, gerarLinkPagamentoCartao } from "@/lib/eupago";
+import { sendReferenciaMultibanco } from "@/lib/email";
 
 const MAX_QUANTIDADE_POR_ITEM = 20;
 
@@ -32,19 +33,23 @@ export interface DadosEncomenda {
   codigoPostal?: string;
   cidade?: string;
   metodoPagamento: "multibanco" | "mbway" | "cartao";
+  // Número da conta MB WAY a usar no pedido de pagamento — separado do
+  // "telefone" de contacto (podem ser diferentes, e o telefone de contacto
+  // pode nem estar preenchido). Só obrigatório quando metodoPagamento é "mbway".
+  telemovelMbway?: string;
 }
 
 export type EncomendaResultado =
   | { error: string }
-  | { orderId: string; referenciaMb?: { entidade: string; referencia: string }; redirectUrl?: string; pagamentoError?: string };
+  | { orderId: string; referenciaMb?: { entidade: string; referencia: string; valor: number }; redirectUrl?: string; pagamentoError?: string };
 
 export async function criarEncomenda(itens: ItemEncomenda[], dados: DadosEncomenda): Promise<EncomendaResultado> {
   if (itens.length === 0) return { error: "O carrinho está vazio." };
   if (!dados.nome.trim()) return { error: "Indica o teu nome." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) return { error: "Email inválido." };
   if (!dados.telefone.trim()) return { error: "Indica um contacto telefónico." };
-  if (dados.metodoPagamento === "mbway" && !/^9\d{8}$/.test(dados.telefone.trim())) {
-    return { error: "Para MBWAY, indica um número de telemóvel português válido." };
+  if (dados.metodoPagamento === "mbway" && !/^9\d{8}$/.test(dados.telemovelMbway?.trim() ?? "")) {
+    return { error: "Indica um número MB WAY válido." };
   }
 
   // Recalcula cada item a partir do catálogo — nunca confiar no nome/preço
@@ -100,21 +105,40 @@ export async function criarEncomenda(itens: ItemEncomenda[], dados: DadosEncomen
   );
 
   const descricao = `Encomenda Fumarentas do Asfalto #${encomenda.id.slice(0, 8)}`;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
   try {
     if (dados.metodoPagamento === "multibanco") {
       const ref = await gerarReferenciaMultibanco({ identificador: encomenda.id, valor: total, descricao });
       await db
         .update(orders)
-        .set({ referenciaMbEntidade: ref.entidade, referenciaMbNumero: ref.referencia })
+        .set({ referenciaMbEntidade: ref.entidade, referenciaMbNumero: ref.referencia, eupagoIdentificador: encomenda.id })
         .where(eq(orders.id, encomenda.id));
-      return { orderId: encomenda.id, referenciaMb: { entidade: ref.entidade, referencia: ref.referencia } };
+      // Falha suave: a referência já está gerada e guardada — um erro a
+      // enviar o email não deve fazer parecer que o pagamento falhou.
+      await sendReferenciaMultibanco(dados.email.trim().toLowerCase(), {
+        id: encomenda.id,
+        entidade: ref.entidade,
+        referencia: ref.referencia,
+        valor: ref.valor,
+      }).catch(() => null);
+      return { orderId: encomenda.id, referenciaMb: { entidade: ref.entidade, referencia: ref.referencia, valor: ref.valor } };
     }
     if (dados.metodoPagamento === "mbway") {
-      await pedirPagamentoMbway({ identificador: encomenda.id, valor: total, descricao, telemovel: dados.telefone.trim() });
+      await pedirPagamentoMbway({ identificador: encomenda.id, valor: total, descricao, telemovel: dados.telemovelMbway!.trim() });
+      await db.update(orders).set({ eupagoIdentificador: encomenda.id }).where(eq(orders.id, encomenda.id));
       return { orderId: encomenda.id };
     }
-    const { url } = await gerarLinkPagamentoCartao({ identificador: encomenda.id, valor: total, descricao });
+    const { url } = await gerarLinkPagamentoCartao({
+      identificador: encomenda.id,
+      valor: total,
+      descricao,
+      email: dados.email.trim().toLowerCase(),
+      successUrl: `${baseUrl}/checkout/retorno?orderId=${encomenda.id}&estado=sucesso`,
+      failUrl: `${baseUrl}/checkout/retorno?orderId=${encomenda.id}&estado=falha`,
+      backUrl: `${baseUrl}/checkout`,
+    });
+    await db.update(orders).set({ eupagoIdentificador: encomenda.id }).where(eq(orders.id, encomenda.id));
     return { orderId: encomenda.id, redirectUrl: url };
   } catch (erro) {
     // A encomenda fica registada como pendente mesmo que o pagamento não

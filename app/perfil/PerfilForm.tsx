@@ -71,30 +71,44 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
           {encomendas.length === 0 ? (
             <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
           ) : (
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col divide-y divide-white/10">
               {encomendas.map((encomenda) => (
-                <li key={encomenda.id} className="rounded-md border border-white/10 p-3 text-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-white/90 font-semibold">#{encomenda.id.slice(0, 8)}</span>
-                    <span className={`text-xs font-bold uppercase tracking-wide ${ESTADO_CLASSE[encomenda.status]}`}>
-                      {ESTADO_LABEL[encomenda.status]}
-                    </span>
-                  </div>
-                  <p className="text-white/40 text-xs mt-0.5">{formatDataEncomenda(encomenda.createdAt)}</p>
-                  <ul className="mt-2 flex flex-col gap-0.5">
-                    {encomenda.items.map((item) => (
-                      <li key={item.id} className="text-white/70 text-xs">
-                        {item.quantidade}× {item.nome}
-                        {(item.cor || item.tamanho) && (
-                          <span className="text-white/40"> · {[item.cor, item.tamanho].filter(Boolean).join(" · ")}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10 text-white/90 font-bold text-sm">
-                    <span>Total</span>
-                    <span>{formatarPreco(encomenda.totalCentimos / 100)}</span>
-                  </div>
+                <li key={encomenda.id}>
+                  <details className="group">
+                    <summary className="flex items-center justify-between gap-2 py-2.5 cursor-pointer list-none">
+                      <div className="min-w-0">
+                        <p className="text-white/90 text-sm">{formatDataEncomenda(encomenda.createdAt)}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`text-xs font-bold uppercase tracking-wide ${ESTADO_CLASSE[encomenda.status]}`}>
+                          {ESTADO_LABEL[encomenda.status]}
+                        </span>
+                        <ChevronDown size={16} className="text-white/40 transition-transform group-open:rotate-180" />
+                      </div>
+                    </summary>
+                    <div className="pb-3 text-sm">
+                      <ul className="flex flex-col gap-0.5">
+                        {encomenda.items.map((item) => (
+                          <li key={item.id} className="text-white/70 text-xs">
+                            {item.quantidade}× {item.nome}
+                            {(item.cor || item.tamanho) && (
+                              <span className="text-white/40"> · {[item.cor, item.tamanho].filter(Boolean).join(" · ")}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10 text-white/90 font-bold text-sm">
+                        <span>Total</span>
+                        <span>{formatarPreco(encomenda.totalCentimos / 100)}</span>
+                      </div>
+                      {encomenda.metodoPagamento === "multibanco" && encomenda.referenciaMbEntidade && encomenda.referenciaMbNumero && (
+                        <div className="mt-2 pt-2 border-t border-white/10 text-xs text-white/70 space-y-0.5">
+                          <p>Entidade <span className="text-white/90 font-semibold">{encomenda.referenciaMbEntidade}</span></p>
+                          <p>Referência <span className="text-white/90 font-semibold">{encomenda.referenciaMbNumero}</span></p>
+                        </div>
+                      )}
+                    </div>
+                  </details>
                 </li>
               ))}
             </ul>
