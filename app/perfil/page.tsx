@@ -62,7 +62,11 @@ export default async function PerfilPage() {
           descanso no topo (senão o único snap-start é o da ContactosSection
           e o browser salta logo para lá ao carregar) — o bloco continua com
           scroll livre lá dentro, não fica preso a h-dvh. */}
-      <div className="snap-start">
+      {/* pb-* extra só no mobile: dá mais espaço de scroll dentro desta
+          secção antes do snap mandatory apanhar o gesto e saltar para
+          Contactos — sem isto, scrollar a lista de encomendas (que pode ser
+          alta) atinge o ponto de snap seguinte demasiado cedo. */}
+      <div className="snap-start pb-32 md:pb-0">
         <AuthPageBackground align="end" verticalAlign="start" footer={false}>
           <PerfilForm user={user} socio={socio} encomendas={encomendas} />
         </AuthPageBackground>
