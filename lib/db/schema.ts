@@ -118,6 +118,13 @@ export const orders = pgTable("order", {
   subtotalCentimos: integer("subtotal_centimos").notNull(),
   portesCentimos: integer("portes_centimos").notNull(),
   totalCentimos: integer("total_centimos").notNull(),
+  // Gerada no cliente (um UUID por tentativa de checkout, guardado em
+  // sessionStorage) e enviada a criarEncomenda — protege contra duplo clique
+  // ou reenvio (ex. refresh a meio do pedido): um segundo pedido com a mesma
+  // chave devolve a encomenda já criada em vez de criar outra e voltar a
+  // pedir pagamento à Eupago. Nullable só por causa de encomendas antigas,
+  // anteriores a esta coluna existir.
+  idempotencyKey: text("idempotency_key").unique(),
   // Preenchidos depois de pedir a referência/pagamento ao Eupago — ver
   // lib/eupago.ts. eupagoIdentificador é o que liga o callback do Eupago a
   // esta encomenda (referência interna que enviamos no pedido).

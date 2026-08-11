@@ -43,6 +43,21 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
   // do React re-renderizar, o que deixa uma janela para um clique/Enter
   // duplo muito rápido disparar dois pedidos antes disso acontecer.
   const submetendoRef = useRef(false);
+  // Chave de idempotência: um UUID por tentativa de checkout, guardado em
+  // sessionStorage para sobreviver a um refresh a meio do pedido (o guard
+  // acima não sobrevive, porque reinicia o estado do componente). O
+  // servidor usa-a para devolver a encomenda já criada em vez de duplicar,
+  // se o mesmo pedido chegar duas vezes. Só gera uma chave nova depois de
+  // uma encomenda ser criada com sucesso. Inicializador "lazy" do useState
+  // (em vez de ref) — corre só uma vez, no primeiro render no cliente.
+  const [idempotencyKey, setIdempotencyKey] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const existente = sessionStorage.getItem("checkout-idempotency-key");
+    if (existente) return existente;
+    const nova = crypto.randomUUID();
+    sessionStorage.setItem("checkout-idempotency-key", nova);
+    return nova;
+  });
 
   const portes = items.length > 0 ? PORTES_EUROS : 0;
   const total = subtotal + portes;
@@ -69,13 +84,17 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
           cor: item.cor,
           tamanho: item.tamanho,
         })),
-        { ...dados, metodoPagamento, telemovelMbway: metodoPagamento === "mbway" ? telemovelMbway : undefined }
+        { ...dados, metodoPagamento, telemovelMbway: metodoPagamento === "mbway" ? telemovelMbway : undefined },
+        idempotencyKey
       );
       if ("error" in res) {
         setErro(res.error);
         return;
       }
       limpar();
+      const novaChave = crypto.randomUUID();
+      sessionStorage.setItem("checkout-idempotency-key", novaChave);
+      setIdempotencyKey(novaChave);
       setResultado(res);
     } finally {
       setLoading(false);

@@ -43,7 +43,28 @@ export type EncomendaResultado =
   | { error: string }
   | { orderId: string; referenciaMb?: { entidade: string; referencia: string; valor: number }; redirectUrl?: string; pagamentoError?: string };
 
-export async function criarEncomenda(itens: ItemEncomenda[], dados: DadosEncomenda): Promise<EncomendaResultado> {
+// idempotencyKey vem do cliente (um UUID por tentativa de checkout, ver
+// CheckoutForm.tsx) — se já existir uma encomenda com esta chave, devolve-a
+// tal como está em vez de criar outra e voltar a pedir pagamento à Eupago.
+// Protege contra duplo clique/reenvio (ex. refresh a meio do pedido).
+export async function criarEncomenda(
+  itens: ItemEncomenda[],
+  dados: DadosEncomenda,
+  idempotencyKey: string
+): Promise<EncomendaResultado> {
+  if (!idempotencyKey.trim()) return { error: "Pedido inválido. Atualiza a página e tenta novamente." };
+
+  const [existente] = await db.select().from(orders).where(eq(orders.idempotencyKey, idempotencyKey)).limit(1);
+  if (existente) {
+    return {
+      orderId: existente.id,
+      referenciaMb:
+        existente.referenciaMbEntidade && existente.referenciaMbNumero
+          ? { entidade: existente.referenciaMbEntidade, referencia: existente.referenciaMbNumero, valor: existente.totalCentimos / 100 }
+          : undefined,
+    };
+  }
+
   if (itens.length === 0) return { error: "O carrinho está vazio." };
   if (!dados.nome.trim()) return { error: "Indica o teu nome." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) return { error: "Email inválido." };
@@ -75,22 +96,42 @@ export async function criarEncomenda(itens: ItemEncomenda[], dados: DadosEncomen
   const portes = PORTES_EUROS;
   const total = subtotal + portes;
 
-  const [encomenda] = await db
-    .insert(orders)
-    .values({
-      userId: session?.user?.id ?? null,
-      nome: dados.nome.trim(),
-      email: dados.email.trim().toLowerCase(),
-      telefone: dados.telefone.trim(),
-      moradaLinha: dados.moradaLinha?.trim() || null,
-      codigoPostal: dados.codigoPostal?.trim() || null,
-      cidade: dados.cidade?.trim() || null,
-      metodoPagamento: dados.metodoPagamento,
-      subtotalCentimos: Math.round(subtotal * 100),
-      portesCentimos: Math.round(portes * 100),
-      totalCentimos: Math.round(total * 100),
-    })
-    .returning();
+  let encomenda: typeof orders.$inferSelect;
+  try {
+    [encomenda] = await db
+      .insert(orders)
+      .values({
+        userId: session?.user?.id ?? null,
+        idempotencyKey,
+        nome: dados.nome.trim(),
+        email: dados.email.trim().toLowerCase(),
+        telefone: dados.telefone.trim(),
+        moradaLinha: dados.moradaLinha?.trim() || null,
+        codigoPostal: dados.codigoPostal?.trim() || null,
+        cidade: dados.cidade?.trim() || null,
+        metodoPagamento: dados.metodoPagamento,
+        subtotalCentimos: Math.round(subtotal * 100),
+        portesCentimos: Math.round(portes * 100),
+        totalCentimos: Math.round(total * 100),
+      })
+      .returning();
+  } catch (erro) {
+    // Corrida rara: dois pedidos com a mesma chave passaram a verificação
+    // acima antes de qualquer um dos dois inserir — a constraint unique na
+    // BD rejeita o segundo insert. Trata-se como "já existe", tal como a
+    // verificação normal no topo da função.
+    const [jaExiste] = await db.select().from(orders).where(eq(orders.idempotencyKey, idempotencyKey)).limit(1);
+    if (jaExiste) {
+      return {
+        orderId: jaExiste.id,
+        referenciaMb:
+          jaExiste.referenciaMbEntidade && jaExiste.referenciaMbNumero
+            ? { entidade: jaExiste.referenciaMbEntidade, referencia: jaExiste.referenciaMbNumero, valor: jaExiste.totalCentimos / 100 }
+            : undefined,
+      };
+    }
+    throw erro;
+  }
 
   await db.insert(orderItems).values(
     itensValidados.map((item) => ({
