@@ -98,6 +98,12 @@ Clicar num evento abre-o como modal sobreposto (via parallel + intercepting rout
 
 Auth.js (`next-auth` v5 beta, config em `auth.ts`), três providers: Credentials (bcrypt), Google e Facebook (OAuth, contas ligadas automaticamente por email já verificado pelo provider). Sessão sempre JWT (obrigatório quando há Credentials provider). `DrizzleAdapter` persiste users/accounts/verification-tokens no Postgres. Resend envia emails de reset de password / confirmação de troca de email.
 
+**Proteções de segurança:**
+- **Rate limiting** via regra no Vercel Firewall (10 pedidos/60s por IP) em `/login`, `/registo`, `/esqueci-me-da-password`, `/perfil`
+- **Registo sem enumeração de utilizadores** — `registar()` (`app/actions/auth.ts`) não faz login automático e devolve sempre a mesma resposta genérica, exista ou não conta com o email indicado (hash da password corre sempre, para o tempo de resposta não denunciar qual dos casos aconteceu)
+- **Upload de foto de perfil** (`atualizarFoto`, `app/actions/perfil.ts`) só aceita JPEG/PNG/WEBP/GIF — SVG bloqueado (podia conter script embutido)
+- Cada página protegida (`/perfil`, `/checkout`) verifica a sessão individualmente no próprio ficheiro — **ainda não há um `proxy.ts` central** que cubra automaticamente páginas novas (ver Backlog)
+
 ## Perfil e Sócio
 
 `/perfil` mostra dados da conta (nome, foto, morada, password), histórico de encomendas (colapsável, com dados de pagamento por encomenda), e uma secção "Sócio" que tenta corresponder a conta ao registo de sócio no Quotagest automaticamente por email (com pesquisa manual por número de sócio/NIF como alternativa) — mostra estado da quota e data de entrada. Esta ligação é só de leitura; o site não gere sócios nem quotas.
@@ -111,7 +117,7 @@ Auth.js (`next-auth` v5 beta, config em `auth.ts`), três providers: Credentials
 - **Login por Facebook para todos** — depende da migração de domínio + possivelmente Meta App Review (app está em modo de desenvolvimento)
 - **Marca/modelo de mota** no perfil — ainda não existe no schema
 - **Email de boas-vindas** no registo — adiado por escolha, registo já funciona sem ele
-- **Enumeração de utilizadores no registo** — `registar()` (`app/actions/auth.ts`) revela se um email já tem conta ("Já existe uma conta com este email."), ao contrário do reset de password que dá sempre a mesma resposta de propósito. Risco baixo (não expõe credenciais, só confirma se alguém é sócio) e já mitigado contra recolha em massa pelo rate limit do Firewall, mas não contra uma consulta pontual dirigida a uma pessoa específica. Corrigir bem implica deixar de fazer login automático a seguir ao registo (mesma resposta genérica nos dois casos) — fica ligado ao email de boas-vindas acima, fazer os dois juntos.
+- **Middleware central de autenticação (`proxy.ts`)** — hoje cada página protegida verifica a sessão manualmente; um `proxy.ts` central adicionaria uma rede de segurança para páginas novas que se esqueça de proteger, mas não substituiria as verificações já existentes (que continuam a ser a proteção real, inclusive para Server Actions). Risco de implementar: mal configurado pode bloquear o site inteiro (corre em todas as rotas por definição) ou criar loop de redirecionamento se `/login` ficar incluído por engano.
 - **Notificações internas por email** (nova encomenda, novo registo) para `fumarentasdoasfalto@gmail.com` — ainda não implementado
 - **Rever templates dos emails** (`lib/email.ts`) — hoje são só HTML simples sem marca visual nenhuma (sem logo, sem cores do site); valeria a pena um template com a identidade visual da associação
 - **Backoffice** para o Sr. Joaquim gerir produtos/eventos (considerado CMS headless tipo Sanity — painel de encomendas também entraria aí como ferramenta customizada, lendo da nossa Postgres, não como documentos nativos do Sanity)
