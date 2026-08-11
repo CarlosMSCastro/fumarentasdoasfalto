@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 
+// TODO: rever templates — hoje são só HTML simples, sem marca visual
+// nenhuma (sem logo, sem cores do site). Ver README.md > Backlog.
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Domínio temporário (quizdabola.fun) até à migração para o domínio
