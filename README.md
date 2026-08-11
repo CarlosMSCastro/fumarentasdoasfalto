@@ -17,6 +17,7 @@ Site oficial da associação Fumarentas do Asfalto, desenvolvido como alternativ
 - **Upload de ficheiros** — Vercel Blob (foto de perfil)
 - **Pagamentos** — Eupago (Multibanco e MB WAY integrados e a funcionar; Cartão de crédito não disponível nesta conta — ver Backlog)
 - **Gestão de sócios** — Quotagest (plataforma externa) — o site lê dados de sócio (estado da quota, data de entrada) via API própria, não gere sócios
+- **Monitorização de erros** — Sentry (`@sentry/nextjs`, via Vercel Marketplace, plano gratuito, região EU), instalado pelo assistente oficial. `dataCollection` foi propositadamente restringido nos 3 ficheiros de config (`sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation-client.ts`) — por omissão o wizard captava cookies (inclui sessão), corpo dos pedidos (passwords em claro nos Server Actions de auth) e parâmetros da URL (tokens de reset/confirmação); ficou só o essencial (utilizador afetado + stack trace). Session Replay ativo (mascarado por omissão pelo próprio Sentry) — considerar mencionar em `/privacidade`.
 
 ## Estrutura de páginas
 
