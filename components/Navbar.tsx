@@ -58,9 +58,16 @@ export default function Navbar() {
       setNavTransparentZone(false);
     }, 0);
     const container = document.getElementById('snap-container');
+    // /perfil e /checkout são páginas de formulário sem hero — no mobile a
+    // navbar grande ocupa espaço a mais, por isso encolhe mais cedo (50px)
+    // só nestas duas páginas e só no mobile (< lg, mesmo breakpoint usado
+    // no resto deste ficheiro para o layout mobile/desktop).
+    const encolherCedo = pathname === "/perfil" || pathname === "/checkout";
     const handleScroll = () => {
       const scrollY = container ? container.scrollTop : window.scrollY;
-      setScrolled(scrollY > 100);
+      const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+      const threshold = encolherCedo && isMobile ? 50 : 100;
+      setScrolled(scrollY > threshold);
       const contactos = document.getElementById('contactos');
       if (contactos) {
         setInContactos(scrollY >= contactos.offsetTop - 200);
