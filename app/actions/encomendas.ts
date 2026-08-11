@@ -7,7 +7,7 @@ import { orders, orderItems } from "@/lib/db/schema";
 import { PORTES_EUROS } from "@/lib/encomendas";
 import { getProdutoById } from "@/lib/produtos";
 import { gerarReferenciaMultibanco, pedirPagamentoMbway, gerarLinkPagamentoCartao } from "@/lib/eupago";
-import { sendReferenciaMultibanco } from "@/lib/email";
+import { sendReferenciaMultibanco, sendConfirmacaoMbway, sendNotificacaoNovaEncomenda } from "@/lib/email";
 
 const MAX_QUANTIDADE_POR_ITEM = 20;
 
@@ -145,6 +145,17 @@ export async function criarEncomenda(
     }))
   );
 
+  // Notificação interna — dispara ao criar a encomenda (não à espera do
+  // pagamento), a associação vai querer saber que há uma encomenda nova
+  // por processar mesmo antes de confirmada.
+  sendNotificacaoNovaEncomenda({
+    id: encomenda.id,
+    nome: encomenda.nome,
+    email: encomenda.email,
+    totalCentimos: encomenda.totalCentimos,
+    metodoPagamento: encomenda.metodoPagamento,
+  }).catch(() => null);
+
   const descricao = `Encomenda Fumarentas do Asfalto #${encomenda.id.slice(0, 8)}`;
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
@@ -162,12 +173,21 @@ export async function criarEncomenda(
         entidade: ref.entidade,
         referencia: ref.referencia,
         valor: ref.valor,
+        dataFim: ref.dataFim,
       }).catch(() => null);
       return { orderId: encomenda.id, referenciaMb: { entidade: ref.entidade, referencia: ref.referencia, valor: ref.valor } };
     }
     if (dados.metodoPagamento === "mbway") {
       await pedirPagamentoMbway({ identificador: encomenda.id, valor: total, descricao, telemovel: dados.telemovelMbway!.trim() });
       await db.update(orders).set({ eupagoIdentificador: encomenda.id }).where(eq(orders.id, encomenda.id));
+      // Falha suave, tal como no ramo do Multibanco acima — o pedido de
+      // pagamento já foi enviado, um erro a mandar o email não deve
+      // invalidar isso.
+      await sendConfirmacaoMbway(dados.email.trim().toLowerCase(), {
+        id: encomenda.id,
+        valor: total,
+        telemovel: dados.telemovelMbway!.trim(),
+      }).catch(() => null);
       return { orderId: encomenda.id };
     }
     const { url } = await gerarLinkPagamentoCartao({

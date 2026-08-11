@@ -91,9 +91,9 @@ Clicar num evento abre-o como modal sobreposto (via parallel + intercepting rout
 - Pagamento via Eupago (`lib/eupago.ts`), canal Eupago dedicado à Loja (separado do canal usado para as quotas do Quotagest):
   - **Multibanco** — gera referência (Entidade/Referência/Valor), mostrada no ecrã de confirmação, enviada por email, e consultável depois em `/perfil`
   - **MB WAY** — pede pagamento diretamente para o número indicado (campo próprio, separado do telefone de contacto)
-  - **Cartão** — não disponível nesta conta Eupago (seria um produto à parte, seria preciso contratar); código existe (`gerarLinkPagamentoCartao`) mas está desligado do checkout
+  - **Cartão** — dispensado por decisão do utilizador (não vale a pena contratar); código existe (`gerarLinkPagamentoCartao`) mas está desligado do checkout, fica só como referência
 - Confirmação de pagamento via webhook (`app/api/pagamentos/eupago-callback`), assinado (`X-Signature`, HMAC-SHA256) — marca a encomenda como paga e envia email de confirmação
-- **Não implementado:** emissão de fatura ao cliente (a Eupago não faz isto automaticamente; precisaria de uma ferramenta de faturação certificada à parte, ex. InvoiceXpress/Vendus/Moloni)
+- **Não implementado:** recibo ao cliente (sem valor fiscal, por decisão do utilizador — não é preciso integrar uma ferramenta de faturação certificada) — ver Backlog
 
 ## Autenticação
 
@@ -103,7 +103,7 @@ Auth.js (`next-auth` v5 beta, config em `auth.ts`), três providers: Credentials
 - **Rate limiting** via regra no Vercel Firewall (10 pedidos/60s por IP) em `/login`, `/registo`, `/esqueci-me-da-password`, `/perfil`
 - **Registo sem enumeração de utilizadores** — `registar()` (`app/actions/auth.ts`) não faz login automático e devolve sempre a mesma resposta genérica, exista ou não conta com o email indicado (hash da password corre sempre, para o tempo de resposta não denunciar qual dos casos aconteceu)
 - **Upload de foto de perfil** (`atualizarFoto`, `app/actions/perfil.ts`) só aceita JPEG/PNG/WEBP/GIF — SVG bloqueado (podia conter script embutido)
-- Cada página protegida (`/perfil`, `/checkout`) verifica a sessão individualmente no próprio ficheiro — **ainda não há um `proxy.ts` central** que cubra automaticamente páginas novas (ver Backlog)
+- Cada página protegida (`/perfil`) verifica a sessão individualmente no próprio ficheiro; `proxy.ts` na raiz do projeto reforça isso como rede de segurança central (matcher só cobre `/perfil` — `/checkout` não exige login de propósito, é guest-friendly). Não substitui as verificações já existentes, inclusive nas Server Actions (ver nota em `proxy.ts`)
 
 ## Perfil e Sócio
 
@@ -111,14 +111,12 @@ Auth.js (`next-auth` v5 beta, config em `auth.ts`), três providers: Credentials
 
 ## Backlog / Por fazer
 
-- **Cartão de crédito (Eupago)** — precisaria de contratar esse produto à parte com a Eupago
-- **Faturação da Loja** — nenhuma fatura é emitida aos clientes; precisa de ferramenta certificada à parte
-- **Botão "Pagar quotas"** em `/perfil` — só leitura: mostrar a referência já emitida pelo Quotagest (sem gerar uma nova se estiver em falta/expirada, decisão deliberada para manter simples)
+- ~~**Cartão de crédito (Eupago)**~~ — dispensável (decisão do utilizador, 2026-08-11); precisaria de contratar esse produto à parte com a Eupago, não vale a pena
+- **Recibo da Loja** — sem valor fiscal (decisão do utilizador, 2026-08-11: não precisa de ser fatura certificada, é só um recibo informal para o cliente) — não implementado ainda, mas escopo muito mais simples do que uma integração de faturação certificada
+- **Botão "Pagar quotas"** em `/perfil` — em espera: auditoria à API real do Quotagest (2026-08-11) mostrou que as referências Multibanco podem não ser geradas automaticamente como o Sr. Joaquim descreveu — à espera de confirmação dele antes de implementar
 - **Migração de domínio** para o `.com` definitivo da associação (afeta `FROM` dos emails, verificação de domínio do Facebook, `NEXT_PUBLIC_APP_URL`)
 - **Login por Facebook para todos** — depende da migração de domínio + possivelmente Meta App Review (app está em modo de desenvolvimento)
-- **Marca/modelo de mota** no perfil — ainda não existe no schema
 - **Email de boas-vindas** no registo — adiado por escolha, registo já funciona sem ele
-- **Middleware central de autenticação (`proxy.ts`)** — hoje cada página protegida verifica a sessão manualmente; um `proxy.ts` central adicionaria uma rede de segurança para páginas novas que se esqueça de proteger, mas não substituiria as verificações já existentes (que continuam a ser a proteção real, inclusive para Server Actions). Risco de implementar: mal configurado pode bloquear o site inteiro (corre em todas as rotas por definição) ou criar loop de redirecionamento se `/login` ficar incluído por engano.
 - **Notificações internas por email** (nova encomenda, novo registo) para `fumarentasdoasfalto@gmail.com` — ainda não implementado
 - **Rever templates dos emails** (`lib/email.ts`) — hoje são só HTML simples sem marca visual nenhuma (sem logo, sem cores do site); valeria a pena um template com a identidade visual da associação
 - **Backoffice** para o Sr. Joaquim gerir produtos/eventos (considerado CMS headless tipo Sanity — painel de encomendas também entraria aí como ferramenta customizada, lendo da nossa Postgres, não como documentos nativos do Sanity)

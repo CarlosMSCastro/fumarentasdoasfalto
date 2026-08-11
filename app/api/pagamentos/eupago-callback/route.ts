@@ -68,6 +68,7 @@ export async function POST(request: Request) {
     const itens = await db.select().from(orderItems).where(inArray(orderItems.orderId, [encomenda.id]));
     await sendOrderConfirmation(encomenda.email, {
       id: encomenda.id,
+      nome: encomenda.nome,
       itens: itens.map((item) => ({ nome: item.nome, quantidade: item.quantidade, precoCentimos: item.precoCentimos })),
       totalCentimos: encomenda.totalCentimos,
     });

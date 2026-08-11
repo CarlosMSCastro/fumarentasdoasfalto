@@ -8,7 +8,7 @@ import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
 import { users, verificationTokens, emailChangeRequests } from "@/lib/db/schema";
 import { signIn, signOut } from "@/auth";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendNotificacaoNovoRegisto } from "@/lib/email";
 
 export type AuthFormState = { error?: string } | undefined;
 export type ResetRequestState = { error?: string; success?: boolean } | undefined;
@@ -37,6 +37,11 @@ export async function registar(_prevState: RegistarFormState, formData: FormData
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
   if (!existing) {
     await db.insert(users).values({ name, email, passwordHash });
+    // Sem await de propósito — só correm no ramo de conta nova, e esperar
+    // por elas atrasaria só este ramo, reintroduzindo pela via do tempo de
+    // resposta a mesma fuga que o resto desta função evita de propósito.
+    sendWelcomeEmail(email, name).catch(() => null);
+    sendNotificacaoNovoRegisto(name, email).catch(() => null);
   }
 
   return { success: true };

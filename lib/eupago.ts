@@ -33,6 +33,8 @@ export interface ReferenciaMultibanco {
   entidade: string;
   referencia: string;
   valor: number;
+  /** formato "YYYY-MM-DD" — até ao fim deste dia a referência aceita pagamento */
+  dataFim: string;
 }
 
 export interface PedidoMbway {
@@ -40,8 +42,21 @@ export interface PedidoMbway {
   transactionID: string;
 }
 
+// data_fim só aceita uma data (AAAA-MM-DD), não hora exata — por isso "2
+// dias" na prática é "válida até ao fim do 2º dia seguinte", nunca 48h
+// exatas a partir do momento da compra (decisão do utilizador, 2026-08-11,
+// já avisado desta imprecisão).
+const VALIDADE_MULTIBANCO_DIAS = 2;
+
+function dataFimMultibanco(): string {
+  const data = new Date();
+  data.setDate(data.getDate() + VALIDADE_MULTIBANCO_DIAS);
+  return data.toISOString().slice(0, 10);
+}
+
 export async function gerarReferenciaMultibanco(pedido: PedidoPagamento): Promise<ReferenciaMultibanco> {
   const chave = lerChave();
+  const dataFim = dataFimMultibanco();
   const res = await fetch(`https://${HOST}/clientes/rest_api/multibanco/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -50,13 +65,16 @@ export async function gerarReferenciaMultibanco(pedido: PedidoPagamento): Promis
       valor: pedido.valor.toFixed(2),
       id: pedido.identificador,
       per_dup: 0, // só permite 1 pagamento por referência
+      data_fim: dataFim,
     }),
   });
   const json = await res.json().catch(() => null);
   if (!res.ok || json?.sucesso !== true) {
     throw new Error(`gerarReferenciaMultibanco: Eupago recusou o pedido (${json?.resposta ?? res.status}).`);
   }
-  return { entidade: json.entidade, referencia: json.referencia, valor: pedido.valor };
+  // A Eupago costuma ecoar o data_fim pedido de volta — usa isso se vier,
+  // senão confia no valor que já enviámos no pedido.
+  return { entidade: json.entidade, referencia: json.referencia, valor: pedido.valor, dataFim: json.data_fim || dataFim };
 }
 
 export async function pedirPagamentoMbway(pedido: PedidoPagamento & { telemovel: string }): Promise<PedidoMbway> {

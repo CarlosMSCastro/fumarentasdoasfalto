@@ -1,23 +1,73 @@
 import { Resend } from "resend";
+import { gerarReciboPdf } from "@/lib/recibo-pdf";
 
-// TODO: rever templates — hoje são só HTML simples, sem marca visual
-// nenhuma (sem logo, sem cores do site). Ver README.md > Backlog.
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Domínio temporário (quizdabola.fun) até à migração para o domínio
 // definitivo da associação — ver CLAUDE.md / troca é só esta linha.
 const FROM = "Fumarentas do Asfalto <naoresponder@quizdabola.fun>";
 
+// Caixa de correio da própria associação, para onde vão as notificações
+// internas (novo registo, nova encomenda) — não é segredo, não precisa de
+// ser env var.
+const ASSOCIACAO_EMAIL = "fumarentasdoasfalto@gmail.com";
+
+const PRIMARY = "#ff6b00";
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL;
+
+// Cartão claro (não o fundo escuro do site) de propósito — clientes de
+// email (Gmail/Outlook) lidam mal com CSS mais complexo, e um fundo escuro
+// arrisca-se a ficar ilegível ou partido nalguns deles. O laranja da marca
+// fica para o cabeçalho, títulos e botões; o corpo do texto é sempre texto
+// escuro sobre branco, para garantir legibilidade em qualquer cliente.
+function wrapEmail(bodyHtml: string): string {
+  return `<!DOCTYPE html>
+<html lang="pt">
+  <body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;background:#ffffff;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td align="center" style="background:#050505;padding:24px;">
+                <img src="${SITE_URL}/logo.png" alt="Fumarentas do Asfalto" width="56" height="56" style="display:block;" />
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px 28px;color:#1a1a1a;font-size:15px;line-height:1.6;">
+                ${bodyHtml}
+              </td>
+            </tr>
+            <tr>
+              <td style="background:#f4f4f4;padding:16px 28px;text-align:center;color:#888888;font-size:12px;">
+                Fumarentas do Asfalto<br />Este é um email automático — não respondas a esta mensagem.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+function emailButton(texto: string, url: string): string {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0;"><tr><td style="background:${PRIMARY};border-radius:999px;">
+    <a href="${url}" style="display:inline-block;padding:12px 28px;color:#ffffff;font-weight:bold;font-size:14px;text-decoration:none;">${texto}</a>
+  </td></tr></table>`;
+}
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   await resend.emails.send({
     from: FROM,
     to,
     subject: "Redefinir password — Fumarentas do Asfalto",
-    html: `
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Redefinir password</h2>
       <p>Recebemos um pedido para redefinir a password da tua conta.</p>
-      <p><a href="${resetUrl}">Clica aqui para definires uma nova password</a></p>
-      <p>Este link expira dentro de 1 hora. Se não pediste isto, ignora este email.</p>
-    `,
+      ${emailButton("Definir nova password", resetUrl)}
+      <p style="color:#666666;font-size:13px;">Este link expira dentro de 1 hora. Se não pediste isto, ignora este email.</p>
+    `),
   });
 }
 
@@ -28,11 +78,12 @@ export async function sendEmailChangeConfirmation(to: string, confirmUrl: string
     from: FROM,
     to,
     subject: "Confirma o teu novo email — Fumarentas do Asfalto",
-    html: `
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Confirmar novo email</h2>
       <p>Pediste para alterar o email da tua conta para este endereço.</p>
-      <p><a href="${confirmUrl}">Clica aqui para confirmares a alteração</a></p>
-      <p>Este link expira dentro de 1 hora. Se não pediste isto, ignora este email.</p>
-    `,
+      ${emailButton("Confirmar alteração", confirmUrl)}
+      <p style="color:#666666;font-size:13px;">Este link expira dentro de 1 hora. Se não pediste isto, ignora este email.</p>
+    `),
   });
 }
 
@@ -45,23 +96,40 @@ export async function sendEmailChangeConfirmation(to: string, confirmUrl: string
 // ainda não sabemos se o pagamento vai mesmo acontecer.
 export async function sendOrderConfirmation(
   to: string,
-  encomenda: { id: string; itens: { nome: string; quantidade: number; precoCentimos: number }[]; totalCentimos: number }
+  encomenda: {
+    id: string;
+    nome: string;
+    itens: { nome: string; quantidade: number; precoCentimos: number }[];
+    totalCentimos: number;
+  }
 ) {
   const formatar = (centimos: number) => `${(centimos / 100).toFixed(2).replace(".", ",")} €`;
   const linhas = encomenda.itens
     .map((item) => `<li>${item.quantidade}× ${item.nome} — ${formatar(item.precoCentimos * item.quantidade)}</li>`)
     .join("");
 
+  // Falha suave: se o PDF rebentar por algum motivo, o email de confirmação
+  // ainda deve sair — só sem o anexo. Ver lib/recibo-pdf.tsx.
+  const reciboPdf = await gerarReciboPdf({
+    id: encomenda.id,
+    nome: encomenda.nome,
+    data: new Date(),
+    itens: encomenda.itens,
+    totalCentimos: encomenda.totalCentimos,
+  }).catch(() => null);
+
   await resend.emails.send({
     from: FROM,
     to,
     subject: `Pagamento confirmado — Encomenda #${encomenda.id.slice(0, 8)}`,
-    html: `
-      <p>Recebemos o pagamento da tua encomenda #${encomenda.id.slice(0, 8)}. Obrigado!</p>
-      <ul>${linhas}</ul>
-      <p><strong>Total: ${formatar(encomenda.totalCentimos)}</strong></p>
-      <p>Vamos entrar em contacto para combinar a entrega/envio.</p>
-    `,
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Pagamento confirmado</h2>
+      <p>Recebemos o pagamento da tua encomenda <strong>#${encomenda.id.slice(0, 8)}</strong>. Obrigado!</p>
+      <ul style="padding-left:20px;">${linhas}</ul>
+      <p style="font-size:17px;"><strong>Total: ${formatar(encomenda.totalCentimos)}</strong></p>
+      <p style="color:#666666;font-size:13px;">O recibo (sem valor fiscal) vai em anexo, em PDF.</p>
+    `),
+    attachments: reciboPdf ? [{ filename: `recibo-${encomenda.id.slice(0, 8)}.pdf`, content: reciboPdf }] : undefined,
   });
 }
 
@@ -72,23 +140,30 @@ export async function sendOrderConfirmation(
 // tem conta — este email chega a todos, incluindo compras de convidado.
 export async function sendReferenciaMultibanco(
   to: string,
-  encomenda: { id: string; entidade: string; referencia: string; valor: number }
+  encomenda: { id: string; entidade: string; referencia: string; valor: number; dataFim: string }
 ) {
   const valorFormatado = `${encomenda.valor.toFixed(2).replace(".", ",")} €`;
+  const dataFimFormatada = new Date(`${encomenda.dataFim}T00:00:00`).toLocaleDateString("pt-PT", {
+    day: "numeric",
+    month: "long",
+  });
 
   await resend.emails.send({
     from: FROM,
     to,
     subject: `Referência Multibanco — Encomenda #${encomenda.id.slice(0, 8)}`,
-    html: `
-      <p>A tua encomenda #${encomenda.id.slice(0, 8)} está registada. Usa os dados abaixo para pagar por Multibanco:</p>
-      <p>
-        <strong>Entidade: ${encomenda.entidade}</strong><br>
-        <strong>Referência: ${encomenda.referencia}</strong><br>
-        <strong>Valor: ${valorFormatado}</strong>
-      </p>
-      <p>Assim que o pagamento for confirmado, recebes outro email e a encomenda passa a "paga".</p>
-    `,
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Referência Multibanco</h2>
+      <p>A tua encomenda <strong>#${encomenda.id.slice(0, 8)}</strong> está registada. Usa os dados abaixo para pagar por Multibanco:</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px 0;background:#f4f4f4;border-radius:6px;width:100%;">
+        <tr><td style="padding:16px 20px;font-size:16px;">
+          <strong>Entidade:</strong> ${encomenda.entidade}<br />
+          <strong>Referência:</strong> ${encomenda.referencia}<br />
+          <strong>Valor:</strong> ${valorFormatado}
+        </td></tr>
+      </table>
+      <p>Válida até <strong>${dataFimFormatada}</strong> — depois disso a referência deixa de aceitar pagamento.</p>
+    `),
   });
 }
 
@@ -97,10 +172,86 @@ export async function sendSocioLinkConfirmation(to: string, confirmUrl: string, 
     from: FROM,
     to,
     subject: "Confirma a associação da tua conta — Fumarentas do Asfalto",
-    html: `
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Confirmar associação de sócio</h2>
       <p>Alguém pediu para ligar uma conta no site ao registo de sócio de <strong>${nomeSocio}</strong>.</p>
-      <p><a href="${confirmUrl}">Clica aqui para confirmares a associação</a></p>
-      <p>Este link expira dentro de 1 hora. Se não foste tu, ignora este email.</p>
-    `,
+      ${emailButton("Confirmar associação", confirmUrl)}
+      <p style="color:#666666;font-size:13px;">Este link expira dentro de 1 hora. Se não foste tu, ignora este email.</p>
+    `),
+  });
+}
+
+// Informativo, não bloqueia login/acesso — disparado só no ramo de conta
+// nova de registar() (app/actions/auth.ts), nunca no ramo de email já
+// existente. Importante: não awaited aí, para não reintroduzir a fuga por
+// tempo de resposta entre os dois ramos que foi corrigida propositadamente
+// nessa função (ver README.md > Autenticação > Proteções de segurança).
+export async function sendWelcomeEmail(to: string, nome: string) {
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "Bem-vindo à Fumarentas do Asfalto!",
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Bem-vindo, ${nome}!</h2>
+      <p>A tua conta no site da Fumarentas do Asfalto foi criada com sucesso.</p>
+      <p>No teu perfil consegues gerir os teus dados, ver o histórico de encomendas da loja, e ligar a tua conta ao teu registo de sócio para veres o estado da tua quota.</p>
+      ${emailButton("Ir para o meu perfil", `${SITE_URL}/perfil`)}
+    `),
+  });
+}
+
+// Notificações internas para a associação — não interessam ao utilizador
+// que despoletou a ação, por isso nunca devem bloquear/atrasar a resposta
+// a essa pessoa. Chamar sem `await` nos sítios de origem (ou com
+// .catch(() => null) se awaited), nunca deixar uma falha aqui rebentar o
+// fluxo principal.
+export async function sendNotificacaoNovoRegisto(nome: string, email: string) {
+  await resend.emails.send({
+    from: FROM,
+    to: ASSOCIACAO_EMAIL,
+    subject: `Novo registo no site — ${nome}`,
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Novo registo no site</h2>
+      <p><strong>${nome}</strong> criou uma conta no site.</p>
+      <p style="color:#666666;font-size:13px;">Email: ${email}</p>
+    `),
+  });
+}
+
+export async function sendNotificacaoNovaEncomenda(encomenda: {
+  id: string;
+  nome: string;
+  email: string;
+  totalCentimos: number;
+  metodoPagamento: string;
+}) {
+  const total = `${(encomenda.totalCentimos / 100).toFixed(2).replace(".", ",")} €`;
+  await resend.emails.send({
+    from: FROM,
+    to: ASSOCIACAO_EMAIL,
+    subject: `Nova encomenda — #${encomenda.id.slice(0, 8)}`,
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Nova encomenda na loja</h2>
+      <p><strong>${encomenda.nome}</strong> (${encomenda.email}) fez uma encomenda de <strong>${total}</strong>, por ${encomenda.metodoPagamento}.</p>
+      <p style="color:#666666;font-size:13px;">Encomenda #${encomenda.id.slice(0, 8)} — ainda por confirmar o pagamento.</p>
+    `),
+  });
+}
+
+// Espelha sendReferenciaMultibanco, mas para MB WAY — o Multibanco já
+// mandava uma confirmação inicial ao criar a encomenda, o MB WAY não
+// mandava nada até ao pagamento ser confirmado. Corrigido a pedido do
+// utilizador, 2026-08-11.
+export async function sendConfirmacaoMbway(to: string, encomenda: { id: string; valor: number; telemovel: string }) {
+  const valorFormatado = `${encomenda.valor.toFixed(2).replace(".", ",")} €`;
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Pedido de pagamento MB WAY — Encomenda #${encomenda.id.slice(0, 8)}`,
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Confirma o pagamento na app MB WAY</h2>
+      <p>A tua encomenda <strong>#${encomenda.id.slice(0, 8)}</strong> está registada. Enviámos um pedido de pagamento de <strong>${valorFormatado}</strong> para o número <strong>${encomenda.telemovel}</strong>.</p>
+      <p>Abre a app MB WAY no teu telemóvel e confirma o pagamento — <strong>tens 5 minutos</strong> a partir de agora, depois disso o pedido expira.</p>
+    `),
   });
 }
