@@ -16,6 +16,7 @@ export type PerfilFormState = { error?: string; success?: boolean } | undefined;
 const EMAIL_CHANGE_TOKEN_TTL_MS = 60 * 60 * 1000;
 const SOCIO_LINK_TOKEN_TTL_MS = 60 * 60 * 1000;
 const MAX_FOTO_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_FOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function atualizarPerfil(_prevState: PerfilFormState, formData: FormData): Promise<PerfilFormState> {
   const session = await auth();
@@ -129,7 +130,7 @@ export async function atualizarFoto(_prevState: PerfilFormState, formData: FormD
 
   const foto = formData.get("foto");
   if (!(foto instanceof File) || foto.size === 0) return { error: "Escolhe uma imagem." };
-  if (!foto.type.startsWith("image/")) return { error: "O ficheiro tem de ser uma imagem." };
+  if (!ALLOWED_FOTO_TYPES.includes(foto.type)) return { error: "Formato de imagem não suportado (usa JPEG, PNG, WEBP ou GIF)." };
   if (foto.size > MAX_FOTO_SIZE_BYTES) return { error: "A imagem não pode passar de 5MB." };
 
   const blob = await put(`avatares/${session.user.id}-${Date.now()}-${foto.name}`, foto, {

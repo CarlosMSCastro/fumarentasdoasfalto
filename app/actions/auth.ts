@@ -12,10 +12,16 @@ import { sendPasswordResetEmail } from "@/lib/email";
 
 export type AuthFormState = { error?: string } | undefined;
 export type ResetRequestState = { error?: string; success?: boolean } | undefined;
+export type RegistarFormState = { error?: string; success?: boolean } | undefined;
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
-export async function registar(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+// Resposta igual quer o email já tenha conta ou não, e sem login automático
+// — evita que este formulário sirva para descobrir quais emails são sócios
+// (enumeração de utilizadores). O hash da password corre sempre, mesmo no
+// caso de email duplicado, para o tempo de resposta não denunciar qual dos
+// dois casos aconteceu.
+export async function registar(_prevState: RegistarFormState, formData: FormData): Promise<RegistarFormState> {
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
@@ -26,18 +32,14 @@ export async function registar(_prevState: AuthFormState, formData: FormData): P
   if (password.length < 8) return { error: "A password tem de ter pelo menos 8 caracteres." };
   if (password !== confirmPassword) return { error: "As passwords não coincidem." };
 
-  const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
-  if (existing) return { error: "Já existe uma conta com este email." };
-
   const passwordHash = await hash(password, 10);
-  await db.insert(users).values({ name, email, passwordHash });
 
-  try {
-    await signIn("credentials", { email, password, redirectTo: "/" });
-  } catch (error) {
-    if (error instanceof AuthError) return { error: "Conta criada, mas não foi possível iniciar sessão. Tenta entrar manualmente." };
-    throw error;
+  const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+  if (!existing) {
+    await db.insert(users).values({ name, email, passwordHash });
   }
+
+  return { success: true };
 }
 
 export async function entrar(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {

@@ -111,6 +111,7 @@ Auth.js (`next-auth` v5 beta, config em `auth.ts`), três providers: Credentials
 - **Login por Facebook para todos** — depende da migração de domínio + possivelmente Meta App Review (app está em modo de desenvolvimento)
 - **Marca/modelo de mota** no perfil — ainda não existe no schema
 - **Email de boas-vindas** no registo — adiado por escolha, registo já funciona sem ele
+- **Enumeração de utilizadores no registo** — `registar()` (`app/actions/auth.ts`) revela se um email já tem conta ("Já existe uma conta com este email."), ao contrário do reset de password que dá sempre a mesma resposta de propósito. Risco baixo (não expõe credenciais, só confirma se alguém é sócio) e já mitigado contra recolha em massa pelo rate limit do Firewall, mas não contra uma consulta pontual dirigida a uma pessoa específica. Corrigir bem implica deixar de fazer login automático a seguir ao registo (mesma resposta genérica nos dois casos) — fica ligado ao email de boas-vindas acima, fazer os dois juntos.
 - **Notificações internas por email** (nova encomenda, novo registo) para `fumarentasdoasfalto@gmail.com` — ainda não implementado
 - **Rever templates dos emails** (`lib/email.ts`) — hoje são só HTML simples sem marca visual nenhuma (sem logo, sem cores do site); valeria a pena um template com a identidade visual da associação
 - **Backoffice** para o Sr. Joaquim gerir produtos/eventos (considerado CMS headless tipo Sanity — painel de encomendas também entraria aí como ferramenta customizada, lendo da nossa Postgres, não como documentos nativos do Sanity)
