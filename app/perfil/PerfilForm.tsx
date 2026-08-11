@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
 import { LogOut, ChevronDown } from "lucide-react";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto, procurarSocio } from "@/app/actions/perfil";
+import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto, procurarSocio, apagarConta } from "@/app/actions/perfil";
 import { terminarSessao } from "@/app/actions/auth";
 import { getHighResAvatarUrl } from "@/lib/avatar";
 import SubmitButton from "@/components/SubmitButton";
@@ -51,6 +51,8 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
   const [emailState, emailAction] = useActionState(pedirAlteracaoEmail, undefined);
   const [socioState, socioAction] = useActionState(procurarSocio, undefined);
   const [fotoState, fotoAction] = useActionState(atualizarFoto, undefined);
+  const [apagarState, apagarAction] = useActionState(apagarConta, undefined);
+  const [apagarConfirmacao, setApagarConfirmacao] = useState("");
   const initials = getInitials(user.name, user.email);
   const { update: updateSession } = useSession();
 
@@ -65,104 +67,77 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
 
   return (
     <div className="w-full max-w-6xl pt-16 md:pt-28">
-      <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10 items-start">
-        <div className="order-last md:order-none pt-4 border-t border-white/10 md:mt-26">
-          <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
-          {encomendas.length === 0 ? (
-            <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
+      {/* Cabeçalho — foto/nome/email centrados, a ocupar a largura toda por
+          cima das 3 colunas (em vez de preso dentro da coluna esquerda). O
+          border-b substitui os border-t que cada coluna tinha antes. */}
+      <div className="flex flex-col items-center text-center gap-2 pb-6 border-b border-white/10">
+        <span className="group/avatar relative shrink-0 w-20 h-20 rounded-full overflow-hidden border border-white/20">
+          {user.image ? (
+            <Image src={getHighResAvatarUrl(user.image)!} alt="" fill sizes="80px" className="object-cover" />
           ) : (
-            <ul className="flex flex-col divide-y divide-white/10">
-              {encomendas.map((encomenda) => (
-                <li key={encomenda.id}>
-                  <details className="group">
-                    <summary className="flex items-center justify-between gap-2 py-2.5 cursor-pointer list-none">
-                      <div className="min-w-0">
-                        <p className="text-white/90 text-sm">{formatDataEncomenda(encomenda.createdAt)}</p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className={`text-xs font-bold uppercase tracking-wide ${ESTADO_CLASSE[encomenda.status]}`}>
-                          {ESTADO_LABEL[encomenda.status]}
-                        </span>
-                        <ChevronDown size={16} className="text-white/40 transition-transform group-open:rotate-180" />
-                      </div>
-                    </summary>
-                    <div className="pb-3 text-sm">
-                      <ul className="flex flex-col gap-0.5">
-                        {encomenda.items.map((item) => (
-                          <li key={item.id} className="text-white/70 text-xs">
-                            {item.quantidade}× {item.nome}
-                            {(item.cor || item.tamanho) && (
-                              <span className="text-white/40"> · {[item.cor, item.tamanho].filter(Boolean).join(" · ")}</span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10 text-white/90 font-bold text-sm">
-                        <span>Total</span>
-                        <span>{formatarPreco(encomenda.totalCentimos / 100)}</span>
-                      </div>
-                      {encomenda.metodoPagamento === "multibanco" && encomenda.referenciaMbEntidade && encomenda.referenciaMbNumero && (
-                        <div className="mt-2 pt-2 border-t border-white/10 text-xs text-white/70 space-y-0.5">
-                          <p>Entidade <span className="text-white/90 font-semibold">{encomenda.referenciaMbEntidade}</span></p>
-                          <p>Referência <span className="text-white/90 font-semibold">{encomenda.referenciaMbNumero}</span></p>
-                        </div>
-                      )}
-                    </div>
-                  </details>
-                </li>
-              ))}
-            </ul>
+            <>
+              <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-2xl font-bold">
+                {initials}
+              </span>
+              <label
+                htmlFor="foto-upload"
+                className="absolute inset-0 flex items-center justify-center text-center px-1 bg-black/75 text-white text-[10px] font-semibold uppercase tracking-wide opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer"
+              >
+                Carregar foto
+              </label>
+              <form action={fotoAction}>
+                <input
+                  id="foto-upload"
+                  name="foto"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => e.currentTarget.form?.requestSubmit()}
+                />
+              </form>
+            </>
           )}
+        </span>
+        <div>
+          <h1 className="text-3xl font-bold text-[#f8f0d9]">{user.name || "A tua conta"}</h1>
+          <p className="text-white/60 text-base">{user.email}</p>
+          {fotoState?.error && <p className="text-sm text-red-400 mt-1">{fotoState.error}</p>}
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1fr_1.3fr] gap-10 items-start pt-8">
+        {/* Coluna 1 — Área do Sócio */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <span className="group/avatar relative shrink-0 w-20 h-20 rounded-full overflow-hidden border border-white/20">
-              {user.image ? (
-                <Image src={getHighResAvatarUrl(user.image)!} alt="" fill sizes="80px" className="object-cover" />
-              ) : (
-                <>
-                  <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-2xl font-bold">
-                    {initials}
-                  </span>
-                  <label
-                    htmlFor="foto-upload"
-                    className="absolute inset-0 flex items-center justify-center text-center px-1 bg-black/75 text-white text-[10px] font-semibold uppercase tracking-wide opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer"
-                  >
-                    Carregar foto
-                  </label>
-                  <form action={fotoAction}>
-                    <input
-                      id="foto-upload"
-                      name="foto"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => e.currentTarget.form?.requestSubmit()}
-                    />
-                  </form>
-                </>
-              )}
-            </span>
-            <div className="min-w-0">
-              <h1 className="text-3xl font-bold text-[#f8f0d9] truncate">{user.name || "A tua conta"}</h1>
-              <p className="text-white/60 text-base truncate">{user.email}</p>
-              {fotoState?.error && <p className="text-sm text-red-400 mt-1">{fotoState.error}</p>}
-            </div>
-          </div>
-
-          <div className="mt-2 pt-4 border-t border-white/10">
-            <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Sócio</h2>
+          <div>
+            <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Área do Sócio</h2>
             {socio ? (
               <dl className="space-y-2 text-base">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-white/60">{socio.numeroSocio ? "Número de sócio" : "Categoria"}</dt>
+                  <dd className="text-white/90">{socio.numeroSocio ? `Nº ${socio.numeroSocio}` : "Sócio Fundador"}</dd>
+                </div>
                 <div className="flex justify-between gap-4">
                   <dt className="text-white/60">Sócio desde</dt>
                   <dd className="text-white/90">{formatDataEntrada(socio.dataEntrada)}</dd>
                 </div>
                 <div className="flex justify-between gap-4">
+                  <dt className="text-white/60">Estado</dt>
+                  <dd className="text-white/90">{socio.estado}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-white/60">NIF</dt>
+                  <dd className="text-white/90">{socio.nif}</dd>
+                </div>
+                {socio.grupoSanguineo && (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-white/60">Grupo sanguíneo</dt>
+                    <dd className="text-white/90">{socio.grupoSanguineo}</dd>
+                  </div>
+                )}
+                <div className="flex justify-between gap-4">
                   <dt className="text-white/60">Estado da quota</dt>
                   <dd className={socio.quotaEmDia ? "text-white/90" : "text-red-400"}>
-                    {socio.quotaEmDia ? "Em dia" : "Em atraso"}
+                    {socio.quotaEmDia ? "Em dia" : `Em atraso — ${formatarPreco(socio.divida)}`}
                   </dd>
                 </div>
               </dl>
@@ -198,9 +173,12 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
               </div>
             )}
           </div>
+        </div>
 
+        {/* Coluna 2 — Ações da conta (colapsáveis) + Histórico de encomendas por baixo. */}
+        <div className="flex flex-col gap-4">
           {user.passwordHash && (
-            <details className="group mt-2">
+            <details className="group">
               <summary className="text-base uppercase tracking-widest text-primary font-bold cursor-pointer list-none flex items-center justify-between">
                 Alterar password
                 <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
@@ -233,7 +211,7 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
             </details>
           )}
 
-          <details className="group mt-2">
+          <details className="group">
             <summary className="text-base uppercase tracking-widest text-primary font-bold cursor-pointer list-none flex items-center justify-between">
               Alterar email
               <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
@@ -254,9 +232,94 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
               </SubmitButton>
             </form>
           </details>
+
+          <details className="group">
+            <summary className="text-base uppercase tracking-widest text-red-400 font-bold cursor-pointer list-none flex items-center justify-between">
+              Apagar conta
+              <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
+            </summary>
+            <form action={apagarAction} className="flex flex-col gap-4 mt-4">
+              <p className="text-sm text-white/60">
+                Ação permanente — não pode ser desfeita. A tua conta e dados pessoais são apagados; encomendas já feitas
+                ficam guardadas para o registo da associação, sem ligação à tua conta.
+              </p>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="confirmacao" className="text-base text-white/70">
+                  Escreve <span className="font-bold text-white/90">APAGAR</span> para confirmares
+                </label>
+                <input
+                  id="confirmacao"
+                  name="confirmacao"
+                  type="text"
+                  autoComplete="off"
+                  value={apagarConfirmacao}
+                  onChange={(e) => setApagarConfirmacao(e.target.value)}
+                  className="rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white focus:outline-none focus:border-red-400"
+                />
+              </div>
+              {apagarState?.error && <p className="text-sm text-red-400">{apagarState.error}</p>}
+              <SubmitButton
+                pendingText="A apagar..."
+                disabled={apagarConfirmacao !== "APAGAR"}
+                className="self-start rounded-full bg-red-500 border border-red-500 px-6 py-3 font-semibold text-white hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer"
+              >
+                Apagar conta
+              </SubmitButton>
+            </form>
+          </details>
+
+          <div className="mt-2 pt-4 border-t border-white/10">
+            <h2 className="text-base uppercase tracking-widest text-primary font-bold mb-3">Histórico de encomendas</h2>
+            {encomendas.length === 0 ? (
+              <p className="text-white/60 text-base">Ainda não tens encomendas.</p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-white/10">
+                {encomendas.map((encomenda) => (
+                  <li key={encomenda.id}>
+                    <details className="group">
+                      <summary className="flex items-center justify-between gap-2 py-2.5 cursor-pointer list-none">
+                        <div className="min-w-0">
+                          <p className="text-white/90 text-sm">{formatDataEncomenda(encomenda.createdAt)}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className={`text-xs font-bold uppercase tracking-wide ${ESTADO_CLASSE[encomenda.status]}`}>
+                            {ESTADO_LABEL[encomenda.status]}
+                          </span>
+                          <ChevronDown size={16} className="text-white/40 transition-transform group-open:rotate-180" />
+                        </div>
+                      </summary>
+                      <div className="pb-3 text-sm">
+                        <ul className="flex flex-col gap-0.5">
+                          {encomenda.items.map((item) => (
+                            <li key={item.id} className="text-white/70 text-xs">
+                              {item.quantidade}× {item.nome}
+                              {(item.cor || item.tamanho) && (
+                                <span className="text-white/40"> · {[item.cor, item.tamanho].filter(Boolean).join(" · ")}</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10 text-white/90 font-bold text-sm">
+                          <span>Total</span>
+                          <span>{formatarPreco(encomenda.totalCentimos / 100)}</span>
+                        </div>
+                        {encomenda.metodoPagamento === "multibanco" && encomenda.referenciaMbEntidade && encomenda.referenciaMbNumero && (
+                          <div className="mt-2 pt-2 border-t border-white/10 text-xs text-white/70 space-y-0.5">
+                            <p>Entidade <span className="text-white/90 font-semibold">{encomenda.referenciaMbEntidade}</span></p>
+                            <p>Referência <span className="text-white/90 font-semibold">{encomenda.referenciaMbNumero}</span></p>
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
-        <div className="pt-4 border-t border-white/10 md:mt-26">
+        {/* Coluna 3 — Morada, inalterada. */}
+        <div>
         <form action={action} className="flex flex-col gap-4">
           <h2 className="text-base uppercase tracking-widest text-primary font-bold">Morada</h2>
           <div className="flex flex-col gap-1.5">
@@ -305,7 +368,7 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
         </form>
         </div>
 
-        {/* Mobile: fora do grid, no fundo do ecrã, depois do Histórico. */}
+        {/* Mobile: fora do grid, no fundo do ecrã, depois de todas as colunas. */}
         <form action={terminarSessao} className="md:hidden order-[10000] flex justify-center mt-6">
           <SubmitButton
             pendingText="A sair..."

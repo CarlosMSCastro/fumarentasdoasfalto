@@ -53,6 +53,15 @@ export type QuotagestSocio = {
   dataEntrada: string | null;
   estado: string;
   quotaEmDia: boolean;
+  /** valor em dívida, em euros — 0 quando quotaEmDia é true */
+  divida: number;
+  /** número de sócio — null para fundadores (ver tipo) */
+  numeroSocio: string | null;
+  /** "Efectivo" | "Fundador", tal como o Quotagest descreve */
+  tipo: string;
+  nif: string;
+  /** null quando o campo está vazio no Quotagest (a maioria dos sócios nunca preencheu) */
+  grupoSanguineo: string | null;
 };
 
 type QuotagestSocioRow = {
@@ -62,10 +71,13 @@ type QuotagestSocioRow = {
   /** número de sócio — só atribuído a quem entrou depois dos fundadores, ver has_codigo */
   codigo: string;
   has_codigo: boolean;
+  tipo_descricao: string;
   nif: string;
   data_entrada: string | null;
   estado_descricao: string;
   has_divida: boolean;
+  divida: string;
+  saude_gruposangue: string;
 };
 
 function mapSocio(row: QuotagestSocioRow): QuotagestSocio {
@@ -76,6 +88,11 @@ function mapSocio(row: QuotagestSocioRow): QuotagestSocio {
     dataEntrada: row.data_entrada,
     estado: row.estado_descricao,
     quotaEmDia: !row.has_divida,
+    divida: Number(row.divida) || 0,
+    numeroSocio: row.has_codigo ? row.codigo : null,
+    tipo: row.tipo_descricao,
+    nif: row.nif,
+    grupoSanguineo: row.saude_gruposangue?.trim() || null,
   };
 }
 

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcryptjs";
 import { put } from "@vercel/blob";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 import { db } from "@/lib/db";
 import { users, emailChangeRequests, socioLinkRequests } from "@/lib/db/schema";
 import { sendEmailChangeConfirmation, sendSocioLinkConfirmation } from "@/lib/email";
@@ -141,4 +141,19 @@ export async function atualizarFoto(_prevState: PerfilFormState, formData: FormD
   revalidatePath("/perfil");
 
   return { success: true };
+}
+
+// accounts/emailChangeRequests/socioLinkRequests têm onDelete: "cascade" no
+// schema — apagar o user já limpa essas tabelas sozinho. orders.userId tem
+// onDelete: "set null" de propósito: as encomendas ficam (histórico da
+// associação), só deixam de estar ligadas a uma conta.
+export async function apagarConta(_prevState: PerfilFormState, formData: FormData): Promise<PerfilFormState> {
+  const session = await auth();
+  if (!session?.user) return { error: "Sessão expirada. Entra novamente." };
+
+  const confirmacao = String(formData.get("confirmacao") ?? "");
+  if (confirmacao !== "APAGAR") return { error: 'Escreve "APAGAR" para confirmares.' };
+
+  await db.delete(users).where(eq(users.id, session.user.id));
+  await signOut({ redirectTo: "/" });
 }
