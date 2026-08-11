@@ -37,6 +37,10 @@ export interface DadosEncomenda {
   // "telefone" de contacto (podem ser diferentes, e o telefone de contacto
   // pode nem estar preenchido). Só obrigatório quando metodoPagamento é "mbway".
   telemovelMbway?: string;
+  // "levantamento" zera os portes (ver cálculo abaixo) — a morada deixa de
+  // fazer sentido, mas continua opcional como já era, não é preciso limpar
+  // os campos no formulário.
+  entrega: "envio" | "levantamento";
 }
 
 export type EncomendaResultado =
@@ -93,7 +97,9 @@ export async function criarEncomenda(
 
   const session = await auth();
   const subtotal = itensValidados.reduce((soma, i) => soma + i.preco * i.quantidade, 0);
-  const portes = PORTES_EUROS;
+  // Levantamento em mão não tem portes — recalculado aqui, nunca a confiar
+  // num total vindo do cliente (mesma lógica dos itens/preços acima).
+  const portes = dados.entrega === "levantamento" ? 0 : PORTES_EUROS;
   const total = subtotal + portes;
 
   let encomenda: typeof orders.$inferSelect;
@@ -110,6 +116,7 @@ export async function criarEncomenda(
         codigoPostal: dados.codigoPostal?.trim() || null,
         cidade: dados.cidade?.trim() || null,
         metodoPagamento: dados.metodoPagamento,
+        metodoEntrega: dados.entrega,
         subtotalCentimos: Math.round(subtotal * 100),
         portesCentimos: Math.round(portes * 100),
         totalCentimos: Math.round(total * 100),
@@ -154,6 +161,7 @@ export async function criarEncomenda(
     email: encomenda.email,
     totalCentimos: encomenda.totalCentimos,
     metodoPagamento: encomenda.metodoPagamento,
+    metodoEntrega: encomenda.metodoEntrega,
   }).catch(() => null);
 
   const descricao = `Encomenda Fumarentas do Asfalto #${encomenda.id.slice(0, 8)}`;

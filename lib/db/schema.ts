@@ -99,6 +99,7 @@ export const socioLinkRequests = pgTable(
 
 export const orderStatusEnum = pgEnum("order_status", ["pendente", "pago", "cancelado", "expirado"]);
 export const metodoPagamentoEnum = pgEnum("metodo_pagamento", ["multibanco", "mbway", "cartao"]);
+export const metodoEntregaEnum = pgEnum("metodo_entrega", ["envio", "levantamento"]);
 
 // userId fica a null para compras de convidado — checkout não obriga login.
 // Valores monetários em cêntimos (inteiro) para evitar erros de vírgula
@@ -114,6 +115,10 @@ export const orders = pgTable("order", {
   codigoPostal: text("codigo_postal"),
   cidade: text("cidade"),
   metodoPagamento: metodoPagamentoEnum("metodo_pagamento").notNull(),
+  // "levantamento" zera os portes em criarEncomenda (app/actions/encomendas.ts)
+  // — default "envio" só por causa de encomendas antigas, anteriores a esta
+  // coluna existir (todas eram entregues por envio até aqui).
+  metodoEntrega: metodoEntregaEnum("metodo_entrega").notNull().default("envio"),
   status: orderStatusEnum("status").notNull().default("pendente"),
   subtotalCentimos: integer("subtotal_centimos").notNull(),
   portesCentimos: integer("portes_centimos").notNull(),

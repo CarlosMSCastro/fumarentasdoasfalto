@@ -43,6 +43,13 @@
       "when": 1786470295036,
       "tag": "0005_friendly_jasper_sitwell",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786484846929,
+      "tag": "0006_lazy_micromacro",
+      "breakpoints": true
     }
   ]
 }

@@ -13,7 +13,7 @@ Site oficial da associação Fumarentas do Asfalto, desenvolvido como alternativ
 - **Mapas** — Google Maps JavaScript API (`@googlemaps/js-api-loader`), com estilo dark customizado, instância singleton persistente entre navegações
 - **Autenticação** — Auth.js (`next-auth` v5 beta) — Credentials (email/password), Google e Facebook, sessões JWT, `DrizzleAdapter`
 - **Base de dados** — Neon Postgres + Drizzle ORM
-- **Emails transacionais** — Resend (reset de password, confirmação de sócio, confirmação de encomenda, referência Multibanco)
+- **Emails transacionais** — Resend (`lib/email.ts`): reset de password, confirmação de troca de email, confirmação de sócio, confirmação de encomenda (com recibo em PDF anexado), referência Multibanco, confirmação MB WAY, boas-vindas no registo, notificações internas (novo registo/nova encomenda). Todos com o mesmo wrapper visual (logo + laranja da marca sobre cartão claro — fundo escuro evitado de propósito, por legibilidade em clientes de email)
 - **Upload de ficheiros** — Vercel Blob (foto de perfil)
 - **Pagamentos** — Eupago (Multibanco e MB WAY integrados e a funcionar; Cartão de crédito não disponível nesta conta — ver Backlog)
 - **Gestão de sócios** — Quotagest (plataforma externa) — o site lê dados de sócio (estado da quota, data de entrada) via API própria, não gere sócios
@@ -88,12 +88,13 @@ Clicar num evento abre-o como modal sobreposto (via parallel + intercepting rout
 
 - Catálogo estático em `data/produtos.json`, carrinho em `localStorage` (`lib/cart.tsx`)
 - Checkout recalcula sempre preços a partir do catálogo no servidor (nunca confia no valor vindo do cliente)
+- **Entrega**: envio (portes fixos, `PORTES_EUROS` em `lib/encomendas.ts`) ou levantamento em mão (grátis, portes a 0€) — escolha guardada em `orders.metodoEntrega`, mostrada no histórico do `/perfil` e na notificação interna de nova encomenda
 - Pagamento via Eupago (`lib/eupago.ts`), canal Eupago dedicado à Loja (separado do canal usado para as quotas do Quotagest):
-  - **Multibanco** — gera referência (Entidade/Referência/Valor), mostrada no ecrã de confirmação, enviada por email, e consultável depois em `/perfil`
-  - **MB WAY** — pede pagamento diretamente para o número indicado (campo próprio, separado do telefone de contacto)
+  - **Multibanco** — gera referência (Entidade/Referência/Valor), válida por 2 dias (`data_fim` pedido à Eupago em `gerarReferenciaMultibanco`; a API só aceita data, não hora exata, por isso "2 dias" é sempre uma aproximação até ao fim desse dia), mostrada no ecrã de confirmação, enviada por email, e consultável depois em `/perfil`
+  - **MB WAY** — pede pagamento diretamente para o número indicado (campo próprio, separado do telefone de contacto); cliente tem 5 minutos para confirmar na app (confirmado na documentação oficial da Eupago)
   - **Cartão** — dispensado por decisão do utilizador (não vale a pena contratar); código existe (`gerarLinkPagamentoCartao`) mas está desligado do checkout, fica só como referência
-- Confirmação de pagamento via webhook (`app/api/pagamentos/eupago-callback`), assinado (`X-Signature`, HMAC-SHA256) — marca a encomenda como paga e envia email de confirmação
-- **Não implementado:** recibo ao cliente (sem valor fiscal, por decisão do utilizador — não é preciso integrar uma ferramenta de faturação certificada) — ver Backlog
+- Confirmação de pagamento via webhook (`app/api/pagamentos/eupago-callback`), assinado (`X-Signature`, HMAC-SHA256) — marca a encomenda como paga e envia email de confirmação com recibo em PDF anexado
+- **Recibo em PDF** (`lib/recibo-pdf.tsx`, `@react-pdf/renderer`) — sem valor fiscal, por decisão do utilizador; gerado a partir dos dados da encomenda e anexado ao email de confirmação de pagamento (falha suave: se o PDF rebentar, o email sai na mesma, só sem anexo)
 
 ## Autenticação
 
@@ -112,12 +113,8 @@ Auth.js (`next-auth` v5 beta, config em `auth.ts`), três providers: Credentials
 ## Backlog / Por fazer
 
 - ~~**Cartão de crédito (Eupago)**~~ — dispensável (decisão do utilizador, 2026-08-11); precisaria de contratar esse produto à parte com a Eupago, não vale a pena
-- **Recibo da Loja** — sem valor fiscal (decisão do utilizador, 2026-08-11: não precisa de ser fatura certificada, é só um recibo informal para o cliente) — não implementado ainda, mas escopo muito mais simples do que uma integração de faturação certificada
 - **Botão "Pagar quotas"** em `/perfil` — em espera: auditoria à API real do Quotagest (2026-08-11) mostrou que as referências Multibanco podem não ser geradas automaticamente como o Sr. Joaquim descreveu — à espera de confirmação dele antes de implementar
 - **Migração de domínio** para o `.com` definitivo da associação (afeta `FROM` dos emails, verificação de domínio do Facebook, `NEXT_PUBLIC_APP_URL`)
 - **Login por Facebook para todos** — depende da migração de domínio + possivelmente Meta App Review (app está em modo de desenvolvimento)
-- **Email de boas-vindas** no registo — adiado por escolha, registo já funciona sem ele
-- **Notificações internas por email** (nova encomenda, novo registo) para `fumarentasdoasfalto@gmail.com` — ainda não implementado
-- **Rever templates dos emails** (`lib/email.ts`) — hoje são só HTML simples sem marca visual nenhuma (sem logo, sem cores do site); valeria a pena um template com a identidade visual da associação
 - **Backoffice** para o Sr. Joaquim gerir produtos/eventos (considerado CMS headless tipo Sanity — painel de encomendas também entraria aí como ferramenta customizada, lendo da nossa Postgres, não como documentos nativos do Sanity)
 - Integração com Facebook Graph API para puxar eventos automaticamente (avaliado — requer App Review da Meta, complexidade elevada)

@@ -224,15 +224,17 @@ export async function sendNotificacaoNovaEncomenda(encomenda: {
   email: string;
   totalCentimos: number;
   metodoPagamento: string;
+  metodoEntrega: "envio" | "levantamento";
 }) {
   const total = `${(encomenda.totalCentimos / 100).toFixed(2).replace(".", ",")} €`;
+  const entrega = encomenda.metodoEntrega === "levantamento" ? "levantamento em mão" : "envio";
   await resend.emails.send({
     from: FROM,
     to: ASSOCIACAO_EMAIL,
     subject: `Nova encomenda — #${encomenda.id.slice(0, 8)}`,
     html: wrapEmail(`
       <h2 style="color:${PRIMARY};margin:0 0 12px;">Nova encomenda na loja</h2>
-      <p><strong>${encomenda.nome}</strong> (${encomenda.email}) fez uma encomenda de <strong>${total}</strong>, por ${encomenda.metodoPagamento}.</p>
+      <p><strong>${encomenda.nome}</strong> (${encomenda.email}) fez uma encomenda de <strong>${total}</strong>, por ${encomenda.metodoPagamento} — <strong>${entrega}</strong>.</p>
       <p style="color:#666666;font-size:13px;">Encomenda #${encomenda.id.slice(0, 8)} — ainda por confirmar o pagamento.</p>
     `),
   });

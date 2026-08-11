@@ -303,6 +303,9 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
                           <span>Total</span>
                           <span>{formatarPreco(encomenda.totalCentimos / 100)}</span>
                         </div>
+                        <p className="text-xs text-white/50 mt-1">
+                          {encomenda.metodoEntrega === "levantamento" ? "Levantamento em mão" : "Envio"}
+                        </p>
                         {encomenda.metodoPagamento === "multibanco" && encomenda.referenciaMbEntidade && encomenda.referenciaMbNumero && (
                           <div className="mt-2 pt-2 border-t border-white/10 text-xs text-white/70 space-y-0.5">
                             <p>Entidade <span className="text-white/90 font-semibold">{encomenda.referenciaMbEntidade}</span></p>

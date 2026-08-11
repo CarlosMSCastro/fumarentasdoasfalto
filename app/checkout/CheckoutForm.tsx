@@ -32,6 +32,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
   const { items, subtotal, limpar } = useCart();
   const [dados, setDados] = useState<DadosIniciais>(initial);
   const [metodoPagamento, setMetodoPagamento] = useState<DadosEncomenda["metodoPagamento"]>("multibanco");
+  const [entrega, setEntrega] = useState<DadosEncomenda["entrega"]>("envio");
   // Separado do "Telefone" de contacto — nem sempre é o mesmo número (ex.
   // conta MB WAY de outra pessoa), e o telefone de contacto pode nem estar
   // preenchido no perfil.
@@ -59,7 +60,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
     return nova;
   });
 
-  const portes = items.length > 0 ? PORTES_EUROS : 0;
+  const portes = items.length > 0 && entrega === "envio" ? PORTES_EUROS : 0;
   const total = subtotal + portes;
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
           cor: item.cor,
           tamanho: item.tamanho,
         })),
-        { ...dados, metodoPagamento, telemovelMbway: metodoPagamento === "mbway" ? telemovelMbway : undefined },
+        { ...dados, metodoPagamento, entrega, telemovelMbway: metodoPagamento === "mbway" ? telemovelMbway : undefined },
         idempotencyKey
       );
       if ("error" in res) {
@@ -154,6 +155,34 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
       {/* Contacto / morada */}
       <div className="flex flex-col gap-2.5">
         <h2 className="text-primary text-sm font-bold uppercase tracking-widest">Contacto e morada</h2>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-white/60 text-xs">Entrega</span>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setEntrega("envio")}
+              className={`rounded-md border px-3 py-2 text-sm transition-colors cursor-pointer ${
+                entrega === "envio" ? "border-primary bg-primary/10 text-white" : "border-white/15 text-white/60 hover:text-white/80"
+              }`}
+            >
+              Envio ({formatarPreco(PORTES_EUROS)})
+            </button>
+            <button
+              type="button"
+              onClick={() => setEntrega("levantamento")}
+              className={`rounded-md border px-3 py-2 text-sm transition-colors cursor-pointer ${
+                entrega === "levantamento" ? "border-primary bg-primary/10 text-white" : "border-white/15 text-white/60 hover:text-white/80"
+              }`}
+            >
+              Levantamento em mão (grátis)
+            </button>
+          </div>
+          {entrega === "levantamento" && (
+            <p className="text-white/40 text-xs italic">A morada não é necessária — combinamos o levantamento por email/telefone.</p>
+          )}
+        </div>
+
         <div className="grid grid-cols-2 gap-2.5">
           <label className="flex flex-col gap-1 col-span-2 sm:col-span-1">
             <span className="text-white/60 text-xs">Nome</span>
