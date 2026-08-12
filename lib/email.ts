@@ -218,24 +218,38 @@ export async function sendNotificacaoNovoRegisto(nome: string, email: string) {
   });
 }
 
-export async function sendNotificacaoNovaEncomenda(encomenda: {
+// Disparado quando a encomenda passa a "pago" (não na criação) — a
+// associação só quer processar/enviar encomendas já pagas, e só nesse ponto
+// faz sentido mostrar a morada de entrega. Ver app/api/pagamentos/
+// eupago-callback/route.ts, ao lado de sendOrderConfirmation.
+export async function sendNotificacaoEncomendaPaga(encomenda: {
   id: string;
   nome: string;
   email: string;
+  telefone: string;
   totalCentimos: number;
   metodoPagamento: string;
   metodoEntrega: "envio" | "levantamento";
+  moradaLinha: string | null;
+  codigoPostal: string | null;
+  cidade: string | null;
 }) {
   const total = `${(encomenda.totalCentimos / 100).toFixed(2).replace(".", ",")} €`;
   const entrega = encomenda.metodoEntrega === "levantamento" ? "levantamento em mão" : "envio";
+  const morada =
+    encomenda.metodoEntrega === "envio" && encomenda.moradaLinha
+      ? `<p>${encomenda.moradaLinha}<br />${encomenda.codigoPostal ?? ""} ${encomenda.cidade ?? ""}</p>`
+      : "";
+
   await resend.emails.send({
     from: FROM,
     to: ASSOCIACAO_EMAIL,
-    subject: `Nova encomenda — #${encomenda.id.slice(0, 8)}`,
+    subject: `Encomenda paga — #${encomenda.id.slice(0, 8)}`,
     html: wrapEmail(`
-      <h2 style="color:${PRIMARY};margin:0 0 12px;">Nova encomenda na loja</h2>
-      <p><strong>${encomenda.nome}</strong> (${encomenda.email}) fez uma encomenda de <strong>${total}</strong>, por ${encomenda.metodoPagamento} — <strong>${entrega}</strong>.</p>
-      <p style="color:#666666;font-size:13px;">Encomenda #${encomenda.id.slice(0, 8)} — ainda por confirmar o pagamento.</p>
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Encomenda paga</h2>
+      <p><strong>${encomenda.nome}</strong> (${encomenda.email}, ${encomenda.telefone}) pagou <strong>${total}</strong>, por ${encomenda.metodoPagamento} — <strong>${entrega}</strong>.</p>
+      ${morada}
+      <p style="color:#666666;font-size:13px;">Encomenda #${encomenda.id.slice(0, 8)}</p>
     `),
   });
 }

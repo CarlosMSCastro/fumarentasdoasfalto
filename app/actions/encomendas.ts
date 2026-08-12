@@ -7,7 +7,7 @@ import { orders, orderItems } from "@/lib/db/schema";
 import { PORTES_EUROS } from "@/lib/encomendas";
 import { getProdutoById } from "@/lib/produtos";
 import { gerarReferenciaMultibanco, pedirPagamentoMbway, gerarLinkPagamentoCartao } from "@/lib/eupago";
-import { sendReferenciaMultibanco, sendConfirmacaoMbway, sendNotificacaoNovaEncomenda } from "@/lib/email";
+import { sendReferenciaMultibanco, sendConfirmacaoMbway } from "@/lib/email";
 
 const MAX_QUANTIDADE_POR_ITEM = 20;
 
@@ -151,18 +151,6 @@ export async function criarEncomenda(
       tamanho: item.tamanho || null,
     }))
   );
-
-  // Notificação interna — dispara ao criar a encomenda (não à espera do
-  // pagamento), a associação vai querer saber que há uma encomenda nova
-  // por processar mesmo antes de confirmada.
-  sendNotificacaoNovaEncomenda({
-    id: encomenda.id,
-    nome: encomenda.nome,
-    email: encomenda.email,
-    totalCentimos: encomenda.totalCentimos,
-    metodoPagamento: encomenda.metodoPagamento,
-    metodoEntrega: encomenda.metodoEntrega,
-  }).catch(() => null);
 
   const descricao = `Encomenda Fumarentas do Asfalto #${encomenda.id.slice(0, 8)}`;
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL;

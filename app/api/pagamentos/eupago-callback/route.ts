@@ -2,7 +2,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders, orderItems } from "@/lib/db/schema";
 import { verificarAssinaturaWebhook } from "@/lib/eupago";
-import { sendOrderConfirmation } from "@/lib/email";
+import { sendOrderConfirmation, sendNotificacaoEncomendaPaga } from "@/lib/email";
 
 // Recebe as notificações de pagamento do Eupago ("Realtime Webhooks 2.0",
 // eupago.readme.io/reference/realtime-webhooks-20) e marca a encomenda
@@ -72,6 +72,18 @@ export async function POST(request: Request) {
       itens: itens.map((item) => ({ nome: item.nome, quantidade: item.quantidade, precoCentimos: item.precoCentimos })),
       totalCentimos: encomenda.totalCentimos,
     });
+    sendNotificacaoEncomendaPaga({
+      id: encomenda.id,
+      nome: encomenda.nome,
+      email: encomenda.email,
+      telefone: encomenda.telefone,
+      totalCentimos: encomenda.totalCentimos,
+      metodoPagamento: encomenda.metodoPagamento,
+      metodoEntrega: encomenda.metodoEntrega,
+      moradaLinha: encomenda.moradaLinha,
+      codigoPostal: encomenda.codigoPostal,
+      cidade: encomenda.cidade,
+    }).catch(() => null);
   }
 
   return new Response("OK", { status: 200 });
