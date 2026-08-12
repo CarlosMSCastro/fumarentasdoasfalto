@@ -233,9 +233,11 @@ export async function sendNotificacaoEncomendaPaga(encomenda: {
   moradaLinha: string | null;
   codigoPostal: string | null;
   cidade: string | null;
+  itens: { nome: string; quantidade: number }[];
 }) {
   const total = `${(encomenda.totalCentimos / 100).toFixed(2).replace(".", ",")} €`;
   const entrega = encomenda.metodoEntrega === "levantamento" ? "levantamento em mão" : "envio";
+  const linhas = encomenda.itens.map((item) => `<li>${item.quantidade}× ${item.nome}</li>`).join("");
 
   const detalheEntrega =
     encomenda.metodoEntrega === "envio"
@@ -251,6 +253,7 @@ export async function sendNotificacaoEncomendaPaga(encomenda: {
     html: wrapEmail(`
       <h2 style="color:${PRIMARY};margin:0 0 12px;">Encomenda paga</h2>
       <p><strong>${encomenda.nome}</strong> (${encomenda.email}, ${encomenda.telefone}) pagou <strong>${total}</strong>, por ${encomenda.metodoPagamento} — <strong>${entrega}</strong>.</p>
+      <ul style="padding-left:20px;">${linhas}</ul>
       ${detalheEntrega}
       <p style="color:#666666;font-size:13px;">Encomenda #${encomenda.id.slice(0, 8)}</p>
     `),

@@ -11,7 +11,15 @@ import { sendOrderConfirmation, sendNotificacaoEncomendaPaga } from "@/lib/email
 //
 // Corpo esperado: { transactions: { identifier, status, entity, reference,
 // method, amount, fees, date, trid }, channel: { name } }. `status` pode
-// ser "Paid" | "Refund" | "Error" | "Cancel" | "Expired".
+// ser "Paid" | "Refund" | "Error" | "Cancel" | "Expired" (doc geral) — mas o
+// MB WAY parece devolver o vocabulário da sua própria API de criação
+// (`transactionStatus: "Success"`, ver lib/eupago.ts pedirPagamentoMbway) em
+// vez de "Paid" no callback. Confirmado em produção 2026-08-12: um pagamento
+// MB WAY real disparou este endpoint (200, assinatura válida) mas a
+// encomenda ficou presa em "pendente" — o mapeamento abaixo não reconhecia
+// o status recebido. "success"/"rejected" adicionados por precaução; não
+// ainda confirmado o valor exato porque o payload não fica registado nos
+// logs de acesso da Vercel (só depois deste console.error).
 //
 // AVISO: se o canal tiver "Encriptar Webhook" = "Sim", o corpo pode vir
 // como { data: "<encriptado>" } em vez da estrutura acima — a doc pública
@@ -23,9 +31,12 @@ import { sendOrderConfirmation, sendNotificacaoEncomendaPaga } from "@/lib/email
 // "pendente" para sempre, mesmo depois do código ter expirado no telemóvel.
 const MAPA_ESTADO: Record<string, "pago" | "cancelado" | "expirado"> = {
   paid: "pago",
+  success: "pago",
   expired: "expirado",
   cancel: "cancelado",
+  cancelled: "cancelado",
   error: "cancelado",
+  rejected: "cancelado",
 };
 
 export async function POST(request: Request) {
@@ -48,6 +59,10 @@ export async function POST(request: Request) {
   const novoEstado = MAPA_ESTADO[String(transacao?.status ?? "").toLowerCase()];
 
   if (typeof identificador !== "string" || !novoEstado) {
+    // Payload chegou e passou a assinatura, mas não bateu certo com o que
+    // esperávamos — isto é exatamente o que aconteceu em silêncio 2026-08-12
+    // com um pagamento MB WAY real. Log em vez de desaparecer sem rasto.
+    console.error("eupago-callback: payload não reconhecido", JSON.stringify(payload));
     return new Response("OK", { status: 200 });
   }
 
@@ -56,6 +71,7 @@ export async function POST(request: Request) {
   // (cancelado/expirado) só se aplica vindo de "pendente" — não faz sentido
   // sobrepor um "pago" ou "cancelado" já definidos com um "expirado" tardio.
   if (!encomenda || encomenda.status === "pago" || (novoEstado !== "pago" && encomenda.status !== "pendente")) {
+    if (!encomenda) console.error("eupago-callback: sem encomenda com este identificador", identificador);
     return new Response("OK", { status: 200 });
   }
 
@@ -83,6 +99,7 @@ export async function POST(request: Request) {
       moradaLinha: encomenda.moradaLinha,
       codigoPostal: encomenda.codigoPostal,
       cidade: encomenda.cidade,
+      itens: itens.map((item) => ({ nome: item.nome, quantidade: item.quantidade })),
     }).catch(() => null);
   }
 
