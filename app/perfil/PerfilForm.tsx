@@ -160,6 +160,9 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
                     Ainda não há referência de pagamento gerada para {socio.descricoesPendentes.join(", ") || "esta cota"}. Contacta a associação.
                   </p>
                 )}
+                <p className="text-xs text-white/40 italic border-t border-white/10 pt-2 mt-2">
+                  Depois de pagares, pode demorar até 48 horas até o site regularizar a tua situação.
+                </p>
               </details>
             )}
             {!socio && (
