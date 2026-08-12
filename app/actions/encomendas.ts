@@ -102,6 +102,15 @@ export async function criarEncomenda(
   const portes = dados.entrega === "levantamento" ? 0 : PORTES_EUROS;
   const total = subtotal + portes;
 
+  // Eupago recusa pedidos MB WAY abaixo de 1€ ("Amount value is invalid",
+  // confirmado testando diretamente 2026-08-12: 0,50€ falha, 0,99€ passa).
+  // Sem isto, a encomenda era criada na mesma e só falhava depois ao pedir o
+  // pagamento, caindo no aviso genérico de "pagamento automático não
+  // disponível" em vez de dizer o que se passa.
+  if (dados.metodoPagamento === "mbway" && total < 1) {
+    return { error: "O valor mínimo para pagamento por MB WAY é 1€. Adiciona mais um produto ou escolhe Multibanco." };
+  }
+
   let encomenda: typeof orders.$inferSelect;
   try {
     [encomenda] = await db
