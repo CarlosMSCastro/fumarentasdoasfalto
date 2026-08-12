@@ -236,10 +236,13 @@ export async function sendNotificacaoEncomendaPaga(encomenda: {
 }) {
   const total = `${(encomenda.totalCentimos / 100).toFixed(2).replace(".", ",")} €`;
   const entrega = encomenda.metodoEntrega === "levantamento" ? "levantamento em mão" : "envio";
-  const morada =
-    encomenda.metodoEntrega === "envio" && encomenda.moradaLinha
-      ? `<p>${encomenda.moradaLinha}<br />${encomenda.codigoPostal ?? ""} ${encomenda.cidade ?? ""}</p>`
-      : "";
+
+  const detalheEntrega =
+    encomenda.metodoEntrega === "envio"
+      ? encomenda.moradaLinha
+        ? `<p><strong>Morada de entrega:</strong><br />${encomenda.moradaLinha}<br />${encomenda.codigoPostal ?? ""} ${encomenda.cidade ?? ""}</p>`
+        : ""
+      : `<p>O cliente escolheu levantamento em mão — combinar por telefone <strong>${encomenda.telefone}</strong> ou email <strong>${encomenda.email}</strong>.</p>`;
 
   await resend.emails.send({
     from: FROM,
@@ -248,7 +251,7 @@ export async function sendNotificacaoEncomendaPaga(encomenda: {
     html: wrapEmail(`
       <h2 style="color:${PRIMARY};margin:0 0 12px;">Encomenda paga</h2>
       <p><strong>${encomenda.nome}</strong> (${encomenda.email}, ${encomenda.telefone}) pagou <strong>${total}</strong>, por ${encomenda.metodoPagamento} — <strong>${entrega}</strong>.</p>
-      ${morada}
+      ${detalheEntrega}
       <p style="color:#666666;font-size:13px;">Encomenda #${encomenda.id.slice(0, 8)}</p>
     `),
   });

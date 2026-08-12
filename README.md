@@ -13,7 +13,7 @@ Site oficial da associação Fumarentas do Asfalto, desenvolvido como alternativ
 - **Mapas** — Google Maps JavaScript API (`@googlemaps/js-api-loader`), com estilo dark customizado, instância singleton persistente entre navegações
 - **Autenticação** — Auth.js (`next-auth` v5 beta) — Credentials (email/password), Google e Facebook, sessões JWT, `DrizzleAdapter`
 - **Base de dados** — Neon Postgres + Drizzle ORM
-- **Emails transacionais** — Resend (`lib/email.ts`): reset de password, confirmação de troca de email, confirmação de sócio, confirmação de encomenda (com recibo em PDF anexado), referência Multibanco, confirmação MB WAY, boas-vindas no registo, notificações internas (novo registo/nova encomenda). Todos com o mesmo wrapper visual (logo + laranja da marca sobre cartão claro — fundo escuro evitado de propósito, por legibilidade em clientes de email)
+- **Emails transacionais** — Resend (`lib/email.ts`): reset de password, confirmação de troca de email, confirmação de sócio, confirmação de encomenda (com recibo em PDF anexado), referência Multibanco, confirmação MB WAY, boas-vindas no registo, notificações internas para a associação (novo registo / encomenda paga, esta última só depois de confirmado o pagamento, já com morada de entrega). Todos com o mesmo wrapper visual (logo + laranja da marca sobre cartão claro — fundo escuro evitado de propósito, por legibilidade em clientes de email; o logo deve ser sempre um PNG truecolor, não indexado com alpha — um PNG em paleta partiu no Outlook, corrigido 2026-08-12)
 - **Upload de ficheiros** — Vercel Blob (foto de perfil)
 - **Pagamentos** — Eupago (Multibanco e MB WAY integrados e a funcionar; Cartão de crédito não disponível nesta conta — ver Backlog)
 - **Gestão de sócios** — Quotagest (plataforma externa) — o site lê dados de sócio (estado da quota, data de entrada) via API própria, não gere sócios
@@ -88,7 +88,7 @@ Clicar num evento abre-o como modal sobreposto (via parallel + intercepting rout
 
 - Catálogo estático em `data/produtos.json`, carrinho em `localStorage` (`lib/cart.tsx`)
 - Checkout recalcula sempre preços a partir do catálogo no servidor (nunca confia no valor vindo do cliente)
-- **Entrega**: envio (portes fixos, `PORTES_EUROS` em `lib/encomendas.ts`) ou levantamento em mão (grátis, portes a 0€) — escolha guardada em `orders.metodoEntrega`, mostrada no histórico do `/perfil` e na notificação interna de nova encomenda
+- **Entrega**: envio (portes fixos, `PORTES_EUROS` em `lib/encomendas.ts`) ou levantamento em mão (grátis, portes a 0€) — escolha guardada em `orders.metodoEntrega`, mostrada no histórico do `/perfil` e na notificação interna à associação (que só sai depois de a encomenda estar paga, e inclui a morada de entrega quando `metodoEntrega` é "envio")
 - Pagamento via Eupago (`lib/eupago.ts`), canal Eupago dedicado à Loja (separado do canal usado para as quotas do Quotagest):
   - **Multibanco** — gera referência (Entidade/Referência/Valor), válida por 2 dias (`data_fim` pedido à Eupago em `gerarReferenciaMultibanco`; a API só aceita data, não hora exata, por isso "2 dias" é sempre uma aproximação até ao fim desse dia), mostrada no ecrã de confirmação, enviada por email, e consultável depois em `/perfil`
   - **MB WAY** — pede pagamento diretamente para o número indicado (campo próprio, separado do telefone de contacto); cliente tem 5 minutos para confirmar na app (confirmado na documentação oficial da Eupago)
@@ -108,13 +108,18 @@ Auth.js (`next-auth` v5 beta, config em `auth.ts`), três providers: Credentials
 
 ## Perfil e Sócio
 
-`/perfil` mostra dados da conta (nome, foto, morada, password), histórico de encomendas (colapsável, com dados de pagamento por encomenda), e uma secção "Sócio" que tenta corresponder a conta ao registo de sócio no Quotagest automaticamente por email (com pesquisa manual por número de sócio/NIF como alternativa) — mostra estado da quota e data de entrada. Esta ligação é só de leitura; o site não gere sócios nem quotas.
+`/perfil` mostra dados da conta (nome, foto, morada, password), histórico de encomendas (colapsável, com dados de pagamento por encomenda), e uma secção "Sócio" que tenta corresponder a conta ao registo de sócio no Quotagest automaticamente por email (com pesquisa manual por número de sócio/NIF como alternativa) — mostra número de sócio, sócio desde, estado, NIF, grupo sanguíneo (quando preenchido) e estado da quota. Quando há dívida, mostra também a descrição de cada item pendente (ex. "Anual", ou o que o Quotagest tiver lá — nem sempre é mesmo uma quota) e, se já existir, a referência Multibanco para pagar, com aviso de que pode demorar até 48h a refletir aqui depois de pago. Esta ligação é só de leitura; o site não gere sócios nem quotas, nem gera referências novas.
 
 ## Backlog / Por fazer
 
+Ativo, por esta ordem:
+
+1. **Migração de domínio** para o `.com` definitivo da associação (afeta `FROM` dos emails, verificação de domínio do Facebook, `NEXT_PUBLIC_APP_URL`)
+2. **Login por Facebook para todos** — depende da migração de domínio (a candidatura ao Meta App Review tem de ser submetida contra o domínio final, não o temporário); pode também precisar de Meta App Review em si (app está em modo de desenvolvimento) — confirmar diretamente no dashboard da Meta, não é só código
+3. **Backoffice** para o Sr. Joaquim gerir produtos/eventos (considerado CMS headless tipo Sanity — painel de encomendas também entraria aí como ferramenta customizada, lendo da nossa Postgres, não como documentos nativos do Sanity)
+
+Em espera indefinida (decisão do utilizador, 2026-08-12 — não são prioridade agendada):
+
 - ~~**Cartão de crédito (Eupago)**~~ — dispensável (decisão do utilizador, 2026-08-11); precisaria de contratar esse produto à parte com a Eupago, não vale a pena
-- **Botão "Pagar quotas"** em `/perfil` — em espera: auditoria à API real do Quotagest (2026-08-11) mostrou que as referências Multibanco podem não ser geradas automaticamente como o Sr. Joaquim descreveu — à espera de confirmação dele antes de implementar
-- **Migração de domínio** para o `.com` definitivo da associação (afeta `FROM` dos emails, verificação de domínio do Facebook, `NEXT_PUBLIC_APP_URL`)
-- **Login por Facebook para todos** — depende da migração de domínio + possivelmente Meta App Review (app está em modo de desenvolvimento)
-- **Backoffice** para o Sr. Joaquim gerir produtos/eventos (considerado CMS headless tipo Sanity — painel de encomendas também entraria aí como ferramenta customizada, lendo da nossa Postgres, não como documentos nativos do Sanity)
+- **Botão "Pagar quotas"** em `/perfil` — o Sr. Joaquim prefere o controlo manual de marcar uma quota como "Pago" diretamente no Quotagest; esta funcionalidade tirar-lhe-ia isso, por isso ficou parada em vez de agendada
 - Integração com Facebook Graph API para puxar eventos automaticamente (avaliado — requer App Review da Meta, complexidade elevada)
