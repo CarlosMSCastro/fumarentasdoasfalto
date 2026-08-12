@@ -141,7 +141,28 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
                   </dd>
                 </div>
               </dl>
-            ) : (
+            ) : null}
+            {socio && !socio.quotaEmDia && (
+              <details className="group mt-3">
+                <summary className="text-sm font-semibold text-primary/80 hover:text-primary cursor-pointer list-none flex items-center gap-1.5 w-fit">
+                  Ver referência de pagamento
+                  <ChevronDown size={16} className="transition-transform group-open:rotate-180" />
+                </summary>
+                {socio.referenciaPendente ? (
+                  <div className="text-sm text-white/70 space-y-1 border-t border-white/10 pt-2 mt-2">
+                    <p>Referente a <span className="text-white/90 font-semibold">{socio.referenciaPendente.descricao}</span></p>
+                    <p>Entidade <span className="text-white/90 font-semibold">{socio.referenciaPendente.entidade}</span></p>
+                    <p>Referência <span className="text-white/90 font-semibold">{socio.referenciaPendente.referencia}</span></p>
+                    <p>Valor <span className="text-white/90 font-semibold">{formatarPreco(socio.referenciaPendente.valor)}</span></p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-white/40 italic border-t border-white/10 pt-2 mt-2">
+                    Ainda não há referência de pagamento gerada para {socio.descricoesPendentes.join(", ") || "esta cota"}. Contacta a associação.
+                  </p>
+                )}
+              </details>
+            )}
+            {!socio && (
               <div>
                 <p className="text-sm text-white/40 italic">
                   Não encontrámos uma inscrição de sócio associada a este email.

@@ -70,41 +70,49 @@ export default function Map({ deferUntilNear = false }: MapProps) {
     let cancelled = false;
 
     const createOrClaim = async () => {
-      if (!initialized) {
-        setOptions({
-          key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+      try {
+        if (!initialized) {
+          setOptions({
+            key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+          });
+          initialized = true;
+        }
+        await importLibrary("maps");
+        if (cancelled || !mapRef.current) return;
+
+        if (mapInstance) {
+          const mapDiv = mapInstance.getDiv();
+          mapRef.current.appendChild(mapDiv);
+          google.maps.event.trigger(mapInstance, "resize");
+          mapInstance.setCenter(MAP_CENTER);
+          return;
+        }
+
+        if (deferUntilNear) return; // anchor instance hasn't created it yet — nothing to claim
+
+        mapInstance = new google.maps.Map(mapRef.current, {
+          center: MAP_CENTER,
+          zoom: 15,
+          styles: MAP_STYLES,
+          disableDefaultUI: true,
+          draggable: false,
+          scrollwheel: false,
+          disableDoubleClickZoom: true,
+          gestureHandling: "none",
         });
-        initialized = true;
+
+        new google.maps.Marker({
+          position: MAP_CENTER,
+          map: mapInstance,
+          title: "Fumarentas do Asfalto",
+        });
+      } catch (error) {
+        // Falha a carregar bibliotecas do Google Maps (rede/CDN/ad-blocker do
+        // visitante) não pode rebentar a página — sem isto era uma promise
+        // rejeitada sem apanhador, gerando alertas no Sentry por cada
+        // biblioteca interna que falhasse (ver /perfil, 2026-08-12).
+        console.warn("Map: falha ao carregar o Google Maps", error);
       }
-      await importLibrary("maps");
-      if (cancelled || !mapRef.current) return;
-
-      if (mapInstance) {
-        const mapDiv = mapInstance.getDiv();
-        mapRef.current.appendChild(mapDiv);
-        google.maps.event.trigger(mapInstance, "resize");
-        mapInstance.setCenter(MAP_CENTER);
-        return;
-      }
-
-      if (deferUntilNear) return; // anchor instance hasn't created it yet — nothing to claim
-
-      mapInstance = new google.maps.Map(mapRef.current, {
-        center: MAP_CENTER,
-        zoom: 15,
-        styles: MAP_STYLES,
-        disableDefaultUI: true,
-        draggable: false,
-        scrollwheel: false,
-        disableDoubleClickZoom: true,
-        gestureHandling: "none",
-      });
-
-      new google.maps.Marker({
-        position: MAP_CENTER,
-        map: mapInstance,
-        title: "Fumarentas do Asfalto",
-      });
     };
 
     if (deferUntilNear) {

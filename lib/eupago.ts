@@ -5,9 +5,16 @@ import { createHmac, timingSafeEqual } from "crypto";
 // visível no backoffice em Channels → Channel Listing) — não o
 // client_id/client_secret/entidade/subentidade que um esqueleto anterior
 // deste ficheiro assumia (essa forma é da SOAP API antiga, incompatível
-// com estes endpoints). Por decisão do utilizador (2026-08-09), a Loja
-// reutiliza por agora o mesmo canal que o Quotagest usa para as quotas dos
-// sócios — não há uma SubEntidade dedicada.
+// com estes endpoints).
+//
+// Canal próprio e dedicado à Loja — NÃO é o mesmo canal que o Quotagest usa
+// para as quotas dos sócios (confirmado 2026-08-12: entidade Multibanco da
+// Loja é 21921, a do Quotagest é 12232 — entidades diferentes = canais
+// diferentes). Um comentário anterior aqui dizia o contrário; estava errado.
+// Consequência: o Webhook 2.0 configurado no canal da Loja só recebe
+// notificações de pagamentos da Loja, nunca de quotas — o que quer que o
+// Quotagest use para se auto-atualizar (se é que usa) é inteiramente
+// separado disto e não temos visibilidade sobre isso.
 //
 // Multibanco usa a chave no corpo do pedido (API REST "legada"); MB WAY e
 // Cartão usam-na num header Authorization (API v1.02). Ver cada função.
