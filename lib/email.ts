@@ -281,8 +281,17 @@ export async function sendConfirmacaoMbway(to: string, encomenda: { id: string; 
 // Disparado quando o admin marca a encomenda como "enviado" no painel (ver
 // marcarEnviadoAdmin em app/actions/admin.ts) — mensagem diferente consoante
 // o método de entrega, à semelhança de sendNotificacaoEncomendaPaga.
-export async function sendEncomendaEnviada(to: string, encomenda: { id: string; metodoEntrega: "envio" | "levantamento" }) {
+// codigoRastreio é opcional (nem todos os envios têm um — ver comentário no
+// schema) e só aparece no email quando o admin o preencheu.
+export async function sendEncomendaEnviada(
+  to: string,
+  encomenda: { id: string; metodoEntrega: "envio" | "levantamento"; codigoRastreio?: string | null }
+) {
   const paraEnvio = encomenda.metodoEntrega === "envio";
+  const rastreio =
+    paraEnvio && encomenda.codigoRastreio
+      ? `<p><strong>Código de rastreio:</strong> ${encomenda.codigoRastreio}</p>`
+      : "";
 
   await resend.emails.send({
     from: FROM,
@@ -295,6 +304,7 @@ export async function sendEncomendaEnviada(to: string, encomenda: { id: string; 
           ? `A tua encomenda <strong>#${encomenda.id.slice(0, 8)}</strong> foi enviada e está a caminho.`
           : `A tua encomenda <strong>#${encomenda.id.slice(0, 8)}</strong> já está pronta — podes vir levantá-la quando quiseres.`
       }</p>
+      ${rastreio}
     `),
   });
 }

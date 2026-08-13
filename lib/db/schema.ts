@@ -138,6 +138,11 @@ export const orders = pgTable("order", {
   referenciaMbEntidade: text("referencia_mb_entidade"),
   referenciaMbNumero: text("referencia_mb_numero"),
   eupagoIdentificador: text("eupago_identificador"),
+  // Preenchido à mão pelo admin ao marcar "Enviado" (sem API de
+  // transportadora — ver marcarEnviadoAdmin em app/actions/admin.ts).
+  // Opcional: nem todos os envios têm rastreio (ex. correio normal sem
+  // registo), por isso nunca é obrigatório nem inventado.
+  codigoRastreio: text("codigo_rastreio"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   paidAt: timestamp("paid_at", { mode: "date" }),
 });
@@ -157,4 +162,17 @@ export const orderItems = pgTable("order_item", {
   quantidade: integer("quantidade").notNull(),
   cor: text("cor"),
   tamanho: text("tamanho"),
+});
+
+// Uma linha por secção do painel — timestamp de "a última vez que um admin
+// visitou esta secção", usado para calcular badges de "N novos" no ecrã
+// inicial do /admin (ver lib/admin-notificacoes.ts). Um marcador global (não
+// por admin) de propósito: há tipicamente 1-2 admins, e "visto por um" já
+// resolve a notificação para efeitos práticos — não vale a pena um sistema
+// de leitura por utilizador para isto.
+export const adminSecaoEnum = pgEnum("admin_secao", ["encomendas", "socios", "utilizadores"]);
+
+export const adminSecoesVistas = pgTable("admin_secao_vista", {
+  secao: adminSecaoEnum("secao").primaryKey(),
+  vistaEm: timestamp("vista_em", { mode: "date" }).notNull().defaultNow(),
 });

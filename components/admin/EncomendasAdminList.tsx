@@ -2,10 +2,11 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
-import { ChevronDown, Trash2, CircleCheck, Truck, PackageCheck, Check } from "lucide-react";
+import { ChevronDown, Trash2, CircleCheck, Truck, PackageCheck, Check, Search } from "lucide-react";
 import type { orders, orderItems } from "@/lib/db/schema";
 import { formatarPreco } from "@/lib/produtos";
 import { apagarEncomendaAdmin, forcarPagoAdmin, marcarEnviadoAdmin } from "@/app/actions/admin";
+import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
 
 export type EncomendaAdmin = typeof orders.$inferSelect & { items: (typeof orderItems.$inferSelect)[] };
 
@@ -89,6 +90,18 @@ function alternar<T>(conjunto: Set<T>, valor: T): Set<T> {
   return novo;
 }
 
+// "#" opcional no início (o painel mostra o nº de encomenda como "#a1b2c3d4")
+// para que colar/escrever com ou sem cardinal encontre a mesma encomenda.
+function correspondePesquisa(encomenda: EncomendaAdmin, termo: string): boolean {
+  const termoId = termo.startsWith("#") ? termo.slice(1) : termo;
+  return (
+    encomenda.nome.toLowerCase().includes(termo) ||
+    encomenda.email.toLowerCase().includes(termo) ||
+    encomenda.telefone.toLowerCase().includes(termo) ||
+    encomenda.id.toLowerCase().includes(termoId)
+  );
+}
+
 // Dropdown de filtro para mobile — <details> nativo (sem estado React extra),
 // o atributo "name" partilhado faz os 3 fecharem-se uns aos outros ao abrir
 // um novo (comportamento nativo do HTML, sem JS). Substitui as pills em
@@ -145,6 +158,7 @@ function FiltroDropdown<T extends string>({
 }
 
 export default function EncomendasAdminList({ encomendas }: { encomendas: EncomendaAdmin[] }) {
+  const { confirmar, pedirTexto, perguntar, host: dialogHost } = useConfirmDialog();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -154,6 +168,7 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
   const [filtroEstados, setFiltroEstados] = useState<Set<EncomendaAdmin["status"]>>(new Set());
   const [filtroEntregas, setFiltroEntregas] = useState<Set<EncomendaAdmin["metodoEntrega"]>>(new Set());
   const [filtroProdutos, setFiltroProdutos] = useState<Set<string>>(new Set());
+  const [pesquisa, setPesquisa] = useState("");
 
   // Produtos para o dropdown — derivados das próprias encomendas (não do
   // catálogo completo), para o filtro só mostrar o que já foi mesmo
@@ -166,14 +181,17 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
     return [...mapa.entries()].sort((a, b) => a[1].localeCompare(b[1]));
   }, [encomendas]);
 
+  const pesquisaNormalizada = pesquisa.trim().toLowerCase();
+
   const encomendasFiltradas = useMemo(() => {
     return encomendas.filter((encomenda) => {
       if (filtroEstados.size > 0 && !filtroEstados.has(encomenda.status)) return false;
       if (filtroEntregas.size > 0 && !filtroEntregas.has(encomenda.metodoEntrega)) return false;
       if (filtroProdutos.size > 0 && !encomenda.items.some((item) => filtroProdutos.has(item.produtoId))) return false;
+      if (pesquisaNormalizada && !correspondePesquisa(encomenda, pesquisaNormalizada)) return false;
       return true;
     });
-  }, [encomendas, filtroEstados, filtroEntregas, filtroProdutos]);
+  }, [encomendas, filtroEstados, filtroEntregas, filtroProdutos, pesquisaNormalizada]);
 
   // Número fixo por encomenda (a mais antiga de sempre é a #1), não a
   // posição na lista filtrada — senão o número mudava consoante o filtro
@@ -200,25 +218,47 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
     });
   };
 
-  const onForcarPago = (encomenda: EncomendaAdmin) => {
-    const confirmado = window.confirm(
-      `Forçar a encomenda #${encomenda.id.slice(0, 8)} para PAGO?\n\nIsto vai enviar ao cliente o email de confirmação com recibo, e a notificação interna, tal como aconteceria automaticamente. Não podes desfazer isto.`
+  const onForcarPago = async (encomenda: EncomendaAdmin) => {
+    const confirmado = await confirmar(
+      `Forçar a encomenda #${encomenda.id.slice(0, 8)} para PAGO?\n\nIsto vai enviar ao cliente o email de confirmação com recibo, e a notificação interna, tal como aconteceria automaticamente. Não podes desfazer isto.`,
+      "emerald"
     );
     if (!confirmado) return;
     executar(encomenda.id, () => forcarPagoAdmin(encomenda.id));
   };
 
-  const onApagar = (encomenda: EncomendaAdmin) => {
-    const confirmado = window.confirm(`Apagar definitivamente a encomenda #${encomenda.id.slice(0, 8)}? Esta ação não pode ser desfeita.`);
+  const onApagar = async (encomenda: EncomendaAdmin) => {
+    const confirmado = await confirmar(
+      `Apagar definitivamente a encomenda #${encomenda.id.slice(0, 8)}? Esta ação não pode ser desfeita.`,
+      "red"
+    );
     if (!confirmado) return;
     executar(encomenda.id, () => apagarEncomendaAdmin(encomenda.id));
   };
 
-  const onMarcarEnviado = (encomenda: EncomendaAdmin) => {
+  const onMarcarEnviado = async (encomenda: EncomendaAdmin) => {
     const acao = encomenda.metodoEntrega === "envio" ? "ENVIADA" : "ENTREGUE";
-    const confirmado = window.confirm(`Marcar a encomenda #${encomenda.id.slice(0, 8)} como ${acao}?`);
+
+    // Pergunta pelo rastreio antes da confirmação final (não depois), para
+    // este poder aparecer já resumido nela — só faz sentido para envio
+    // (levantamento em mão não tem). "Não" segue sem código; "Cancelar" é
+    // diferente — aborta a ação toda, não marca a encomenda como enviada.
+    let codigoRastreio: string | null = null;
+    if (encomenda.metodoEntrega === "envio") {
+      const temRastreio = await perguntar("Tem código de rastreio?");
+      if (temRastreio === null) return;
+      if (temRastreio === "sim") {
+        codigoRastreio = await pedirTexto("Código de rastreio:");
+      }
+    }
+
+    const confirmado = await confirmar(
+      `Marcar a encomenda #${encomenda.id.slice(0, 8)} como ${acao}?` +
+        (codigoRastreio ? `\n\nCódigo de rastreio: ${codigoRastreio}` : "")
+    );
     if (!confirmado) return;
-    executar(encomenda.id, () => marcarEnviadoAdmin(encomenda.id));
+
+    executar(encomenda.id, () => marcarEnviadoAdmin(encomenda.id, codigoRastreio));
   };
 
   // Cada grupo devolve as pills de fresco em cada chamada — chamadas duas
@@ -284,6 +324,17 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
 
   return (
     <div>
+      <div className="relative mb-4 sm:mb-6">
+        <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+        <input
+          type="text"
+          value={pesquisa}
+          onChange={(e) => setPesquisa(e.target.value)}
+          placeholder="Pesquisar por nome, email, telefone ou nº de encomenda..."
+          className="w-full rounded-full border border-white/15 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white/90 placeholder:text-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+        />
+      </div>
+
       {/* Mobile: 3 dropdowns compactos em vez de pills — cada um abre a
           lista de opções por cima do conteúdo em baixo. */}
       <div className="flex items-center gap-2 mb-6 sm:hidden">
@@ -317,7 +368,10 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
 
       {/* Desktop: tudo numa linha só, como já estava — ml para alinhar com
           o card das encomendas em baixo (não com o número de índice). */}
-      <div className="hidden sm:flex sm:flex-wrap sm:items-center gap-1.5 mb-8 ml-[4.75rem]">
+      {/* Sem ml a alinhar com o card (como estava antes) — a fila precisa da
+          largura toda, igual à barra de pesquisa em cima, senão parte para
+          uma segunda linha assim que há mais de um filtro de produto. */}
+      <div className="hidden sm:flex sm:flex-wrap sm:items-center gap-1.5 mb-8">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40 shrink-0">Estado</span>
         {pillsEstado()}
 
@@ -440,6 +494,8 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
                     <Campo legenda="Entrega" valor="Levantamento em mão — combinar por telefone/email acima." />
                   )}
 
+                  {encomenda.codigoRastreio && <Campo legenda="Código de rastreio" valor={encomenda.codigoRastreio} />}
+
                   {encomenda.metodoPagamento === "multibanco" && encomenda.referenciaMbEntidade && encomenda.referenciaMbNumero && (
                     <div className="grid grid-cols-2 gap-3 sm:gap-5">
                       <Campo legenda="Entidade" valor={encomenda.referenciaMbEntidade} />
@@ -475,6 +531,7 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
         })}
       </ul>
       )}
+      {dialogHost}
     </div>
   );
 }

@@ -71,6 +71,20 @@
       "when": 1786589334481,
       "tag": "0009_sour_lizard",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1786640760195,
+      "tag": "0010_fuzzy_gressill",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1786646624381,
+      "tag": "0011_windy_omega_flight",
+      "breakpoints": true
     }
   ]
 }

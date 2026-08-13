@@ -7,7 +7,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 // continua igual.
 export default function PainelLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthPageBackground footer={false} verticalAlign="start" compactPaddingMobile>
+    <AuthPageBackground footer={false} verticalAlign="start" compactPaddingMobile wide>
       <div className="w-full flex flex-col lg:flex-row gap-6 lg:gap-10 pt-16 pb-24 md:pt-28">
         <AdminSidebar />
         <main className="flex-1 min-w-0">{children}</main>

@@ -2,10 +2,12 @@ import { desc, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders, orderItems } from "@/lib/db/schema";
 import { expirarMbwayPendentes } from "@/lib/expiracao";
+import { marcarSecaoVista } from "@/lib/admin-notificacoes";
 import EncomendasAdminList, { type EncomendaAdmin } from "@/components/admin/EncomendasAdminList";
 
 async function getTodasEncomendas(): Promise<EncomendaAdmin[]> {
   await expirarMbwayPendentes();
+  await marcarSecaoVista("encomendas");
 
   const todas = await db.select().from(orders).orderBy(desc(orders.createdAt));
   if (todas.length === 0) return [];
@@ -25,7 +27,7 @@ export default async function AdminEncomendasPage() {
   const encomendas = await getTodasEncomendas();
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <div className="w-full">
       <h1 className="text-2xl md:text-3xl font-bold text-[#f8f0d9] mb-8">Encomendas</h1>
       <EncomendasAdminList encomendas={encomendas} />
     </div>

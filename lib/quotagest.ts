@@ -1,7 +1,9 @@
-// Integração com a API do Quotagest (gestão de sócios) — só leitura.
-// Credencial única e partilhada da associação (não é por utilizador), por
-// isso este módulo só pode ser chamado a partir de código server-side
-// (Server Components / Server Actions), nunca exposto ao cliente.
+// Integração com a API do Quotagest (gestão de sócios). Maioritariamente só
+// leitura — a exceção é atualizarSocio, para o painel de admin poder
+// corrigir dados de contacto (ver comentário lá). Credencial única e
+// partilhada da associação (não é por utilizador), por isso este módulo só
+// pode ser chamado a partir de código server-side (Server Components /
+// Server Actions), nunca exposto ao cliente.
 
 const BASE_URL = "https://www.app.quotagest.pt/api";
 
@@ -29,16 +31,17 @@ async function login(): Promise<string> {
   return body.token as string;
 }
 
-async function fetchAuthed(path: string, retrying = false): Promise<Response> {
+async function fetchAuthed(path: string, init?: RequestInit, retrying = false): Promise<Response> {
   cachedToken ??= await login();
 
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "auth-token": cachedToken },
+    ...init,
+    headers: { ...init?.headers, "auth-token": cachedToken },
   });
 
   if (res.status === 401 && !retrying) {
     cachedToken = null;
-    return fetchAuthed(path, true);
+    return fetchAuthed(path, init, true);
   }
 
   return res;
@@ -62,6 +65,17 @@ export type QuotagestSocio = {
   nif: string;
   /** null quando o campo está vazio no Quotagest (a maioria dos sócios nunca preencheu) */
   grupoSanguineo: string | null;
+  // Campos de contacto editáveis pelo painel de admin (ver atualizarSocio) —
+  // confirmados presentes no mesmo GET /socios já usado para a lista, sem
+  // pedido extra por sócio.
+  telefone: string | null;
+  telemovel: string | null;
+  morada: string | null;
+  codigoPostal: string | null;
+  /** formato "YYYY-MM-DD", como devolvido pela API */
+  dataNascimento: string | null;
+  /** URL pública (storage.quotagest.pt) — null quando o sócio não tem foto carregada */
+  fotografiaUrl: string | null;
   /**
    * Referência Multibanco da cota pendente mais próxima, se o Quotagest já
    * a tiver gerado — nem toda cota por pagar tem uma (ver auditoria em
@@ -92,6 +106,13 @@ type QuotagestSocioRow = {
   has_divida: boolean;
   divida: string;
   saude_gruposangue: string;
+  telefone: string | null;
+  telemovel: string | null;
+  morada: string | null;
+  codigo_postal: string | null;
+  data_nascimento: string | null;
+  hasfotografia: boolean;
+  fotografia_url: string | null;
 };
 
 function mapSocio(row: QuotagestSocioRow): QuotagestSocio {
@@ -109,6 +130,12 @@ function mapSocio(row: QuotagestSocioRow): QuotagestSocio {
     tipo: row.tipo_descricao,
     nif: row.nif,
     grupoSanguineo: row.saude_gruposangue?.trim() || null,
+    telefone: row.telefone,
+    telemovel: row.telemovel,
+    morada: row.morada,
+    codigoPostal: row.codigo_postal,
+    dataNascimento: row.data_nascimento,
+    fotografiaUrl: row.hasfotografia ? row.fotografia_url : null,
     referenciaPendente: null,
     descricoesPendentes: [],
   };
@@ -180,6 +207,17 @@ async function getSocios(): Promise<QuotagestSocioRow[]> {
   return body?.rows ?? [];
 }
 
+// Para a lista do painel de admin (/admin/socios) — usa só o has_divida/
+// divida devolvido por /socios (ver mapSocio), sem o withDividaReal por
+// sócio, que faria ~120 pedidos extra ao Quotagest de cada vez que a página
+// carregasse. O valor pode estar ligeiramente desatualizado (ver comentário
+// em mapSocio), aceitável para uma vista geral — o /perfil de cada sócio
+// continua a mostrar o valor exato via withDividaReal.
+export async function getTodosSocios(): Promise<QuotagestSocio[]> {
+  const rows = await getSocios();
+  return rows.map(mapSocio);
+}
+
 export async function getSocioByEmail(email: string): Promise<QuotagestSocio | null> {
   const normalized = email.trim().toLowerCase();
   const rows = await getSocios();
@@ -205,4 +243,89 @@ export async function findSocioByCodigoOuNif(query: string): Promise<QuotagestSo
     (row) => (row.has_codigo && row.codigo === digits) || row.nif === digits
   );
   return match ? withDividaReal(mapSocio(match)) : null;
+}
+
+export type AtualizarSocioInput = {
+  nome: string;
+  email: string;
+  nif: string;
+  telefone: string | null;
+  telemovel: string | null;
+  morada: string | null;
+  codigoPostal: string | null;
+  dataNascimento: string | null;
+};
+
+// Único endpoint de escrita deste módulo — âmbito deliberadamente limitado
+// aos campos de contacto/identificação (o utilizador confirmou que editar
+// isto diretamente no Quotagest não é problema). Nunca toca em id_tipo/
+// id_estado (afetam a lógica de quotas, e os IDs válidos não estão
+// mapeados) nem em codigo (número de sócio, a identidade dele no
+// Quotagest) — essas alterações ficam só no backoffice do Quotagest.
+// Envia sempre o conjunto completo destes campos, não só os alterados: o
+// formulário no painel pré-preenche com os valores atuais (confirmados
+// presentes no GET /socios), para um PUT não apagar sem querer um campo que
+// o admin não tocou.
+export async function atualizarSocio(id: string, dados: AtualizarSocioInput): Promise<void> {
+  const res = await fetchAuthed(`/socios/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nome: dados.nome,
+      email: dados.email,
+      nif: dados.nif,
+      telefone: dados.telefone,
+      telemovel: dados.telemovel,
+      morada: dados.morada,
+      codigo_postal: dados.codigoPostal,
+      data_nascimento: dados.dataNascimento,
+    }),
+  });
+  if (!res.ok) throw new Error(`Quotagest: PUT /socios/${id} falhou (${res.status})`);
+}
+
+type QuotagestMovimentoRow = {
+  id_socio: string;
+  total_pago: string;
+  montante: string;
+  ano: number;
+};
+
+export type EstatisticasFinanceiras = {
+  totalPagoAno: number;
+  totalPagoHistorico: number;
+  totalEmDivida: number;
+  numeroSociosEmDivida: number;
+};
+
+// Confirmado ao vivo (2026-08-13): /quotas não precisa de id_socio — dá para
+// pedir os movimentos da associação toda de uma vez, em vez de um pedido por
+// sócio (o que seria ~240 pedidos extra ao Quotagest de cada vez que o
+// painel carregasse). limit alto pelo mesmo motivo que getSocios (mais
+// simples e barato do que paginar).
+export async function getEstatisticasFinanceiras(): Promise<EstatisticasFinanceiras> {
+  const anoAtual = new Date().getFullYear();
+
+  const [resPagas, resPendentes] = await Promise.all([
+    fetchAuthed("/quotas?liquidado=1&limit=1000"),
+    fetchAuthed("/quotas?liquidado=0&limit=1000"),
+  ]);
+  if (!resPagas.ok) throw new Error(`Quotagest: /quotas?liquidado=1 falhou (${resPagas.status})`);
+  // Mesmo comportamento de /quotas?id_socio=X&liquidado=0 (ver
+  // getQuotasPendentes) — 400 quando não há nenhuma cota por pagar em toda a
+  // associação, não um array vazio.
+  const linhasPendentes: QuotagestMovimentoRow[] =
+    resPendentes.status === 400 ? [] : resPendentes.ok ? ((await resPendentes.json())?.rows ?? []) : [];
+  if (!resPendentes.ok && resPendentes.status !== 400) {
+    throw new Error(`Quotagest: /quotas?liquidado=0 falhou (${resPendentes.status})`);
+  }
+
+  const linhasPagas: QuotagestMovimentoRow[] = (await resPagas.json())?.rows ?? [];
+
+  return {
+    totalPagoHistorico: linhasPagas.reduce((soma, q) => soma + (Number(q.total_pago) || 0), 0),
+    totalPagoAno: linhasPagas.filter((q) => q.ano === anoAtual).reduce((soma, q) => soma + (Number(q.total_pago) || 0), 0),
+    totalEmDivida: linhasPendentes.reduce((soma, q) => soma + (Number(q.montante) || 0), 0),
+    numeroSociosEmDivida: new Set(linhasPendentes.map((q) => q.id_socio)).size,
+  };
 }

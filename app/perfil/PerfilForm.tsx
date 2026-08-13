@@ -338,6 +338,11 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
                             <p>Referência <span className="text-white/90 font-semibold">{encomenda.referenciaMbNumero}</span></p>
                           </div>
                         )}
+                        {encomenda.codigoRastreio && (
+                          <div className="mt-2 pt-2 border-t border-white/10 text-xs text-white/70">
+                            <p>Rastreio <span className="text-white/90 font-semibold">{encomenda.codigoRastreio}</span></p>
+                          </div>
+                        )}
                       </div>
                     </details>
                   </li>

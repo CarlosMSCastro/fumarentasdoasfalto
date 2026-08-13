@@ -25,6 +25,12 @@ interface AuthPageBackgroundProps {
   // colado/tapado por ela. As páginas de auth normais (login, perfil, etc.)
   // continuam com o py-24 de sempre.
   compactPaddingMobile?: boolean;
+  // true usa um contentor mais largo que o max-w-7xl (que existe para
+  // alinhar com o <Navbar />) — só faz sentido em páginas sem Navbar (ex:
+  // painel de admin), onde não há nada para alinhar e o painel/tabelas
+  // beneficiam do espaço extra (ex: a fila de filtros de /admin/encomendas
+  // com muitas opções de produto, que senão parte para uma segunda linha).
+  wide?: boolean;
 }
 
 export default function AuthPageBackground({
@@ -33,6 +39,7 @@ export default function AuthPageBackground({
   verticalAlign = "center",
   footer = true,
   compactPaddingMobile = false,
+  wide = false,
 }: AuthPageBackgroundProps) {
   return (
     <div className="relative min-h-dvh w-full flex flex-col overflow-hidden">
@@ -55,7 +62,7 @@ export default function AuthPageBackground({
           verticalAlign === "start" ? "items-start" : "items-center"
         }`}
       >
-        <div className={`w-full max-w-7xl mx-auto flex ${align === "end" ? "justify-end" : "justify-center"}`}>
+        <div className={`w-full ${wide ? "max-w-[100rem]" : "max-w-7xl"} mx-auto flex ${align === "end" ? "justify-end" : "justify-center"}`}>
           {children}
         </div>
       </div>
