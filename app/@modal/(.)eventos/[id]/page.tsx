@@ -7,7 +7,7 @@ export default async function EventoModalPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const evento = getEventoById(id);
+  const evento = await getEventoById(id);
   if (!evento) return null;
   return <EventoModal evento={evento} />;
 }

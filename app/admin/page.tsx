@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { orders, users } from "@/lib/db/schema";
 import { obterUltimasVisitas } from "@/lib/admin-notificacoes";
 import { getTodosSocios, getEstatisticasFinanceiras, type EstatisticasFinanceiras } from "@/lib/quotagest";
-import { formatarPreco } from "@/lib/produtos";
+import { formatarPreco } from "@/lib/preco";
 import AuthPageBackground from "@/components/AuthPageBackground";
 
 type ResumoAdmin = {
@@ -86,12 +86,13 @@ export default async function AdminPage() {
         </div>
 
         <div className="w-full grid grid-cols-2 gap-3 sm:gap-6">
-          {/* Sem href ainda — depende do Sanity estar provisionado. */}
-          <div className="flex flex-col items-center gap-1.5 sm:gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-4 sm:px-6 sm:py-10 opacity-50 cursor-not-allowed">
-            <PenSquare className="w-6 h-6 sm:w-10 sm:h-10 text-white/60" />
-            <span className="text-xs sm:text-lg font-bold uppercase tracking-widest text-white/60 text-center">Editar Conteúdo</span>
-            <span className="text-[9px] sm:text-xs uppercase tracking-widest text-white/30">Brevemente</span>
-          </div>
+          <Link
+            href="/admin/conteudo"
+            className="flex flex-col items-center gap-1.5 sm:gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-4 sm:px-6 sm:py-10 hover:border-primary/60 hover:bg-white/10 hover:shadow-[0_0_24px_rgba(var(--primary-rgb),0.25)] transition-all"
+          >
+            <PenSquare className="w-6 h-6 sm:w-10 sm:h-10 text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]" />
+            <span className="text-xs sm:text-lg font-bold uppercase tracking-widest text-[#f8f0d9] text-center">Editar Conteúdo</span>
+          </Link>
 
           <Link
             href="/admin/encomendas"

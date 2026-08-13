@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { useCart } from "@/lib/cart";
-import { formatarPreco } from "@/lib/produtos";
+import { formatarPreco } from "@/lib/preco";
 import { PORTES_EUROS } from "@/lib/encomendas";
 import { criarEncomenda, type DadosEncomenda, type EncomendaResultado } from "@/app/actions/encomendas";
 

@@ -9,7 +9,7 @@ const links = [
   { href: "/admin/encomendas", label: "Encomendas", icon: Package, disabled: false },
   { href: "/admin/socios", label: "Sócios", icon: IdCard, disabled: false },
   { href: "/admin/utilizadores", label: "Utilizadores", icon: Users, disabled: false },
-  { href: null, label: "Editar Conteúdo", icon: PenSquare, disabled: true },
+  { href: "/admin/conteudo", label: "Editar Conteúdo", icon: PenSquare, disabled: false },
 ] as const;
 
 export default function AdminSidebar() {
@@ -29,7 +29,10 @@ export default function AdminSidebar() {
             </span>
           );
         }
-        const active = pathname === link.href;
+        // startsWith cobre sub-rotas (ex. /admin/conteudo/fundadores continua
+        // a destacar "Editar Conteúdo") — "/admin" fica de fora do startsWith
+        // para não acender em todas as outras secções.
+        const active = pathname === link.href || (link.href !== "/admin" && pathname.startsWith(`${link.href}/`));
         return (
           <Link
             key={link.label}

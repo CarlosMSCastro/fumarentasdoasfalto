@@ -1,9 +1,11 @@
-"use client";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import EventosTimeline from "@/components/EventosTimeline";
+import { getEventos } from "@/lib/eventos";
 
-export default function EventosPage() {
+export default async function EventosPage() {
+  const eventos = await getEventos();
+
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <section className="relative h-dvh w-full overflow-hidden snap-start">
@@ -13,7 +15,7 @@ export default function EventosPage() {
               <p className="text-white/90 text-xl uppercase tracking-widest mb-0">Os nossos</p>
               <h1 className="text-4xl md:text-6xl font-bold text-[#f8f0d9]">Eventos</h1>
             </div>
-            <EventosTimeline />
+            <EventosTimeline eventos={eventos} />
           </div>
         </div>
 

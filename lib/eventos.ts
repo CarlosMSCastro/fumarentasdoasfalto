@@ -1,38 +1,65 @@
-import eventosData from "@/data/eventos.json";
+import "server-only";
+import { asc, eq, and, inArray } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { eventos, eventoFotos } from "@/lib/db/schema";
 
-export interface Evento {
+export type Evento = {
   id: string;
   titulo: string;
   local: string;
   data: string;
   descricao: string;
   destaque: boolean;
-  pasta: string;
-  capa: string;
+  mostrar: boolean;
+  capaUrl: string;
   fotos: string[];
+};
+
+type EventoRow = typeof eventos.$inferSelect;
+
+async function comFotos(linhas: EventoRow[]): Promise<Evento[]> {
+  if (linhas.length === 0) return [];
+  const fotos = await db
+    .select()
+    .from(eventoFotos)
+    .where(inArray(eventoFotos.eventoId, linhas.map((e) => e.id)))
+    .orderBy(asc(eventoFotos.ordem));
+  return linhas.map((ev) => ({
+    ...ev,
+    fotos: fotos.filter((f) => f.eventoId === ev.id).map((f) => f.url),
+  }));
 }
 
-const eventos = eventosData as Evento[];
-
-export function getEventos(): Evento[] {
-  return eventos;
+// Só os eventos com mostrar=true — para uso público (timeline). Ver
+// getTodosEventos() para o painel de admin, que precisa de ver também os
+// escondidos.
+export async function getEventos(): Promise<Evento[]> {
+  const linhas = await db.select().from(eventos).where(eq(eventos.mostrar, true)).orderBy(asc(eventos.data));
+  return comFotos(linhas);
 }
 
-export function getEventoById(id: string): Evento | undefined {
-  return eventos.find((ev) => ev.id === id);
+export async function getTodosEventos(): Promise<Evento[]> {
+  const linhas = await db.select().from(eventos).orderBy(asc(eventos.data));
+  return comFotos(linhas);
 }
 
-const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-export function mesDe(data: string): string {
-  const partes = data.split("-");
-  if (partes.length < 2) return "";
-  return MESES[parseInt(partes[1]) - 1];
+// mostrar=false esconde tanto da timeline como da própria página
+// /eventos/[id] — chamadas públicas usam esta função (filtra), o admin usa
+// getEventoByIdAdmin (não filtra).
+export async function getEventoById(id: string): Promise<Evento | undefined> {
+  const [linha] = await db
+    .select()
+    .from(eventos)
+    .where(and(eq(eventos.id, id), eq(eventos.mostrar, true)))
+    .limit(1);
+  if (!linha) return undefined;
+  const [evento] = await comFotos([linha]);
+  return evento;
 }
 
-export function formatarDataCompleta(data: string): string {
-  const partes = data.split("-");
-  if (partes.length === 3) return `${partes[2]} ${MESES[parseInt(partes[1]) - 1]} ${partes[0]}`;
-  if (partes.length === 2) return `${MESES[parseInt(partes[1]) - 1]} ${partes[0]}`;
-  return partes[0];
+export async function getEventoByIdAdmin(id: string): Promise<Evento | undefined> {
+  const [linha] = await db.select().from(eventos).where(eq(eventos.id, id)).limit(1);
+  if (!linha) return undefined;
+  const [evento] = await comFotos([linha]);
+  return evento;
 }

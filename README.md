@@ -116,7 +116,8 @@ Ativo, por esta ordem:
 
 1. **Migração de domínio** para o `.com` definitivo da associação (afeta `FROM` dos emails, verificação de domínio do Facebook, `NEXT_PUBLIC_APP_URL`)
 2. **Login por Facebook para todos** — depende da migração de domínio (a candidatura ao Meta App Review tem de ser submetida contra o domínio final, não o temporário); pode também precisar de Meta App Review em si (app está em modo de desenvolvimento) — confirmar diretamente no dashboard da Meta, não é só código
-3. **Backoffice** para o Sr. Joaquim gerir produtos/eventos (considerado CMS headless tipo Sanity — painel de encomendas também entraria aí como ferramenta customizada, lendo da nossa Postgres, não como documentos nativos do Sanity)
+
+~~3. Backoffice para o Sr. Joaquim gerir produtos/eventos~~ — feito: `/admin` (encomendas, sócios, utilizadores) + `/admin/conteudo` (textos, fundadores, objetivos, eventos, produtos), CMS próprio sobre a Postgres, sem Sanity nem headless CMS externo — ver `CLAUDE.md`.
 
 Em espera indefinida (decisão do utilizador, 2026-08-12 — não são prioridade agendada):
 

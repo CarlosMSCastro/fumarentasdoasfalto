@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
-import { getEventos, mesDe, formatarDataCompleta, type Evento } from "@/lib/eventos";
-const eventos = getEventos();
+import { mesDe, formatarDataCompleta } from "@/lib/eventos-formato";
+import type { Evento } from "@/lib/eventos";
 function agruparPorAno(lista: Evento[]) {
   const grupos: Record<string, Evento[]> = {};
   lista.forEach((ev) => {
@@ -31,7 +31,7 @@ const CARD_DOG_EARS = [
   "absolute w-7 h-7 bottom-0 left-0 [clip-path:polygon(0_100%,0_0,100%_100%)] bg-[linear-gradient(to_top_right,rgba(255,255,255,0.4),rgba(0,0,0,0.28))]",
   "absolute w-7 h-7 bottom-0 right-0 [clip-path:polygon(100%_100%,0_100%,100%_0)] bg-[linear-gradient(to_top_left,rgba(255,255,255,0.4),rgba(0,0,0,0.28))]",
 ];
-export default function EventosTimeline() {
+export default function EventosTimeline({ eventos }: { eventos: Evento[] }) {
   const grupos = agruparPorAno(eventos);
   const anos = Object.keys(grupos).sort();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -234,7 +234,7 @@ export default function EventosTimeline() {
                           }`}
                         >
                           <Image
-                            src={`/eventos/${ev.pasta}/${ev.capa}`}
+                            src={ev.capaUrl}
                             alt={ev.titulo}
                             fill
                             sizes={ev.destaque ? "(max-width: 768px) 250px, 410px" : "(max-width: 768px) 224px, 366px"}

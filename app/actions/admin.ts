@@ -2,16 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { eq, ne, and } from "drizzle-orm";
-import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { orders, orderItems, users } from "@/lib/db/schema";
 import { sendOrderConfirmation, sendNotificacaoEncomendaPaga, sendEncomendaEnviada } from "@/lib/email";
 import { atualizarSocio, type AtualizarSocioInput } from "@/lib/quotagest";
-
-async function exigirAdmin() {
-  const session = await auth();
-  if (session?.user?.role !== "admin") throw new Error("Não autorizado");
-}
+import { exigirAdmin } from "@/lib/admin-auth";
 
 export async function apagarEncomendaAdmin(id: string) {
   await exigirAdmin();

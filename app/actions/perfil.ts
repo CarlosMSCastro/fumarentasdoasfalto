@@ -4,19 +4,17 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcryptjs";
-import { put } from "@vercel/blob";
 import { auth, signOut } from "@/auth";
 import { db } from "@/lib/db";
 import { users, emailChangeRequests, socioLinkRequests } from "@/lib/db/schema";
 import { sendEmailChangeConfirmation, sendSocioLinkConfirmation } from "@/lib/email";
 import { findSocioByCodigoOuNif } from "@/lib/quotagest";
+import { validarFoto, carregarFoto } from "@/lib/upload";
 
 export type PerfilFormState = { error?: string; success?: boolean } | undefined;
 
 const EMAIL_CHANGE_TOKEN_TTL_MS = 60 * 60 * 1000;
 const SOCIO_LINK_TOKEN_TTL_MS = 60 * 60 * 1000;
-const MAX_FOTO_SIZE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_FOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function atualizarPerfil(_prevState: PerfilFormState, formData: FormData): Promise<PerfilFormState> {
   const session = await auth();
@@ -128,16 +126,12 @@ export async function atualizarFoto(_prevState: PerfilFormState, formData: FormD
   const [user] = await db.select({ image: users.image }).from(users).where(eq(users.id, session.user.id)).limit(1);
   if (user?.image) return { error: "Já tens uma foto configurada." };
 
-  const foto = formData.get("foto");
-  if (!(foto instanceof File) || foto.size === 0) return { error: "Escolhe uma imagem." };
-  if (!ALLOWED_FOTO_TYPES.includes(foto.type)) return { error: "Formato de imagem não suportado (usa JPEG, PNG, WEBP ou GIF)." };
-  if (foto.size > MAX_FOTO_SIZE_BYTES) return { error: "A imagem não pode passar de 5MB." };
+  const validacao = validarFoto(formData.get("foto"));
+  if (validacao.erro !== null) return { error: validacao.erro };
 
-  const blob = await put(`avatares/${session.user.id}-${Date.now()}-${foto.name}`, foto, {
-    access: "public",
-  });
+  const url = await carregarFoto(`avatares/${session.user.id}-${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
 
-  await db.update(users).set({ image: blob.url }).where(eq(users.id, session.user.id));
+  await db.update(users).set({ image: url }).where(eq(users.id, session.user.id));
   revalidatePath("/perfil");
 
   return { success: true };

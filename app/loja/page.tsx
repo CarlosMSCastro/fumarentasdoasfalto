@@ -1,8 +1,11 @@
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import LojaGrid from "@/components/LojaGrid";
+import { getProdutos } from "@/lib/produtos";
 
-export default function LojaPage() {
+export default async function LojaPage() {
+  const produtos = await getProdutos();
+
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
       <section id="loja" className="relative h-dvh w-full overflow-visible snap-start">
@@ -13,7 +16,7 @@ export default function LojaPage() {
             <h1 className="text-3xl md:text-6xl font-bold text-[#f8f0d9]">Loja</h1>
           </div>
 
-          <LojaGrid />
+          <LojaGrid produtos={produtos} />
         </div>
 
         <ScrollIndicator targetId="contactos" className="bottom-[2vh] z-20" />

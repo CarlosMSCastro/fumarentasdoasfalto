@@ -2,16 +2,17 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { scrollToContactosBypassingSnap } from "@/lib/scroll";
+import type { ObjetivoCardId } from "@/lib/objetivos";
 
-const cards = [
-  { title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bg: "/conviv.jpg" },
-  { title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/reparacao", bg: "/05.jpg" },
-  { title: "Workshops e Palestras", sub: "Aprende, ensina, evolui", href: "/eventos", bg: "/worksh.jpg" },
+const cards: { id: ObjetivoCardId; title: string; sub: string; href: string; bgPadrao: string }[] = [
+  { id: "encontros", title: "Encontros e Passeios", sub: "Rides, encontros e convívio", href: "/eventos", bgPadrao: "/conviv.jpg" },
+  { id: "restauracao", title: "Restauração de Motorizadas", sub: "Partilha de conhecimento e técnica", href: "/reparacao", bgPadrao: "/05.jpg" },
+  { id: "workshops", title: "Workshops e Palestras", sub: "Aprende, ensina, evolui", href: "/eventos", bgPadrao: "/worksh.jpg" },
 ];
 
 const SWIPE_THRESHOLD = 50;
 
-export default function ObjetivosMobile() {
+export default function ObjetivosMobile({ fotos }: { fotos: Partial<Record<ObjetivoCardId, string>> }) {
   const [active, setActive] = useState(0);
   const touchStartRef = useRef<number | null>(null);
 
@@ -48,15 +49,15 @@ export default function ObjetivosMobile() {
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${active * 100}%)`, touchAction: 'pan-x' }}
         >
-          {cards.map((card, i) => (
+          {cards.map((card) => (
             <a
-              key={`${card.href}-${i}`}
+              key={card.id}
               href={card.href}
               onClick={(e) => handleClick(e, card.href)}
               className="relative w-full h-full shrink-0 flex flex-col justify-between p-6 rounded-sm overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.75)]"
             >
               <Image
-                src={card.bg}
+                src={fotos[card.id] ?? card.bgPadrao}
                 alt=""
                 fill
                 sizes="100vw"

@@ -1,13 +1,10 @@
-import fundadoresData from "@/data/fundadores.json";
+import "server-only";
+import { asc } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { fundadores } from "@/lib/db/schema";
 
-export interface Fundador {
-  nome: string;
-  cargo: string;
-  foto: string;
-}
+export type Fundador = typeof fundadores.$inferSelect;
 
-const fundadores = fundadoresData as Fundador[];
-
-export function getFundadores(): Fundador[] {
-  return fundadores;
+export async function getFundadores(): Promise<Fundador[]> {
+  return db.select().from(fundadores).orderBy(asc(fundadores.ordem));
 }

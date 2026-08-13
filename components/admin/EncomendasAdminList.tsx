@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
 import { ChevronDown, Trash2, CircleCheck, Truck, PackageCheck, Check, Search } from "lucide-react";
 import type { orders, orderItems } from "@/lib/db/schema";
-import { formatarPreco } from "@/lib/produtos";
+import { formatarPreco } from "@/lib/preco";
 import { apagarEncomendaAdmin, forcarPagoAdmin, marcarEnviadoAdmin } from "@/app/actions/admin";
 import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
 

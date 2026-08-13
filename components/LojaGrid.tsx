@@ -2,13 +2,17 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ShoppingBag } from "lucide-react";
-import { getProdutos, formatarPreco, type Produto } from "@/lib/produtos";
+import { formatarPreco } from "@/lib/preco";
+import type { Produto } from "@/lib/produtos";
 import { useCart } from "@/lib/cart";
-
-const produtos = getProdutos();
 
 const CORES_HEX: Record<string, string> = {
   "Branco": "#ffffff",
+  "Preto": "#1a1a1a",
+  "Cinzento": "#9ca3af",
+  "Azul": "#2563eb",
+  "Vermelho": "#dc2626",
+  "Verde": "#16a34a",
   "Roxo": "#7c3aed",
 };
 
@@ -16,9 +20,8 @@ function corParaHex(nome: string): string {
   return CORES_HEX[nome] ?? "#999999";
 }
 
-// Ainda não há fotos reais dos produtos (pastas em public/loja/ vazias) — em
-// vez de deixar o <Image> partido, cai para um ícone quando o ficheiro não
-// existe. Assim que as fotos forem adicionadas, isto resolve-se sozinho.
+// Cai para um ícone se a imagem falhar a carregar (ex: Blob temporariamente
+// indisponível) em vez de deixar o <Image> partido.
 function ProdutoImagem({ produto }: { produto: Produto }) {
   const [erro, setErro] = useState(false);
 
@@ -32,7 +35,7 @@ function ProdutoImagem({ produto }: { produto: Produto }) {
 
   return (
     <Image
-      src={`/loja/${produto.pasta}/${produto.capa}`}
+      src={produto.capaUrl}
       alt={produto.nome}
       fill
       sizes="(max-width: 640px) 45vw, (max-width: 768px) 30vw, 19vw"
@@ -64,7 +67,7 @@ function ProdutoCard({
     produtoId: produto.id,
     nome: produto.nome,
     preco: produto.preco,
-    imagemSrc: `/loja/${produto.pasta}/${produto.capa}`,
+    imagemSrc: produto.capaUrl,
     cor: corSelecionada,
     tamanho: tamanhoSelecionado,
   };
@@ -179,7 +182,7 @@ function ProdutoCard({
   );
 }
 
-export default function LojaGrid() {
+export default function LojaGrid({ produtos }: { produtos: Produto[] }) {
   const [ativoIndex, setAtivoIndex] = useState<number | null>(null);
 
   useEffect(() => {

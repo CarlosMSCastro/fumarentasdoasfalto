@@ -6,7 +6,7 @@ import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { formatarPreco } from "@/lib/produtos";
+import { formatarPreco } from "@/lib/preco";
 import { PORTES_EUROS } from "@/lib/encomendas";
 
 export default function CartSheet() {

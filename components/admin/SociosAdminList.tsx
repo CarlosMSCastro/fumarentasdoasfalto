@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
 import { ChevronDown, Search, Pencil } from "lucide-react";
 import type { QuotagestSocio, AtualizarSocioInput } from "@/lib/quotagest";
-import { formatarPreco } from "@/lib/produtos";
+import { formatarPreco } from "@/lib/preco";
 import { atualizarSocioAdmin } from "@/app/actions/admin";
 
 export type SocioAdmin = QuotagestSocio & { temConta: boolean };

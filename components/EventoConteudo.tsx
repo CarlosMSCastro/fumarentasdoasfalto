@@ -3,7 +3,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import EventoLightbox from "@/components/EventoLightbox";
-import { formatarDataCompleta, type Evento } from "@/lib/eventos";
+import { formatarDataCompleta } from "@/lib/eventos-formato";
+import type { Evento } from "@/lib/eventos";
 
 export default function EventoConteudo({ evento }: { evento: Evento }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -78,7 +79,7 @@ export default function EventoConteudo({ evento }: { evento: Evento }) {
             className="relative shrink-0 w-full h-full snap-start overflow-hidden cursor-pointer"
           >
             <Image
-              src={`/eventos/${evento.pasta}/${foto}`}
+              src={foto}
               alt={`${evento.titulo} - foto ${i + 1}`}
               fill
               priority={i === 0}
@@ -113,7 +114,7 @@ export default function EventoConteudo({ evento }: { evento: Evento }) {
                   i === heroIndex ? "ring-orange-500" : "ring-transparent opacity-60 hover:opacity-100"
                 }`}
               >
-                <Image src={`/eventos/${evento.pasta}/${foto}`} alt="" fill sizes="80px" className="object-cover" />
+                <Image src={foto} alt="" fill sizes="80px" className="object-cover" />
               </button>
             ))}
           </div>
@@ -137,7 +138,6 @@ export default function EventoConteudo({ evento }: { evento: Evento }) {
 
       {lightboxIndex !== null && (
         <EventoLightbox
-          pasta={evento.pasta}
           fotos={evento.fotos}
           index={lightboxIndex}
           titulo={evento.titulo}

@@ -15,7 +15,7 @@ export interface ItemEncomenda {
   produtoId: string;
   // nome/preco vêm do carrinho no cliente só para o resumo visual do
   // checkout — nunca são usados para calcular o total. criarEncomenda
-  // recalcula sempre os dois a partir de data/produtos.json (fonte da
+  // recalcula sempre os dois a partir da tabela produto (fonte da
   // verdade), senão bastava editar o localStorage para pagar o que se
   // quisesse por uma encomenda.
   nome: string;
@@ -81,7 +81,7 @@ export async function criarEncomenda(
   // que vem do cliente (ver comentário em ItemEncomenda).
   const itensValidados: { produtoId: string; nome: string; preco: number; quantidade: number; cor?: string; tamanho?: string }[] = [];
   for (const item of itens) {
-    const produto = getProdutoById(item.produtoId);
+    const produto = await getProdutoById(item.produtoId);
     if (!produto) return { error: "Um dos produtos do carrinho já não existe. Atualiza a página e tenta novamente." };
     if (!produto.disponivel) return { error: `"${produto.nome}" já não está disponível.` };
 

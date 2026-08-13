@@ -2,12 +2,11 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import ScrollIndicator from "@/components/ScrollIndicator";
-import { getFundadores } from "@/lib/fundadores";
+import type { Fundador } from "@/lib/fundadores";
 
-const fundadores = getFundadores();
 const TAP_REVEAL_MS = 2000;
 
-export default function FoundersSection() {
+export default function FoundersSection({ fundadores }: { fundadores: Fundador[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const activeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -43,7 +42,7 @@ export default function FoundersSection() {
               >
                 <div className="relative flex-1 min-h-0 m-1 md:m-1.5 overflow-hidden rounded-sm">
                   <Image
-                    src={`/fundadores/${fundador.foto}`}
+                    src={fundador.fotoUrl}
                     alt={fundador.nome}
                     fill
                     sizes="(max-width: 768px) 28vw, 10vw"

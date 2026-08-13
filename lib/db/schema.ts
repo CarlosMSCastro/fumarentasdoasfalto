@@ -1,4 +1,4 @@
-import { pgTable, pgEnum, text, timestamp, uuid, integer, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, text, timestamp, uuid, integer, boolean, primaryKey } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
@@ -147,10 +147,10 @@ export const orders = pgTable("order", {
   paidAt: timestamp("paid_at", { mode: "date" }),
 });
 
-// produtoId refere-se ao id em produtos.json, não uma FK (os produtos vivem
-// em ficheiro, não em BD — ver Content strategy no CLAUDE.md). nome e preco
-// são um snapshot do momento da compra, para a encomenda não mudar se o
-// produto for depois editado/removido do catálogo.
+// produtoId refere-se ao id na tabela produto, mas não é uma FK de propósito
+// — nome e preco são um snapshot do momento da compra (para a encomenda não
+// mudar se o produto for depois editado/apagado), e um produto apagado não
+// deve arrastar as encomendas antigas que o referenciam.
 export const orderItems = pgTable("order_item", {
   id: uuid("id").defaultRandom().primaryKey(),
   orderId: uuid("orderId")
@@ -175,4 +175,110 @@ export const adminSecaoEnum = pgEnum("admin_secao", ["encomendas", "socios", "ut
 export const adminSecoesVistas = pgTable("admin_secao_vista", {
   secao: adminSecaoEnum("secao").primaryKey(),
   vistaEm: timestamp("vista_em", { mode: "date" }).notNull().defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// CMS de conteúdo (sem Sanity — ver plano de implementação). Substitui
+// data/*.json e texto hardcoded por tabelas geridas em /admin/conteudo.
+// ---------------------------------------------------------------------------
+
+export const fundadores = pgTable("fundador", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  nome: text("nome").notNull(),
+  cargo: text("cargo").notNull(),
+  fotoUrl: text("foto_url").notNull(),
+  // Ordem de exibição — sem UI de reordenar por agora, novos entram no fim
+  // (maior ordem existente + 1).
+  ordem: integer("ordem").notNull().default(0),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+// 3 linhas fixas (uma por card dos Objetivos) — nunca criadas/apagadas pelo
+// admin, só a fotoUrl é editável. Ver ObjetivosDesktop.tsx/ObjetivosMobile.tsx.
+export const objetivoCardIdEnum = pgEnum("objetivo_card_id", ["encontros", "restauracao", "workshops"]);
+
+export const objetivoFotos = pgTable("objetivo_foto", {
+  cardId: objetivoCardIdEnum("card_id").primaryKey(),
+  fotoUrl: text("foto_url").notNull(),
+});
+
+// Texto simples da homepage/sobre — key-value de propósito: o conjunto de
+// strings cresce ad hoc (mais um parágrafo, um label novo) sem precisar de
+// migration nenhuma, só uma chave nova em TEXTOS_PADRAO (lib/textos.ts), que
+// serve de seed inicial E de fallback em runtime para qualquer chave que
+// ainda não tenha sido migrada/gravada.
+export const conteudoTexto = pgTable("conteudo_texto", {
+  chave: text("chave").primaryKey(),
+  valor: text("valor").notNull(),
+});
+
+// Páginas legais precisam de adicionar/remover secções inteiras (não só
+// editar texto existente) — por isso não cabem no key-value acima. Uma linha
+// por secção, ordenada, por página.
+export const paginaLegalEnum = pgEnum("pagina_legal", ["termos", "privacidade", "cookies"]);
+
+export const paginaLegalSeccoes = pgTable("pagina_legal_seccao", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  pagina: paginaLegalEnum("pagina").notNull(),
+  ordem: integer("ordem").notNull().default(0),
+  subtitulo: text("subtitulo").notNull(),
+  corpo: text("corpo").notNull(),
+});
+
+// id continua texto (slug), não uuid — preserva as URLs /eventos/[id] já
+// existentes/partilhadas (ver data/eventos.json, ids tipo "aniversario-1").
+export const eventos = pgTable("evento", {
+  id: text("id").primaryKey(),
+  titulo: text("titulo").notNull(),
+  local: text("local").notNull(),
+  // Formato "YYYY-MM-DD" (ou "YYYY-MM"), como o JSON original — mesmo shape
+  // que mesDe()/formatarDataCompleta() em lib/eventos.ts já esperam.
+  data: text("data").notNull(),
+  descricao: text("descricao").notNull().default(""),
+  // Migrado 1:1 do JSON, sem UI de edição no admin (fora do âmbito pedido) —
+  // controla o tamanho maior na timeline para eventos-marco.
+  destaque: boolean("destaque").notNull().default(false),
+  // Novo — toggle "mostrar/não mostrar" pedido. false esconde tanto da
+  // timeline como da própria página /eventos/[id] (ver lib/eventos.ts).
+  mostrar: boolean("mostrar").notNull().default(true),
+  capaUrl: text("capa_url").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const eventoFotos = pgTable("evento_foto", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  eventoId: text("evento_id")
+    .notNull()
+    .references(() => eventos.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  ordem: integer("ordem").notNull().default(0),
+});
+
+// Sem rota própria (loja não tem /loja/[id]) — uuid chega, não precisa de
+// slug bonito. cores/tamanhos ficam null quando o produto não tem essa
+// variante (mesmo shape do data/produtos.json atual) — sem tabela de
+// stock/SKU por variante, o checkout nunca teve isso, só disponivel a nível
+// de produto.
+export const produtos = pgTable("produto", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  nome: text("nome").notNull(),
+  // Texto livre — confirmado por grep que não filtra/agrupa nada na UI hoje.
+  categoria: text("categoria").notNull().default(""),
+  descricao: text("descricao").notNull().default(""),
+  precoCentimos: integer("preco_centimos").notNull(),
+  // Toggle "esgotado" = inverter isto.
+  disponivel: boolean("disponivel").notNull().default(true),
+  capaUrl: text("capa_url").notNull(),
+  cores: text("cores").array(),
+  tamanhos: text("tamanhos").array(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const produtoFotos = pgTable("produto_foto", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  produtoId: uuid("produto_id")
+    .notNull()
+    .references(() => produtos.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  ordem: integer("ordem").notNull().default(0),
 });

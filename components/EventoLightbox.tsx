@@ -4,7 +4,6 @@ import { useEffect, useCallback, useRef, useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface EventoLightboxProps {
-  pasta: string;
   fotos: string[];
   index: number;
   titulo: string;
@@ -36,7 +35,7 @@ const DRAG_THRESHOLD = 8;
 const WHEEL_DELTA_THRESHOLD = 20;
 const WHEEL_COOLDOWN_MS = 500;
 
-export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, onIndexChange }: EventoLightboxProps) {
+export default function EventoLightbox({ fotos, index, titulo, onClose, onIndexChange }: EventoLightboxProps) {
   const total = fotos.length;
   const boxRef = useRef<HTMLDivElement>(null);
   const naturalRef = useRef<{ w: number; h: number } | null>(null);
@@ -262,7 +261,7 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
             limites da foto letterboxed */}
         <div className="absolute inset-0 overflow-hidden">
           <Image
-            src={`/eventos/${pasta}/${fotos[index]}`}
+            src={fotos[index]}
             alt={`${titulo} - foto ${index + 1}`}
             fill
             draggable={false}
@@ -283,20 +282,8 @@ export default function EventoLightbox({ pasta, fotos, index, titulo, onClose, o
             arrancar o pedido de rede só no momento do clique. */}
         {total > 1 && (
           <div className="absolute w-px h-px opacity-0 pointer-events-none overflow-hidden" aria-hidden="true">
-            <Image
-              src={`/eventos/${pasta}/${fotos[(index - 1 + total) % total]}`}
-              alt=""
-              fill
-              sizes="90vw"
-              loading="eager"
-            />
-            <Image
-              src={`/eventos/${pasta}/${fotos[(index + 1) % total]}`}
-              alt=""
-              fill
-              sizes="90vw"
-              loading="eager"
-            />
+            <Image src={fotos[(index - 1 + total) % total]} alt="" fill sizes="90vw" loading="eager" />
+            <Image src={fotos[(index + 1) % total]} alt="" fill sizes="90vw" loading="eager" />
           </div>
         )}
 

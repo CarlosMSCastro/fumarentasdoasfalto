@@ -9,7 +9,7 @@ import { getHighResAvatarUrl } from "@/lib/avatar";
 import SubmitButton from "@/components/SubmitButton";
 import type { users, orders, orderItems } from "@/lib/db/schema";
 import type { QuotagestSocio } from "@/lib/quotagest";
-import { formatarPreco } from "@/lib/produtos";
+import { formatarPreco } from "@/lib/preco";
 
 type User = typeof users.$inferSelect;
 

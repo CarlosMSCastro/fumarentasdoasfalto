@@ -1,8 +1,9 @@
 import { getEventos, getEventoById } from "@/lib/eventos";
 import EventoPageClient from "./EventoPageClient";
 
-export function generateStaticParams() {
-  return getEventos().map((evento) => ({ id: evento.id }));
+export async function generateStaticParams() {
+  const eventos = await getEventos();
+  return eventos.map((evento) => ({ id: evento.id }));
 }
 
 export default async function EventoPage({
@@ -11,6 +12,6 @@ export default async function EventoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const evento = getEventoById(id);
+  const evento = await getEventoById(id);
   return <EventoPageClient evento={evento} />;
 }
