@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { and, eq, inArray, desc, ne } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { users, orders, orderItems } from "@/lib/db/schema";
+import { users, orders, orderItems, quotaPagamentos } from "@/lib/db/schema";
 import { getSocioByEmail, getSocioById, type QuotagestSocio } from "@/lib/quotagest";
-import { expirarMbwayPendentes } from "@/lib/expiracao";
+import { expirarMbwayPendentes, expirarQuotaPendentes } from "@/lib/expiracao";
 import AuthPageBackground from "@/components/AuthPageBackground";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
@@ -53,6 +53,20 @@ async function getEncomendas(userId: string): Promise<Encomenda[]> {
   }));
 }
 
+// A mais recente chega para os 3 estados que o PerfilForm precisa de
+// distinguir (sem pagamento em curso / pendente / pago a aguardar o
+// Quotagest) — não interessa histórico de tentativas antigas aqui.
+async function getUltimoPagamentoQuota(userId: string) {
+  await expirarQuotaPendentes();
+  const [ultimo] = await db
+    .select()
+    .from(quotaPagamentos)
+    .where(eq(quotaPagamentos.userId, userId))
+    .orderBy(desc(quotaPagamentos.createdAt))
+    .limit(1);
+  return ultimo ?? null;
+}
+
 export default async function PerfilPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
@@ -65,6 +79,7 @@ export default async function PerfilPage() {
   // "Sócio" fica sem dados (ver fallback no PerfilForm).
   const socio = await resolveSocio(user).catch(() => null);
   const encomendas = await getEncomendas(user.id);
+  const ultimoPagamentoQuota = await getUltimoPagamentoQuota(user.id);
 
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
@@ -78,7 +93,7 @@ export default async function PerfilPage() {
           alta) atinge o ponto de snap seguinte demasiado cedo. */}
       <div className="snap-start pb-32 md:pb-0">
         <AuthPageBackground align="end" verticalAlign="start" footer={false}>
-          <PerfilForm user={user} socio={socio} encomendas={encomendas} />
+          <PerfilForm user={user} socio={socio} encomendas={encomendas} ultimoPagamentoQuota={ultimoPagamentoQuota} />
         </AuthPageBackground>
         {/* O conteúdo tem altura variável (não é h-dvh como as outras
             páginas), por isso o indicador vai relative logo a seguir ao

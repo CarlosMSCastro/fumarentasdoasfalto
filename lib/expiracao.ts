@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq, lt } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { orders } from "@/lib/db/schema";
+import { orders, quotaPagamentos } from "@/lib/db/schema";
 
 // Ficheiro à parte de lib/encomendas.ts de propósito — este importa lib/db
 // (liga à BD com DATABASE_URL), e lib/encomendas.ts é importado por
@@ -29,4 +29,17 @@ export async function expirarMbwayPendentes(): Promise<void> {
     .update(orders)
     .set({ status: "expirado" })
     .where(and(eq(orders.status, "pendente"), eq(orders.metodoPagamento, "mbway"), lt(orders.createdAt, limite)));
+}
+
+// Mesmo problema, mesma solução — ver comentário acima. Chamado a par de
+// expirarMbwayPendentes() no topo de app/perfil/page.tsx: um MB WAY de
+// quota pendente a mais de 7 min também nunca teria callback do Eupago.
+// Multibanco não precisa disto — a referência continua válida 2 dias, sem
+// necessidade de expiração antecipada (mesmo comportamento de orders).
+export async function expirarQuotaPendentes(): Promise<void> {
+  const limite = new Date(Date.now() - MBWAY_EXPIRA_APOS_MINUTOS * 60 * 1000);
+  await db
+    .update(quotaPagamentos)
+    .set({ status: "expirado" })
+    .where(and(eq(quotaPagamentos.status, "pendente"), eq(quotaPagamentos.metodoPagamento, "mbway"), lt(quotaPagamentos.createdAt, limite)));
 }

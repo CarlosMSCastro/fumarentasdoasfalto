@@ -308,3 +308,44 @@ export async function sendEncomendaEnviada(
     `),
   });
 }
+
+// Disparado pelo webhook do Eupago (app/api/pagamentos/eupago-callback/
+// route.ts) quando um pagamento de quota (não uma encomenda — ver
+// pedirPagamentoQuota em app/actions/quota.ts) é confirmado. Nunca promete
+// atualização instantânea do registo de sócio: o Quotagest não é tocado
+// automaticamente, o Sr. Joaquim atualiza à mão (mesma janela de até 48h já
+// avisada em /perfil).
+export async function sendConfirmacaoQuotaPaga(to: string, dados: { nome: string; valor: number; dataPagamento: Date }) {
+  const valorFormatado = `${dados.valor.toFixed(2).replace(".", ",")} €`;
+  const dataFormatada = dados.dataPagamento.toLocaleDateString("pt-PT", { day: "numeric", month: "long", year: "numeric" });
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "Pagamento da quota confirmado — Fumarentas do Asfalto",
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Pagamento confirmado</h2>
+      <p>Olá ${dados.nome}, recebemos o pagamento da tua quota de <strong>${valorFormatado}</strong>, em ${dataFormatada}. Obrigado!</p>
+      <p style="color:#666666;font-size:13px;">O teu registo de sócio pode demorar até 48 horas a refletir isto — a associação atualiza-o manualmente.</p>
+    `),
+  });
+}
+
+// Interna, para a associação — separada de sendNotificacaoEncomendaPaga de
+// propósito, para nunca ser confundida com uma venda da loja: ao contrário
+// de uma encomenda normal, isto exige uma ação manual do Sr. Joaquim
+// (marcar a quota como paga no Quotagest).
+export async function sendNotificacaoQuotaPaga(dados: { nome: string; email: string; valor: number; metodoPagamento: string }) {
+  const valorFormatado = `${dados.valor.toFixed(2).replace(".", ",")} €`;
+
+  await resend.emails.send({
+    from: FROM,
+    to: ASSOCIACAO_EMAIL,
+    subject: `QUOTA PAGA — ${dados.nome}`,
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">Quota paga</h2>
+      <p><strong>${dados.nome}</strong> (${dados.email}) pagou a quota — <strong>${valorFormatado}</strong>, por ${dados.metodoPagamento}.</p>
+      <p style="color:#666666;font-size:13px;">Não esquecer de marcar como paga no Quotagest.</p>
+    `),
+  });
+}

@@ -7,13 +7,33 @@ import { atualizarPerfil, alterarPassword, pedirAlteracaoEmail, atualizarFoto, p
 import { terminarSessao } from "@/app/actions/auth";
 import { getHighResAvatarUrl } from "@/lib/avatar";
 import SubmitButton from "@/components/SubmitButton";
-import type { users, orders, orderItems } from "@/lib/db/schema";
+import PagarQuotaForm, { type EstadoPagamentoQuota } from "@/components/PagarQuotaForm";
+import type { users, orders, orderItems, quotaPagamentos } from "@/lib/db/schema";
 import type { QuotagestSocio } from "@/lib/quotagest";
 import { formatarPreco } from "@/lib/preco";
 
 type User = typeof users.$inferSelect;
 
 export type Encomenda = typeof orders.$inferSelect & { items: (typeof orderItems.$inferSelect)[] };
+type QuotaPagamento = typeof quotaPagamentos.$inferSelect;
+
+function estadoPagamentoQuota(pagamento: QuotaPagamento | null): EstadoPagamentoQuota {
+  if (!pagamento) return { tipo: "nenhum" };
+  if (pagamento.status === "pago" && pagamento.paidAt) {
+    return { tipo: "pago", valor: pagamento.valorCentimos / 100, paidAt: pagamento.paidAt };
+  }
+  if (pagamento.status === "pendente") {
+    return {
+      tipo: "pendente",
+      metodoPagamento: pagamento.metodoPagamento as "multibanco" | "mbway",
+      referenciaMb:
+        pagamento.referenciaMbEntidade && pagamento.referenciaMbNumero
+          ? { entidade: pagamento.referenciaMbEntidade, referencia: pagamento.referenciaMbNumero, valor: pagamento.valorCentimos / 100 }
+          : undefined,
+    };
+  }
+  return { tipo: "nenhum" };
+}
 
 const ESTADO_LABEL: Record<Encomenda["status"], string> = {
   pendente: "Pagamento pendente",
@@ -47,7 +67,17 @@ function formatDataEntrada(dataEntrada: string | null): string {
   return new Date(dataEntrada).toLocaleDateString("pt-PT", { year: "numeric", month: "long", day: "numeric" });
 }
 
-export default function PerfilForm({ user, socio, encomendas }: { user: User; socio: QuotagestSocio | null; encomendas: Encomenda[] }) {
+export default function PerfilForm({
+  user,
+  socio,
+  encomendas,
+  ultimoPagamentoQuota,
+}: {
+  user: User;
+  socio: QuotagestSocio | null;
+  encomendas: Encomenda[];
+  ultimoPagamentoQuota: QuotaPagamento | null;
+}) {
   const [state, action] = useActionState(atualizarPerfil, undefined);
   const [passwordState, passwordAction] = useActionState(alterarPassword, undefined);
   const [emailState, emailAction] = useActionState(pedirAlteracaoEmail, undefined);
@@ -145,27 +175,12 @@ export default function PerfilForm({ user, socio, encomendas }: { user: User; so
               </dl>
             ) : null}
             {socio && !socio.quotaEmDia && (
-              <details className="group mt-3">
-                <summary className="text-sm font-semibold text-primary/80 hover:text-primary cursor-pointer list-none flex items-center gap-1.5 w-fit">
-                  Ver referência de pagamento
-                  <ChevronDown size={16} className="transition-transform group-open:rotate-180" />
-                </summary>
-                {socio.referenciaPendente ? (
-                  <div className="text-sm text-white/70 space-y-1 border-t border-white/10 pt-2 mt-2">
-                    <p>Referente a <span className="text-white/90 font-semibold">{socio.referenciaPendente.descricao}</span></p>
-                    <p>Entidade <span className="text-white/90 font-semibold">{socio.referenciaPendente.entidade}</span></p>
-                    <p>Referência <span className="text-white/90 font-semibold">{socio.referenciaPendente.referencia}</span></p>
-                    <p>Valor <span className="text-white/90 font-semibold">{formatarPreco(socio.referenciaPendente.valor)}</span></p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-white/40 italic border-t border-white/10 pt-2 mt-2">
-                    Ainda não há referência de pagamento gerada para {socio.descricoesPendentes.join(", ") || "esta cota"}. Contacta a associação.
-                  </p>
-                )}
-                <p className="text-xs text-white/40 italic border-t border-white/10 pt-2 mt-2">
-                  Depois de pagares, pode demorar até 48 horas até o site regularizar a tua situação.
-                </p>
-              </details>
+              <PagarQuotaForm
+                divida={socio.divida}
+                telefoneInicial={user.phone ?? ""}
+                estadoInicial={estadoPagamentoQuota(ultimoPagamentoQuota)}
+                referenciaQuotagest={socio.referenciaPendente}
+              />
             )}
             {!socio && (
               <div>

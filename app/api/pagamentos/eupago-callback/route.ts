@@ -1,8 +1,8 @@
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { orders, orderItems } from "@/lib/db/schema";
+import { orders, orderItems, quotaPagamentos } from "@/lib/db/schema";
 import { verificarAssinaturaWebhook } from "@/lib/eupago";
-import { sendOrderConfirmation, sendNotificacaoEncomendaPaga } from "@/lib/email";
+import { sendOrderConfirmation, sendNotificacaoEncomendaPaga, sendConfirmacaoQuotaPaga, sendNotificacaoQuotaPaga } from "@/lib/email";
 
 // Recebe as notificações de pagamento do Eupago ("Realtime Webhooks 2.0",
 // eupago.readme.io/reference/realtime-webhooks-20) e marca a encomenda
@@ -66,6 +66,14 @@ export async function POST(request: Request) {
     return new Response("OK", { status: 200 });
   }
 
+  // Pagamentos de quota (ver app/actions/quota.ts) usam o identificador
+  // "quota:{id}" em vez do id nu de uma encomenda, para o webhook conseguir
+  // distinguir os dois sem ambiguidade — mesmo canal Eupago, tabela
+  // diferente. O ramo de encomendas abaixo fica intocado.
+  if (identificador.startsWith("quota:")) {
+    return processarCallbackQuota(identificador.slice("quota:".length), novoEstado);
+  }
+
   const [encomenda] = await db.select().from(orders).where(eq(orders.eupagoIdentificador, identificador));
   // Um estado já "final" para o pagamento (pago/enviado) nunca é sobreposto
   // por um webhook tardio ou duplicado; cancelado/expirado só se aplica
@@ -102,6 +110,42 @@ export async function POST(request: Request) {
       codigoPostal: encomenda.codigoPostal,
       cidade: encomenda.cidade,
       itens: itens.map((item) => ({ nome: item.nome, quantidade: item.quantidade })),
+    }).catch(() => null);
+  }
+
+  return new Response("OK", { status: 200 });
+}
+
+// Mesma lógica de idempotência do ramo de encomendas acima (nunca sobrepor
+// um "pago" já confirmado; cancelado/expirado só a partir de "pendente") —
+// ver comentário lá para o porquê. O registo como paga no Quotagest continua
+// manual (ver app/actions/quota.ts) — aqui só se confirma o pagamento do
+// nosso lado e se avisam os dois emails.
+async function processarCallbackQuota(id: string, novoEstado: "pago" | "cancelado" | "expirado"): Promise<Response> {
+  const [pagamento] = await db.select().from(quotaPagamentos).where(eq(quotaPagamentos.id, id));
+  const jaConfirmado = pagamento?.status === "pago";
+  if (!pagamento || jaConfirmado || (novoEstado !== "pago" && pagamento.status !== "pendente")) {
+    if (!pagamento) console.error("eupago-callback: sem quota_pagamento com este id", id);
+    return new Response("OK", { status: 200 });
+  }
+
+  await db
+    .update(quotaPagamentos)
+    .set({ status: novoEstado, paidAt: novoEstado === "pago" ? new Date() : null })
+    .where(eq(quotaPagamentos.id, pagamento.id));
+
+  if (novoEstado === "pago") {
+    const dataPagamento = new Date();
+    await sendConfirmacaoQuotaPaga(pagamento.email, {
+      nome: pagamento.nome,
+      valor: pagamento.valorCentimos / 100,
+      dataPagamento,
+    });
+    sendNotificacaoQuotaPaga({
+      nome: pagamento.nome,
+      email: pagamento.email,
+      valor: pagamento.valorCentimos / 100,
+      metodoPagamento: pagamento.metodoPagamento,
     }).catch(() => null);
   }
 

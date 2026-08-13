@@ -282,3 +282,37 @@ export const produtoFotos = pgTable("produto_foto", {
   url: text("url").notNull(),
   ordem: integer("ordem").notNull().default(0),
 });
+
+// Pagamento de quota pelo próprio sócio em /perfil — não é uma encomenda
+// (sem itens/morada/entrega), por isso tabela própria em vez de reaproveitar
+// "orders". Usa o canal Eupago da Loja (gerarReferenciaMultibanco/
+// pedirPagamentoMbway, lib/eupago.ts) — nunca o do Quotagest, que tem
+// problemas conhecidos (referências nem sempre emitidas, webhook deles não
+// está ativo). O registo como paga no Quotagest continua manual, feito pelo
+// Sr. Joaquim — só a cobrança em si passa a ser fiável.
+export const quotaPagamentoStatusEnum = pgEnum("quota_pagamento_status", ["pendente", "pago", "cancelado", "expirado"]);
+
+export const quotaPagamentos = pgTable("quota_pagamento", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  quotagestId: text("quotagest_id").notNull(),
+  // Snapshot do momento do pedido — nome como consta no Quotagest (para o
+  // Sr. Joaquim identificar o sócio), email da conta (para onde vai a
+  // confirmação, pode não ser o mesmo que o Quotagest tem registado).
+  nome: text("nome").notNull(),
+  email: text("email").notNull(),
+  // Sempre = dívida do sócio no momento do pedido, nunca escolhido pelo
+  // cliente (ver pedirPagamentoQuota em app/actions/quota.ts).
+  valorCentimos: integer("valor_centimos").notNull(),
+  // Reaproveita metodoPagamentoEnum — só "multibanco"/"mbway" são usados
+  // aqui, mas não vale a pena um enum novo só para excluir "cartao".
+  metodoPagamento: metodoPagamentoEnum("metodo_pagamento").notNull(),
+  status: quotaPagamentoStatusEnum("status").notNull().default("pendente"),
+  referenciaMbEntidade: text("referencia_mb_entidade"),
+  referenciaMbNumero: text("referencia_mb_numero"),
+  telemovelMbway: text("telemovel_mbway"),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  paidAt: timestamp("paid_at", { mode: "date" }),
+});
