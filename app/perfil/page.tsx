@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
-import { eq, inArray, desc } from "drizzle-orm";
+import { and, eq, inArray, desc, ne } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { users, orders, orderItems } from "@/lib/db/schema";
 import { getSocioByEmail, getSocioById, type QuotagestSocio } from "@/lib/quotagest";
+import { expirarMbwayPendentes } from "@/lib/encomendas";
 import AuthPageBackground from "@/components/AuthPageBackground";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
@@ -29,7 +30,16 @@ async function resolveSocio(user: User): Promise<QuotagestSocio | null> {
 // um join, mais fácil de agrupar em memória do que lidar com linhas
 // duplicadas de um LEFT JOIN.
 async function getEncomendas(userId: string): Promise<Encomenda[]> {
-  const encomendasDoUser = await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
+  await expirarMbwayPendentes();
+
+  // "expirado" não aparece aqui — do ponto de vista do cliente é como se o
+  // pedido nunca tivesse acontecido, não interessa poluir o histórico com
+  // isso (fica visível no painel de admin, para limpeza).
+  const encomendasDoUser = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.userId, userId), ne(orders.status, "expirado")))
+    .orderBy(desc(orders.createdAt));
   if (encomendasDoUser.length === 0) return [];
 
   const items = await db

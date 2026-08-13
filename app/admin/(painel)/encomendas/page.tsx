@@ -1,9 +1,12 @@
 import { desc, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders, orderItems } from "@/lib/db/schema";
+import { expirarMbwayPendentes } from "@/lib/encomendas";
 import EncomendasAdminList, { type EncomendaAdmin } from "@/components/admin/EncomendasAdminList";
 
 async function getTodasEncomendas(): Promise<EncomendaAdmin[]> {
+  await expirarMbwayPendentes();
+
   const todas = await db.select().from(orders).orderBy(desc(orders.createdAt));
   if (todas.length === 0) return [];
 
