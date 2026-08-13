@@ -122,5 +122,5 @@ Ativo, por esta ordem:
 Em espera indefinida (decisão do utilizador, 2026-08-12 — não são prioridade agendada):
 
 - ~~**Cartão de crédito (Eupago)**~~ — dispensável (decisão do utilizador, 2026-08-11); precisaria de contratar esse produto à parte com a Eupago, não vale a pena
-- **Botão "Pagar quotas"** em `/perfil` — o Sr. Joaquim prefere o controlo manual de marcar uma quota como "Pago" diretamente no Quotagest; esta funcionalidade tirar-lhe-ia isso, por isso ficou parada em vez de agendada
+- ~~**Botão "Pagar quotas"** em `/perfil`~~ — feito: usa o canal Eupago da Loja (não o do Quotagest), o registo no Quotagest continua manual pelo Sr. Joaquim como ele preferia, só a cobrança/confirmação por email passou a automática. Reaproveita a referência Multibanco já emitida quando o Quotagest a gerar em massa (ex. "quota geral"), em vez de gerar uma segunda concorrente — ver `CLAUDE.md`.
 - Integração com Facebook Graph API para puxar eventos automaticamente (avaliado — requer App Review da Meta, complexidade elevada)
