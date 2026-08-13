@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { users, orders, orderItems } from "@/lib/db/schema";
 import { getSocioByEmail, getSocioById, type QuotagestSocio } from "@/lib/quotagest";
-import { expirarMbwayPendentes } from "@/lib/encomendas";
+import { expirarMbwayPendentes } from "@/lib/expiracao";
 import AuthPageBackground from "@/components/AuthPageBackground";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
