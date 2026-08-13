@@ -16,7 +16,7 @@ type User = typeof users.$inferSelect;
 export type Encomenda = typeof orders.$inferSelect & { items: (typeof orderItems.$inferSelect)[] };
 
 const ESTADO_LABEL: Record<Encomenda["status"], string> = {
-  pendente: "Pendente",
+  pendente: "Pagamento pendente",
   pago: "Pago",
   enviado: "Enviado",
   cancelado: "Cancelado",

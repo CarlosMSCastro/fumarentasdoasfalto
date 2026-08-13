@@ -10,7 +10,7 @@ import { apagarEncomendaAdmin, forcarPagoAdmin, marcarEnviadoAdmin } from "@/app
 export type EncomendaAdmin = typeof orders.$inferSelect & { items: (typeof orderItems.$inferSelect)[] };
 
 const ESTADO_LABEL: Record<EncomendaAdmin["status"], string> = {
-  pendente: "Pendente",
+  pendente: "Pagamento pendente",
   pago: "Pago",
   enviado: "Enviado",
   cancelado: "Cancelado",
@@ -175,6 +175,17 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
     });
   }, [encomendas, filtroEstados, filtroEntregas, filtroProdutos]);
 
+  // Número fixo por encomenda (a mais antiga de sempre é a #1), não a
+  // posição na lista filtrada — senão o número mudava consoante o filtro
+  // ativo, e a lista mostra-se mais recente primeiro, por isso a #1 aparece
+  // lá em baixo.
+  const numeroPorId = useMemo(() => {
+    const porAntiguidade = [...encomendas].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    const mapa = new Map<string, number>();
+    porAntiguidade.forEach((encomenda, i) => mapa.set(encomenda.id, i + 1));
+    return mapa;
+  }, [encomendas]);
+
   const executar = (id: string, acao: () => Promise<void>) => {
     setErro(null);
     setPendingId(id);
@@ -329,12 +340,13 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
         <p className="text-white/60 text-base">Nenhuma encomenda encontrada com estes filtros.</p>
       ) : (
       <ul className="flex flex-col gap-4">
-        {encomendasFiltradas.map((encomenda, index) => {
+        {encomendasFiltradas.map((encomenda) => {
           const aProcessar = isPending && pendingId === encomenda.id;
+          const numero = numeroPorId.get(encomenda.id) ?? 0;
           return (
             <li key={encomenda.id} className="flex items-start gap-2 sm:gap-3">
               <span className="shrink-0 w-9 sm:w-16 pt-2.5 sm:pt-3 text-right text-lg sm:text-3xl font-extrabold text-primary drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)] whitespace-nowrap">
-                {String(index + 1).padStart(2, "0")}#
+                {String(numero).padStart(2, "0")}#
               </span>
               <div className="flex-1 min-w-0 rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
               <details className="group">
