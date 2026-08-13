@@ -50,6 +50,27 @@
       "when": 1786484846929,
       "tag": "0006_lazy_micromacro",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786585949436,
+      "tag": "0007_fluffy_vance_astro",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786587459126,
+      "tag": "0008_calm_triton",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786589334481,
+      "tag": "0009_sour_lizard",
+      "breakpoints": true
     }
   ]
 }

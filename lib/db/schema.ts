@@ -97,7 +97,9 @@ export const socioLinkRequests = pgTable(
   (t) => [primaryKey({ columns: [t.token] })]
 );
 
-export const orderStatusEnum = pgEnum("order_status", ["pendente", "pago", "cancelado", "expirado"]);
+// "enviado" é o último estado do fluxo (sem API dos correios nem tracking,
+// é o admin que marca à mão quando despacha) — ver painel /admin/encomendas.
+export const orderStatusEnum = pgEnum("order_status", ["pendente", "pago", "cancelado", "expirado", "enviado"]);
 export const metodoPagamentoEnum = pgEnum("metodo_pagamento", ["multibanco", "mbway", "cartao"]);
 export const metodoEntregaEnum = pgEnum("metodo_entrega", ["envio", "levantamento"]);
 

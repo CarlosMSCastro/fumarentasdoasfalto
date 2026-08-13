@@ -18,6 +18,7 @@ export type Encomenda = typeof orders.$inferSelect & { items: (typeof orderItems
 const ESTADO_LABEL: Record<Encomenda["status"], string> = {
   pendente: "Pendente",
   pago: "Pago",
+  enviado: "Enviado",
   cancelado: "Cancelado",
   expirado: "Expirado",
 };
@@ -25,6 +26,7 @@ const ESTADO_LABEL: Record<Encomenda["status"], string> = {
 const ESTADO_CLASSE: Record<Encomenda["status"], string> = {
   pendente: "text-yellow-400",
   pago: "text-white/90",
+  enviado: "text-emerald-400",
   cancelado: "text-red-400",
   expirado: "text-red-400",
 };

@@ -67,10 +67,12 @@ export async function POST(request: Request) {
   }
 
   const [encomenda] = await db.select().from(orders).where(eq(orders.eupagoIdentificador, identificador));
-  // "pago" nunca é sobreposto (idempotência); um estado terminal
-  // (cancelado/expirado) só se aplica vindo de "pendente" — não faz sentido
-  // sobrepor um "pago" ou "cancelado" já definidos com um "expirado" tardio.
-  if (!encomenda || encomenda.status === "pago" || (novoEstado !== "pago" && encomenda.status !== "pendente")) {
+  // Um estado já "final" para o pagamento (pago/enviado) nunca é sobreposto
+  // por um webhook tardio ou duplicado; cancelado/expirado só se aplica
+  // vindo de "pendente" — não faz sentido um "expirado" tardio sobrepor um
+  // "pago" já confirmado.
+  const jaConfirmado = encomenda?.status === "pago" || encomenda?.status === "enviado";
+  if (!encomenda || jaConfirmado || (novoEstado !== "pago" && encomenda.status !== "pendente")) {
     if (!encomenda) console.error("eupago-callback: sem encomenda com este identificador", identificador);
     return new Response("OK", { status: 200 });
   }

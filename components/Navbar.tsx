@@ -85,6 +85,9 @@ export default function Navbar() {
     return () => target.removeEventListener("scroll", handleScroll);
   }, [pathname]);
 
+  // /admin é um painel interno à parte, sem a navegação do site público.
+  if (pathname?.startsWith("/admin")) return null;
+
   const getLinkClass = (link: typeof links[number]) => {
     if (link.isContacto) {
       return inContactos ? "text-primary" : "text-[#f8f0d9] hover:text-primary";
