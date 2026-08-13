@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
-import { ChevronDown, Trash2, CircleCheck, Truck, PackageCheck } from "lucide-react";
+import { ChevronDown, Trash2, CircleCheck, Truck, PackageCheck, Check } from "lucide-react";
 import type { orders, orderItems } from "@/lib/db/schema";
 import { formatarPreco } from "@/lib/produtos";
 import { apagarEncomendaAdmin, forcarPagoAdmin, marcarEnviadoAdmin } from "@/app/actions/admin";
@@ -89,6 +89,61 @@ function alternar<T>(conjunto: Set<T>, valor: T): Set<T> {
   return novo;
 }
 
+// Dropdown de filtro para mobile — <details> nativo (sem estado React extra),
+// o atributo "name" partilhado faz os 3 fecharem-se uns aos outros ao abrir
+// um novo (comportamento nativo do HTML, sem JS). Substitui as pills em
+// scroll horizontal, que o utilizador achou confusas no telemóvel.
+function FiltroDropdown<T extends string>({
+  label,
+  opcoes,
+  selecionados,
+  onAlternar,
+  onLimpar,
+}: {
+  label: string;
+  opcoes: { valor: T; texto: string }[];
+  selecionados: Set<T>;
+  onAlternar: (valor: T) => void;
+  onLimpar: () => void;
+}) {
+  return (
+    <details name="filtro-mobile" className="group relative">
+      <summary className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 cursor-pointer list-none whitespace-nowrap">
+        {label}
+        {selecionados.size > 0 && <span className="text-primary">({selecionados.size})</span>}
+        <ChevronDown size={12} className="text-white/40 transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="absolute z-20 mt-2 flex flex-col gap-0.5 rounded-lg border border-white/15 bg-[#141414] p-1.5 shadow-xl min-w-44 max-h-64 overflow-y-auto">
+        <button
+          type="button"
+          onClick={onLimpar}
+          className={`rounded-md px-3 py-2 text-sm text-left font-bold cursor-pointer ${
+            selecionados.size === 0 ? "text-primary" : "text-white/60 hover:bg-white/5"
+          }`}
+        >
+          Todos
+        </button>
+        {opcoes.map((opcao) => {
+          const ativo = selecionados.has(opcao.valor);
+          return (
+            <button
+              key={opcao.valor}
+              type="button"
+              onClick={() => onAlternar(opcao.valor)}
+              className={`flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-left cursor-pointer ${
+                ativo ? "bg-primary/15 text-primary font-semibold" : "text-white/70 hover:bg-white/5"
+              }`}
+            >
+              {opcao.texto}
+              {ativo && <Check size={14} />}
+            </button>
+          );
+        })}
+      </div>
+    </details>
+  );
+}
+
 export default function EncomendasAdminList({ encomendas }: { encomendas: EncomendaAdmin[] }) {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -149,6 +204,9 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
   };
 
   const onMarcarEnviado = (encomenda: EncomendaAdmin) => {
+    const acao = encomenda.metodoEntrega === "envio" ? "ENVIADA" : "ENTREGUE";
+    const confirmado = window.confirm(`Marcar a encomenda #${encomenda.id.slice(0, 8)} como ${acao}?`);
+    if (!confirmado) return;
     executar(encomenda.id, () => marcarEnviadoAdmin(encomenda.id));
   };
 
@@ -215,22 +273,34 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
 
   return (
     <div>
-      {/* Mobile: um grupo por linha, pills em scroll horizontal (não
-          quebram para a linha de baixo — era isso que ficava confuso). */}
-      <div className="flex flex-col gap-3 mb-6 sm:hidden">
-        <div>
-          <span className="block text-[11px] font-semibold uppercase tracking-wide text-white/40 mb-1.5">Estado</span>
-          <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-0.5">{pillsEstado()}</div>
-        </div>
-        <div>
-          <span className="block text-[11px] font-semibold uppercase tracking-wide text-white/40 mb-1.5">Entrega</span>
-          <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-0.5">{pillsEntrega()}</div>
-        </div>
+      {/* Mobile: 3 dropdowns compactos em vez de pills — cada um abre a
+          lista de opções por cima do conteúdo em baixo. */}
+      <div className="flex items-center gap-2 mb-6 sm:hidden">
+        <FiltroDropdown
+          label="Estado"
+          opcoes={Object.entries(ESTADO_LABEL).map(([valor, texto]) => ({ valor: valor as EncomendaAdmin["status"], texto }))}
+          selecionados={filtroEstados}
+          onAlternar={(valor) => setFiltroEstados((atual) => alternar(atual, valor))}
+          onLimpar={() => setFiltroEstados(new Set())}
+        />
+        <FiltroDropdown
+          label="Entrega"
+          opcoes={[
+            { valor: "envio" as EncomendaAdmin["metodoEntrega"], texto: "Envio" },
+            { valor: "levantamento" as EncomendaAdmin["metodoEntrega"], texto: "Levantamento" },
+          ]}
+          selecionados={filtroEntregas}
+          onAlternar={(valor) => setFiltroEntregas((atual) => alternar(atual, valor))}
+          onLimpar={() => setFiltroEntregas(new Set())}
+        />
         {produtosDisponiveis.length > 0 && (
-          <div>
-            <span className="block text-[11px] font-semibold uppercase tracking-wide text-white/40 mb-1.5">Produto</span>
-            <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-0.5">{pillsProduto()}</div>
-          </div>
+          <FiltroDropdown
+            label="Produto"
+            opcoes={produtosDisponiveis.map(([valor, texto]) => ({ valor, texto }))}
+            selecionados={filtroProdutos}
+            onAlternar={(valor) => setFiltroProdutos((atual) => alternar(atual, valor))}
+            onLimpar={() => setFiltroProdutos(new Set())}
+          />
         )}
       </div>
 

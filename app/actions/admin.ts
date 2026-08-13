@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { orders, orderItems } from "@/lib/db/schema";
-import { sendOrderConfirmation, sendNotificacaoEncomendaPaga } from "@/lib/email";
+import { sendOrderConfirmation, sendNotificacaoEncomendaPaga, sendEncomendaEnviada } from "@/lib/email";
 
 async function exigirAdmin() {
   const session = await auth();
@@ -61,11 +61,21 @@ export async function forcarPagoAdmin(id: string) {
 }
 
 // Último estado do fluxo — sem API dos correios, é o admin que marca à mão
-// quando a encomenda sai para entrega. Sem email associado (nada foi pedido
-// para este passo).
+// quando a encomenda sai para entrega. Manda ao cliente sendEncomendaEnviada
+// (texto diferente consoante envio/levantamento).
 export async function marcarEnviadoAdmin(id: string) {
   await exigirAdmin();
+
+  const [encomenda] = await db.select().from(orders).where(eq(orders.id, id));
+  if (!encomenda || encomenda.status !== "pago") return;
+
   await db.update(orders).set({ status: "enviado" }).where(eq(orders.id, id));
+
+  await sendEncomendaEnviada(encomenda.email, {
+    id: encomenda.id,
+    metodoEntrega: encomenda.metodoEntrega,
+  }).catch(() => null);
+
   revalidatePath("/admin/encomendas");
   revalidatePath("/perfil");
 }

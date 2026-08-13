@@ -277,3 +277,24 @@ export async function sendConfirmacaoMbway(to: string, encomenda: { id: string; 
     `),
   });
 }
+
+// Disparado quando o admin marca a encomenda como "enviado" no painel (ver
+// marcarEnviadoAdmin em app/actions/admin.ts) — mensagem diferente consoante
+// o método de entrega, à semelhança de sendNotificacaoEncomendaPaga.
+export async function sendEncomendaEnviada(to: string, encomenda: { id: string; metodoEntrega: "envio" | "levantamento" }) {
+  const paraEnvio = encomenda.metodoEntrega === "envio";
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${paraEnvio ? "Encomenda enviada" : "Encomenda pronta para levantamento"} — #${encomenda.id.slice(0, 8)}`,
+    html: wrapEmail(`
+      <h2 style="color:${PRIMARY};margin:0 0 12px;">${paraEnvio ? "Encomenda enviada" : "Pronta para levantamento"}</h2>
+      <p>${
+        paraEnvio
+          ? `A tua encomenda <strong>#${encomenda.id.slice(0, 8)}</strong> foi enviada e está a caminho.`
+          : `A tua encomenda <strong>#${encomenda.id.slice(0, 8)}</strong> já está pronta — podes vir levantá-la quando quiseres.`
+      }</p>
+    `),
+  });
+}
