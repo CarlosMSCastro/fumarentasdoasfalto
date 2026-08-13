@@ -53,15 +53,17 @@ function textoEntrega(encomenda: EncomendaAdmin): string {
 // por baixo. Reutilizado para todos os campos de detalhe do painel.
 function Campo({ legenda, valor }: { legenda: string; valor: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 min-w-0">
       <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</span>
-      <span className="text-sm text-white/90">{valor}</span>
+      {/* break-words — sem isto, um email comprido não quebra (não tem
+          espaços) e transborda por cima da célula ao lado no grid. */}
+      <span className="text-sm text-white/90 break-words">{valor}</span>
     </div>
   );
 }
 
 function classePill(ativo: boolean): string {
-  return `rounded-full px-2 py-0.5 text-xs font-semibold transition-all cursor-pointer border whitespace-nowrap ${
+  return `shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold transition-all cursor-pointer border whitespace-nowrap ${
     ativo
       ? "bg-primary border-primary text-white shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
       : "bg-white/5 border-white/15 text-white/70 hover:border-white/30 hover:text-white"
@@ -73,7 +75,7 @@ function classePill(ativo: boolean): string {
 // outros — o destaque pedido é sobretudo notar-se que é a opção de "reset"
 // (limpa a seleção do grupo todo).
 function classePillTodos(ativo: boolean): string {
-  return `rounded-full px-2 py-0.5 text-xs font-bold transition-all cursor-pointer border whitespace-nowrap ${
+  return `shrink-0 rounded-full px-2 py-0.5 text-xs font-bold transition-all cursor-pointer border whitespace-nowrap ${
     ativo
       ? "bg-primary border-primary text-white shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
       : "border-dashed border-white/30 text-white/80 hover:border-white/50"
@@ -150,78 +152,104 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
     executar(encomenda.id, () => marcarEnviadoAdmin(encomenda.id));
   };
 
+  // Cada grupo devolve as pills de fresco em cada chamada — chamadas duas
+  // vezes (bloco mobile e bloco desktop, ver return) para gerar duas árvores
+  // de elementos independentes em vez de reutilizar a mesma instância.
+  const pillsEstado = () => (
+    <>
+      <button type="button" className={classePillTodos(filtroEstados.size === 0)} onClick={() => setFiltroEstados(new Set())}>
+        Todos
+      </button>
+      {Object.entries(ESTADO_LABEL).map(([valor, label]) => (
+        <button
+          key={valor}
+          type="button"
+          className={classePill(filtroEstados.has(valor as EncomendaAdmin["status"]))}
+          onClick={() => setFiltroEstados((atual) => alternar(atual, valor as EncomendaAdmin["status"]))}
+        >
+          {label}
+        </button>
+      ))}
+    </>
+  );
+
+  const pillsEntrega = () => (
+    <>
+      <button type="button" className={classePillTodos(filtroEntregas.size === 0)} onClick={() => setFiltroEntregas(new Set())}>
+        Todos
+      </button>
+      <button type="button" className={classePill(filtroEntregas.has("envio"))} onClick={() => setFiltroEntregas((atual) => alternar(atual, "envio"))}>
+        Envio
+      </button>
+      <button
+        type="button"
+        className={classePill(filtroEntregas.has("levantamento"))}
+        onClick={() => setFiltroEntregas((atual) => alternar(atual, "levantamento"))}
+      >
+        Levantamento
+      </button>
+    </>
+  );
+
+  const pillsProduto = () => (
+    <>
+      <button type="button" className={classePillTodos(filtroProdutos.size === 0)} onClick={() => setFiltroProdutos(new Set())}>
+        Todos
+      </button>
+      {produtosDisponiveis.map(([produtoId, nome]) => (
+        <button
+          key={produtoId}
+          type="button"
+          className={classePill(filtroProdutos.has(produtoId))}
+          onClick={() => setFiltroProdutos((atual) => alternar(atual, produtoId))}
+        >
+          {nome}
+        </button>
+      ))}
+    </>
+  );
+
   if (encomendas.length === 0) {
     return <p className="text-white/60 text-base">Ainda não há encomendas.</p>;
   }
 
   return (
     <div>
-      {/* sm:ml para alinhar com o card das encomendas em baixo (não com o
-          número de índice, mais estreito no mobile) — sem esse offset no
-          mobile para não desperdiçar largura já escassa. No mobile cada
-          grupo (Estado/Entrega/Produto) fica na sua própria linha; no
-          desktop tudo tenta caber numa linha só (flex-wrap). */}
-      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-1.5 mb-8 sm:ml-[4.75rem]">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40 shrink-0">Estado</span>
-          <button type="button" className={classePillTodos(filtroEstados.size === 0)} onClick={() => setFiltroEstados(new Set())}>
-            Todos
-          </button>
-          {Object.entries(ESTADO_LABEL).map(([valor, label]) => (
-            <button
-              key={valor}
-              type="button"
-              className={classePill(filtroEstados.has(valor as EncomendaAdmin["status"]))}
-              onClick={() => setFiltroEstados((atual) => alternar(atual, valor as EncomendaAdmin["status"]))}
-            >
-              {label}
-            </button>
-          ))}
+      {/* Mobile: um grupo por linha, pills em scroll horizontal (não
+          quebram para a linha de baixo — era isso que ficava confuso). */}
+      <div className="flex flex-col gap-3 mb-6 sm:hidden">
+        <div>
+          <span className="block text-[11px] font-semibold uppercase tracking-wide text-white/40 mb-1.5">Estado</span>
+          <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-0.5">{pillsEstado()}</div>
         </div>
-
-        <span className="hidden sm:block w-px h-4 bg-white/10 mx-0.5" />
-
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40 shrink-0">Entrega</span>
-          <button type="button" className={classePillTodos(filtroEntregas.size === 0)} onClick={() => setFiltroEntregas(new Set())}>
-            Todos
-          </button>
-          <button
-            type="button"
-            className={classePill(filtroEntregas.has("envio"))}
-            onClick={() => setFiltroEntregas((atual) => alternar(atual, "envio"))}
-          >
-            Envio
-          </button>
-          <button
-            type="button"
-            className={classePill(filtroEntregas.has("levantamento"))}
-            onClick={() => setFiltroEntregas((atual) => alternar(atual, "levantamento"))}
-          >
-            Levantamento
-          </button>
+        <div>
+          <span className="block text-[11px] font-semibold uppercase tracking-wide text-white/40 mb-1.5">Entrega</span>
+          <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-0.5">{pillsEntrega()}</div>
         </div>
+        {produtosDisponiveis.length > 0 && (
+          <div>
+            <span className="block text-[11px] font-semibold uppercase tracking-wide text-white/40 mb-1.5">Produto</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-0.5">{pillsProduto()}</div>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: tudo numa linha só, como já estava — ml para alinhar com
+          o card das encomendas em baixo (não com o número de índice). */}
+      <div className="hidden sm:flex sm:flex-wrap sm:items-center gap-1.5 mb-8 ml-[4.75rem]">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40 shrink-0">Estado</span>
+        {pillsEstado()}
+
+        <span className="w-px h-4 bg-white/10 mx-0.5" />
+
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40 shrink-0">Entrega</span>
+        {pillsEntrega()}
 
         {produtosDisponiveis.length > 0 && (
           <>
-            <span className="hidden sm:block w-px h-4 bg-white/10 mx-0.5" />
-
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40 shrink-0">Produto</span>
-              <button type="button" className={classePillTodos(filtroProdutos.size === 0)} onClick={() => setFiltroProdutos(new Set())}>
-                Todos
-              </button>
-              {produtosDisponiveis.map(([produtoId, nome]) => (
-                <button
-                  key={produtoId}
-                  type="button"
-                  className={classePill(filtroProdutos.has(produtoId))}
-                  onClick={() => setFiltroProdutos((atual) => alternar(atual, produtoId))}
-                >
-                  {nome}
-                </button>
-              ))}
-            </div>
+            <span className="w-px h-4 bg-white/10 mx-0.5" />
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40 shrink-0">Produto</span>
+            {pillsProduto()}
           </>
         )}
       </div>
@@ -300,8 +328,8 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
                   </div>
                 </summary>
 
-                <div className="px-5 pb-5 pt-1 flex flex-col gap-5 border-t border-white/10">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 pt-4">
+                <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-1 flex flex-col gap-3 sm:gap-5 border-t border-white/10">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 pt-3 sm:pt-4">
                     <Campo legenda="Email" valor={encomenda.email} />
                     <Campo legenda="Telefone" valor={encomenda.telefone} />
                     <Campo legenda="Data de pagamento" valor={formatDataHora(encomenda.paidAt)} />
@@ -331,13 +359,13 @@ export default function EncomendasAdminList({ encomendas }: { encomendas: Encome
                   )}
 
                   {encomenda.metodoPagamento === "multibanco" && encomenda.referenciaMbEntidade && encomenda.referenciaMbNumero && (
-                    <div className="grid grid-cols-2 gap-5">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-5">
                       <Campo legenda="Entidade" valor={encomenda.referenciaMbEntidade} />
                       <Campo legenda="Referência" valor={encomenda.referenciaMbNumero} />
                     </div>
                   )}
 
-                  <div className="flex flex-wrap gap-3 pt-3 border-t border-white/10">
+                  <div className="flex flex-wrap gap-2 sm:gap-3 pt-2 sm:pt-3 border-t border-white/10">
                     {encomenda.status !== "pago" && encomenda.status !== "enviado" && (
                       <button
                         type="button"

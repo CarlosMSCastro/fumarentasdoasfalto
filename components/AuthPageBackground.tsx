@@ -20,9 +20,20 @@ interface AuthPageBackgroundProps {
   // que agora encosta a <ContactosSection /> — essa secção já inclui um
   // Footer, então o daqui ficaria duplicado).
   footer?: boolean;
+  // true reduz o py-24 no mobile (py-8) — só faz sentido em páginas sem
+  // <Navbar /> fixa a sobrepor o topo (ex: /admin), senão o conteúdo fica
+  // colado/tapado por ela. As páginas de auth normais (login, perfil, etc.)
+  // continuam com o py-24 de sempre.
+  compactPaddingMobile?: boolean;
 }
 
-export default function AuthPageBackground({ children, align = "center", verticalAlign = "center", footer = true }: AuthPageBackgroundProps) {
+export default function AuthPageBackground({
+  children,
+  align = "center",
+  verticalAlign = "center",
+  footer = true,
+  compactPaddingMobile = false,
+}: AuthPageBackgroundProps) {
   return (
     <div className="relative min-h-dvh w-full flex flex-col overflow-hidden">
       <div className="fixed inset-0 overflow-hidden -z-10" aria-hidden="true">
@@ -39,7 +50,11 @@ export default function AuthPageBackground({ children, align = "center", vertica
         <SmokeVideo className="absolute inset-0 w-full h-full object-cover opacity-65 pointer-events-none mix-blend-screen" />
       </div>
 
-      <div className={`relative z-10 flex-1 flex px-6 py-24 ${verticalAlign === "start" ? "items-start" : "items-center"}`}>
+      <div
+        className={`relative z-10 flex-1 flex px-6 ${compactPaddingMobile ? "py-8 sm:py-24" : "py-24"} ${
+          verticalAlign === "start" ? "items-start" : "items-center"
+        }`}
+      >
         <div className={`w-full max-w-7xl mx-auto flex ${align === "end" ? "justify-end" : "justify-center"}`}>
           {children}
         </div>
