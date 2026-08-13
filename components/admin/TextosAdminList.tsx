@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import type { TextoChave, SeccaoLegal, PaginaLegalId } from "@/lib/textos";
 import {
   atualizarTextoAdmin,
@@ -11,62 +11,149 @@ import {
 } from "@/app/actions/admin-textos";
 import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
 
-function CampoTexto({
-  legenda,
-  valorInicial,
-  onGuardar,
-  multiline = false,
-  isPending,
-}: {
-  legenda: string;
-  valorInicial: string;
-  onGuardar: (valor: string) => Promise<{ error?: string }>;
-  multiline?: boolean;
-  isPending: boolean;
-}) {
-  const [valor, setValor] = useState(valorInicial);
-  const [erro, setErro] = useState<string | null>(null);
-
-  const guardar = async () => {
-    setErro(null);
-    const resultado = await onGuardar(valor);
-    if (resultado.error) setErro(resultado.error);
-  };
-
-  const classeCampo =
-    "w-full rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-primary";
-
+function Campo({ legenda, valor }: { legenda: string; valor: string }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</label>
-      {multiline ? (
-        <textarea value={valor} onChange={(e) => setValor(e.target.value)} rows={3} className={classeCampo} />
-      ) : (
-        <input type="text" value={valor} onChange={(e) => setValor(e.target.value)} className={classeCampo} />
-      )}
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={guardar}
-          className="self-start rounded-full bg-primary hover:bg-[var(--primary-hover)] px-4 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-50 cursor-pointer"
-        >
-          Guardar
-        </button>
-        {erro && <span className="text-red-400 text-xs">{erro}</span>}
-      </div>
+    <div className="flex flex-col gap-1 min-w-0">
+      <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</span>
+      <span className="text-sm text-white/90 break-words whitespace-pre-line">{valor}</span>
     </div>
   );
 }
 
+function CampoInput({
+  legenda,
+  value,
+  onChange,
+  multiline = false,
+}: {
+  legenda: string;
+  value: string;
+  onChange: (valor: string) => void;
+  multiline?: boolean;
+}) {
+  const classeCampo =
+    "w-full rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-primary";
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</label>
+      {multiline ? (
+        <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className={classeCampo} />
+      ) : (
+        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={classeCampo} />
+      )}
+    </div>
+  );
+}
+
+// Grupo (Homepage/Sobre/cada página legal) — fechado por defeito, mesmo
+// padrão das outras áreas do admin (Fundadores/Eventos/Produtos, listas de
+// <details> fechadas até se clicar). Título a laranja para dar destaque
+// (pedido explícito, distingue-se do resto do texto branco/cinza).
 function Grupo({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <details className="group rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden" open>
-      <summary className="px-4 sm:px-5 py-3 cursor-pointer list-none text-base font-bold text-white/90 hover:bg-white/[0.03] transition-colors">
+    <details className="group rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+      <summary className="px-4 sm:px-5 py-3 cursor-pointer list-none text-base font-bold text-primary hover:bg-white/[0.03] transition-colors">
         {titulo}
       </summary>
-      <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-white/10 flex flex-col gap-4">{children}</div>
+      <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-white/10 flex flex-col gap-5">{children}</div>
     </details>
+  );
+}
+
+type CampoDef = { chave: TextoChave; legenda: string; multiline?: boolean };
+
+// Um "Editar" desbloqueia TODOS os campos deste bloco de uma vez (não um por
+// campo) — mesmo espírito de Fundadores/Eventos/Produtos, onde editar uma
+// entidade desbloqueia os seus campos todos juntos. "Homepage" por exemplo
+// tem 2 blocos (Hero, Objetivos) dentro do mesmo Grupo — cada um com o seu
+// próprio Editar independente.
+function BlocoTextoEditavel({
+  titulo,
+  campos,
+  textos,
+  isPending,
+  startTransition,
+}: {
+  titulo: string;
+  campos: CampoDef[];
+  textos: Record<TextoChave, string>;
+  isPending: boolean;
+  startTransition: (fn: () => void | Promise<void>) => void;
+}) {
+  const [editando, setEditando] = useState(false);
+  const [valores, setValores] = useState<Record<string, string>>({});
+  const [erro, setErro] = useState<string | null>(null);
+
+  const iniciarEdicao = () => {
+    setErro(null);
+    setValores(Object.fromEntries(campos.map((c) => [c.chave, textos[c.chave]])));
+    setEditando(true);
+  };
+
+  const guardar = () => {
+    setErro(null);
+    startTransition(async () => {
+      const resultados = await Promise.all(campos.map((c) => atualizarTextoAdmin(c.chave, valores[c.chave] ?? "")));
+      const comErro = resultados.find((r) => r.error);
+      if (comErro?.error) {
+        setErro(comErro.error);
+        return;
+      }
+      setEditando(false);
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-white/30">{titulo}</p>
+      {editando ? (
+        <>
+          {campos.map((c) => (
+            <CampoInput
+              key={c.chave}
+              legenda={c.legenda}
+              value={valores[c.chave] ?? ""}
+              onChange={(v) => setValores((prev) => ({ ...prev, [c.chave]: v }))}
+              multiline={c.multiline}
+            />
+          ))}
+          {erro && <p className="text-red-400 text-xs">{erro}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={guardar}
+              className="rounded-full bg-primary hover:bg-[var(--primary-hover)] px-4 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-50 cursor-pointer"
+            >
+              Guardar
+            </button>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setEditando(false)}
+              className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-semibold text-white/70 hover:text-white hover:border-white/30 transition-all disabled:opacity-50 cursor-pointer"
+            >
+              Cancelar
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {campos.map((c) => (
+              <Campo key={c.chave} legenda={c.legenda} valor={textos[c.chave]} />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={iniciarEdicao}
+            className="self-start flex items-center gap-2 rounded-full border border-primary/50 text-primary hover:bg-primary/10 px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer"
+          >
+            <Pencil size={13} /> Editar
+          </button>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -86,10 +173,6 @@ function SeccoesLegais({
   const [novoSubtitulo, setNovoSubtitulo] = useState("");
   const [novoCorpo, setNovoCorpo] = useState("");
   const [erroNovo, setErroNovo] = useState<string | null>(null);
-
-  const onGuardarSeccao = async (id: string, dados: { subtitulo: string; corpo: string }) => {
-    return atualizarSeccaoLegalAdmin(id, dados);
-  };
 
   const onApagarSeccao = async (seccao: SeccaoLegal) => {
     const confirmado = await confirmar(
@@ -121,7 +204,7 @@ function SeccoesLegais({
           key={seccao.id}
           seccao={seccao}
           isPending={isPending}
-          onGuardar={(dados) => onGuardarSeccao(seccao.id, dados)}
+          onGuardar={(dados) => atualizarSeccaoLegalAdmin(seccao.id, dados)}
           onApagar={() => onApagarSeccao(seccao)}
         />
       ))}
@@ -176,6 +259,10 @@ function SeccoesLegais({
   );
 }
 
+// Mesmo padrão fixo→Editar→Guardar dos blocos acima, aplicado a cada secção
+// legal (subtítulo+corpo juntos, um "Editar" só) — Apagar fica sempre
+// visível em modo de leitura, à parte do Editar, mesmo espírito de
+// Fundadores/Eventos/Produtos.
 function SeccaoLegalItem({
   seccao,
   isPending,
@@ -187,39 +274,79 @@ function SeccaoLegalItem({
   onGuardar: (dados: { subtitulo: string; corpo: string }) => Promise<{ error?: string }>;
   onApagar: () => void;
 }) {
+  const [editando, setEditando] = useState(false);
   const [subtitulo, setSubtitulo] = useState(seccao.subtitulo);
   const [corpo, setCorpo] = useState(seccao.corpo);
   const [erro, setErro] = useState<string | null>(null);
 
+  const iniciarEdicao = () => {
+    setErro(null);
+    setSubtitulo(seccao.subtitulo);
+    setCorpo(seccao.corpo);
+    setEditando(true);
+  };
+
   const guardar = async () => {
     setErro(null);
     const resultado = await onGuardar({ subtitulo, corpo });
-    if (resultado.error) setErro(resultado.error);
+    if (resultado.error) {
+      setErro(resultado.error);
+      return;
+    }
+    setEditando(false);
   };
+
+  if (editando) {
+    return (
+      <div className="rounded-lg border border-white/10 p-3 flex flex-col gap-2">
+        <input
+          type="text"
+          placeholder="Subtítulo (opcional)"
+          value={subtitulo}
+          onChange={(e) => setSubtitulo(e.target.value)}
+          className="w-full rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-primary"
+        />
+        <textarea
+          value={corpo}
+          onChange={(e) => setCorpo(e.target.value)}
+          rows={3}
+          className="w-full rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-primary"
+        />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={guardar}
+            className="rounded-full bg-primary hover:bg-[var(--primary-hover)] px-4 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-50 cursor-pointer"
+          >
+            Guardar
+          </button>
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => setEditando(false)}
+            className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-semibold text-white/70 hover:text-white hover:border-white/30 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            Cancelar
+          </button>
+          {erro && <span className="text-red-400 text-xs">{erro}</span>}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border border-white/10 p-3 flex flex-col gap-2">
-      <input
-        type="text"
-        placeholder="Subtítulo (opcional)"
-        value={subtitulo}
-        onChange={(e) => setSubtitulo(e.target.value)}
-        className="w-full rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-primary"
-      />
-      <textarea
-        value={corpo}
-        onChange={(e) => setCorpo(e.target.value)}
-        rows={3}
-        className="w-full rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-primary"
-      />
+      <Campo legenda={seccao.subtitulo ? "Subtítulo" : "Subtítulo (nenhum)"} valor={seccao.subtitulo || "—"} />
+      <Campo legenda="Texto" valor={seccao.corpo} />
       <div className="flex items-center gap-2">
         <button
           type="button"
           disabled={isPending}
-          onClick={guardar}
-          className="rounded-full bg-primary hover:bg-[var(--primary-hover)] px-4 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-50 cursor-pointer"
+          onClick={iniciarEdicao}
+          className="flex items-center gap-1.5 rounded-full border border-primary/50 text-primary hover:bg-primary/10 px-4 py-1.5 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
         >
-          Guardar
+          <Pencil size={12} /> Editar
         </button>
         <button
           type="button"
@@ -229,7 +356,6 @@ function SeccaoLegalItem({
         >
           <Trash2 size={13} />
         </button>
-        {erro && <span className="text-red-400 text-xs">{erro}</span>}
       </div>
     </div>
   );
@@ -248,103 +374,78 @@ export default function TextosAdminList({
 }) {
   const [isPending, startTransition] = useTransition();
 
-  // Envolve a chamada normal (que devolve uma Promise) numa startTransition,
-  // mas continua a devolver o resultado ao CampoTexto para este poder
-  // mostrar o erro — startTransition não devolve o valor do callback, por
-  // isso a chamada em si fica fora dele (só o isPending é que é global).
-  const guardarTexto = (chave: TextoChave) => async (valor: string) => {
-    return new Promise<{ error?: string }>((resolve) => {
-      startTransition(async () => {
-        resolve(await atualizarTextoAdmin(chave, valor));
-      });
-    });
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <Grupo titulo="Homepage">
-        <CampoTexto legenda="Hero — label" valorInicial={textos["home.hero.label"]} onGuardar={guardarTexto("home.hero.label")} isPending={isPending} />
-        <CampoTexto legenda="Hero — título" valorInicial={textos["home.hero.titulo"]} onGuardar={guardarTexto("home.hero.titulo")} isPending={isPending} />
-        <CampoTexto
-          legenda="Hero — descrição"
-          valorInicial={textos["home.hero.descricao"]}
-          onGuardar={guardarTexto("home.hero.descricao")}
-          multiline
+        <BlocoTextoEditavel
+          titulo="Hero"
+          textos={textos}
           isPending={isPending}
+          startTransition={startTransition}
+          campos={[
+            { chave: "home.hero.label", legenda: "Label" },
+            { chave: "home.hero.titulo", legenda: "Título" },
+            { chave: "home.hero.descricao", legenda: "Descrição", multiline: true },
+          ]}
         />
-        <CampoTexto
-          legenda="Objetivos — label"
-          valorInicial={textos["home.objetivos.label"]}
-          onGuardar={guardarTexto("home.objetivos.label")}
+        <BlocoTextoEditavel
+          titulo="Objetivos"
+          textos={textos}
           isPending={isPending}
-        />
-        <CampoTexto
-          legenda="Objetivos — título"
-          valorInicial={textos["home.objetivos.titulo"]}
-          onGuardar={guardarTexto("home.objetivos.titulo")}
-          isPending={isPending}
-        />
-        <CampoTexto
-          legenda="Objetivos — descrição"
-          valorInicial={textos["home.objetivos.descricao"]}
-          onGuardar={guardarTexto("home.objetivos.descricao")}
-          multiline
-          isPending={isPending}
+          startTransition={startTransition}
+          campos={[
+            { chave: "home.objetivos.label", legenda: "Label" },
+            { chave: "home.objetivos.titulo", legenda: "Título" },
+            { chave: "home.objetivos.descricao", legenda: "Descrição", multiline: true },
+          ]}
         />
       </Grupo>
 
       <Grupo titulo="Sobre">
-        <CampoTexto legenda="Label" valorInicial={textos["sobre.label"]} onGuardar={guardarTexto("sobre.label")} isPending={isPending} />
-        <CampoTexto legenda="Título" valorInicial={textos["sobre.titulo"]} onGuardar={guardarTexto("sobre.titulo")} isPending={isPending} />
-        <CampoTexto
-          legenda="Parágrafo 1"
-          valorInicial={textos["sobre.paragrafo1"]}
-          onGuardar={guardarTexto("sobre.paragrafo1")}
-          multiline
+        <BlocoTextoEditavel
+          titulo="Texto"
+          textos={textos}
           isPending={isPending}
-        />
-        <CampoTexto
-          legenda="Parágrafo 2"
-          valorInicial={textos["sobre.paragrafo2"]}
-          onGuardar={guardarTexto("sobre.paragrafo2")}
-          multiline
-          isPending={isPending}
-        />
-        <CampoTexto
-          legenda="Parágrafo 3"
-          valorInicial={textos["sobre.paragrafo3"]}
-          onGuardar={guardarTexto("sobre.paragrafo3")}
-          multiline
-          isPending={isPending}
+          startTransition={startTransition}
+          campos={[
+            { chave: "sobre.label", legenda: "Label" },
+            { chave: "sobre.titulo", legenda: "Título" },
+            { chave: "sobre.paragrafo1", legenda: "Parágrafo 1", multiline: true },
+            { chave: "sobre.paragrafo2", legenda: "Parágrafo 2", multiline: true },
+            { chave: "sobre.paragrafo3", legenda: "Parágrafo 3", multiline: true },
+          ]}
         />
       </Grupo>
 
       <Grupo titulo="Termos e Condições">
-        <CampoTexto
-          legenda="Título da página"
-          valorInicial={textos["legal.termos.titulo"]}
-          onGuardar={guardarTexto("legal.termos.titulo")}
+        <BlocoTextoEditavel
+          titulo="Título da página"
+          textos={textos}
           isPending={isPending}
+          startTransition={startTransition}
+          campos={[{ chave: "legal.termos.titulo", legenda: "Título" }]}
         />
         <SeccoesLegais pagina="termos" seccoes={seccoesTermos} isPending={isPending} startTransition={startTransition} />
       </Grupo>
 
       <Grupo titulo="Política de Privacidade">
-        <CampoTexto
-          legenda="Título da página"
-          valorInicial={textos["legal.privacidade.titulo"]}
-          onGuardar={guardarTexto("legal.privacidade.titulo")}
+        <BlocoTextoEditavel
+          titulo="Título da página"
+          textos={textos}
           isPending={isPending}
+          startTransition={startTransition}
+          campos={[{ chave: "legal.privacidade.titulo", legenda: "Título" }]}
         />
         <SeccoesLegais pagina="privacidade" seccoes={seccoesPrivacidade} isPending={isPending} startTransition={startTransition} />
       </Grupo>
 
       <Grupo titulo="Política de Cookies">
-        <CampoTexto
-          legenda="Título da página"
-          valorInicial={textos["legal.cookies.titulo"]}
-          onGuardar={guardarTexto("legal.cookies.titulo")}
+        <BlocoTextoEditavel
+          titulo="Título da página"
+          textos={textos}
           isPending={isPending}
+          startTransition={startTransition}
+          campos={[{ chave: "legal.cookies.titulo", legenda: "Título" }]}
         />
         <SeccoesLegais pagina="cookies" seccoes={seccoesCookies} isPending={isPending} startTransition={startTransition} />
       </Grupo>
