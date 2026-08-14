@@ -134,14 +134,14 @@ export async function gerarLinkPagamentoCartao(
 // Confirma que um pedido recebido em app/api/pagamentos/eupago-callback veio
 // mesmo do Eupago (header X-Signature, HMAC-SHA256 em base64 sobre o corpo
 // bruto do pedido) — sem isto, qualquer pessoa podia chamar o callback a
-// mandar marcar encomendas como pagas. A chave usada aqui não está 100%
-// confirmada pela documentação (não diz explicitamente se é a mesma Chave
-// API ou um segredo de webhook à parte) — usa EUPAGO_WEBHOOK_SECRET se
-// existir, senão cai para EUPAGO_API_KEY. Por testar com uma transação real
-// antes de confiar cegamente nisto em produção.
+// mandar marcar encomendas como pagas. Falha fechado (rejeita) se
+// EUPAGO_WEBHOOK_SECRET não estiver definida — nunca reutiliza EUPAGO_API_KEY
+// (chave com outro propósito, autenticar pedidos de saída à Eupago) como
+// fallback. Por testar com uma transação real antes de confiar cegamente
+// nisto em produção.
 export function verificarAssinaturaWebhook(corpoBruto: string, assinaturaBase64: string | null): boolean {
   if (!assinaturaBase64) return false;
-  const chave = process.env.EUPAGO_WEBHOOK_SECRET || process.env.EUPAGO_API_KEY;
+  const chave = process.env.EUPAGO_WEBHOOK_SECRET;
   if (!chave) return false;
 
   const esperada = createHmac("sha256", chave).update(corpoBruto).digest();

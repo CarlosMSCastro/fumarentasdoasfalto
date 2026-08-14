@@ -21,6 +21,21 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "storage.quotagest.pt" },
     ],
   },
+  // Só os headers sem risco de partir algo (CSP fica de fora — Google Maps/
+  // OAuth/Sentry precisam de exceções específicas, avaliado à parte).
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+        ],
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {
