@@ -259,6 +259,7 @@ export default function EventosAdminList({ eventos }: { eventos: Evento[] }) {
                                     type="button"
                                     disabled={isPending}
                                     title="Usar como capa"
+                                    aria-label="Usar como capa"
                                     onClick={() => onEscolherCapa(evento.id, url)}
                                     className="flex items-center justify-center w-7 h-7 rounded-full bg-white/90 text-black hover:bg-white transition-all disabled:opacity-50 cursor-pointer"
                                   >
@@ -269,6 +270,7 @@ export default function EventosAdminList({ eventos }: { eventos: Evento[] }) {
                                   type="button"
                                   disabled={isPending}
                                   title="Apagar foto"
+                                  aria-label="Apagar foto"
                                   onClick={() => onApagarFoto(evento.id, url)}
                                   className="flex items-center justify-center w-7 h-7 rounded-full bg-red-500/90 text-white hover:bg-red-500 transition-all disabled:opacity-50 cursor-pointer"
                                 >

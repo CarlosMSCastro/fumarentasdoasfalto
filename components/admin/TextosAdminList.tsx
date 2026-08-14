@@ -319,6 +319,7 @@ function SeccaoLegalItem({
           type="button"
           disabled={isPending}
           onClick={onApagar}
+          aria-label={seccao.subtitulo ? `Apagar secção "${seccao.subtitulo}"` : "Apagar secção"}
           className="flex items-center justify-center w-7 h-7 rounded-full border border-red-400/50 text-red-400 hover:bg-red-400/10 transition-all disabled:opacity-50 cursor-pointer"
         >
           <Trash2 size={13} />

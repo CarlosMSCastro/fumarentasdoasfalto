@@ -210,6 +210,7 @@ export default function FundadoresAdminList({ fundadores }: { fundadores: Fundad
                         type="button"
                         disabled={isPending}
                         onClick={() => iniciarEdicao(fundador)}
+                        aria-label={`Editar ${fundador.nome}`}
                         className="flex items-center justify-center w-8 h-8 rounded-full border border-primary/50 text-primary hover:bg-primary/10 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         <Pencil size={14} />
@@ -218,6 +219,7 @@ export default function FundadoresAdminList({ fundadores }: { fundadores: Fundad
                         type="button"
                         disabled={isPending}
                         onClick={() => onApagar(fundador)}
+                        aria-label={`Apagar ${fundador.nome}`}
                         className="flex items-center justify-center w-8 h-8 rounded-full border border-red-400/50 text-red-400 hover:bg-red-400/10 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         <Trash2 size={14} />
