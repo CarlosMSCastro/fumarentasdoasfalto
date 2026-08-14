@@ -129,7 +129,7 @@ export async function atualizarFoto(_prevState: PerfilFormState, formData: FormD
   const validacao = validarFoto(formData.get("foto"));
   if (validacao.erro !== null) return { error: validacao.erro };
 
-  const url = await carregarFoto(`avatares/${session.user.id}-${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
+  const url = await carregarFoto(`avatares/${session.user.id}-${Date.now()}`, validacao.ficheiro);
 
   await db.update(users).set({ image: url }).where(eq(users.id, session.user.id));
   revalidatePath("/perfil");

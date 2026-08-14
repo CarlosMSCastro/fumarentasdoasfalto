@@ -31,7 +31,7 @@ export async function criarFundadorAdmin(formData: FormData): Promise<{ error?: 
   const ordem = (ultimo?.ordem ?? -1) + 1;
 
   const id = randomUUID();
-  const fotoUrl = await carregarFoto(`fundadores/${id}-${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
+  const fotoUrl = await carregarFoto(`fundadores/${id}-${Date.now()}`, validacao.ficheiro);
 
   await db.insert(fundadores).values({ id, nome, cargo, fotoUrl, ordem });
   revalidarFundadores();
@@ -64,7 +64,7 @@ export async function trocarFotoFundadorAdmin(id: string, formData: FormData): P
   const [atual] = await db.select({ fotoUrl: fundadores.fotoUrl }).from(fundadores).where(eq(fundadores.id, id)).limit(1);
   if (!atual) return { error: "Fundador não encontrado." };
 
-  const novaFotoUrl = await carregarFoto(`fundadores/${id}-${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
+  const novaFotoUrl = await carregarFoto(`fundadores/${id}-${Date.now()}`, validacao.ficheiro);
   await db.update(fundadores).set({ fotoUrl: novaFotoUrl }).where(eq(fundadores.id, id));
   await apagarFoto(atual.fotoUrl);
 

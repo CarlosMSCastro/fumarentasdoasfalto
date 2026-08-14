@@ -55,7 +55,7 @@ export async function criarProdutoAdmin(formData: FormData): Promise<{ error?: s
   const tamanhos = parseListaOpcional(formData.get("tamanhos"));
 
   const id = randomUUID();
-  const fotoUrl = await carregarFoto(`produtos/${id}/${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
+  const fotoUrl = await carregarFoto(`produtos/${id}/${Date.now()}`, validacao.ficheiro);
 
   await db.insert(produtos).values({
     id,
@@ -120,7 +120,7 @@ export async function adicionarFotoProdutoAdmin(id: string, formData: FormData):
     .limit(1);
   const ordem = (ultima?.ordem ?? -1) + 1;
 
-  const url = await carregarFoto(`produtos/${id}/${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
+  const url = await carregarFoto(`produtos/${id}/${Date.now()}`, validacao.ficheiro);
   await db.insert(produtoFotos).values({ produtoId: id, url, ordem });
 
   revalidarProdutos();

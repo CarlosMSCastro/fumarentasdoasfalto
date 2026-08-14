@@ -37,9 +37,21 @@ export function validarFoto(foto: FormDataEntryValue | null): ResultadoValidacao
   return { erro: null, ficheiro: foto };
 }
 
-export async function carregarFoto(caminho: string, ficheiro: File): Promise<string> {
+const EXTENSAO_POR_TIPO: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+
+// prefixo nunca deve incluir o nome do ficheiro original do cliente
+// (File.name é controlado por quem faz o pedido, trivial de forjar) — a
+// extensão vem sempre do foto.type já validado em validarFoto, nunca do
+// nome que o browser reportou.
+export async function carregarFoto(prefixo: string, ficheiro: File): Promise<string> {
   const foto = await redimensionarSeNecessario(ficheiro);
-  const blob = await put(caminho, foto, { access: "public" });
+  const extensao = EXTENSAO_POR_TIPO[ficheiro.type] ?? "jpg";
+  const blob = await put(`${prefixo}.${extensao}`, foto, { access: "public" });
   return blob.url;
 }
 

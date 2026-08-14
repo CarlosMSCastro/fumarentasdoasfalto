@@ -55,7 +55,7 @@ export async function criarEventoAdmin(formData: FormData): Promise<{ error?: st
   if (validacao.erro !== null) return { error: validacao.erro };
 
   const id = await gerarIdUnico(titulo);
-  const fotoUrl = await carregarFoto(`eventos/${id}/${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
+  const fotoUrl = await carregarFoto(`eventos/${id}/${Date.now()}`, validacao.ficheiro);
 
   await db.insert(eventos).values({ id, titulo, local, data, descricao, capaUrl: fotoUrl });
   await db.insert(eventoFotos).values({ eventoId: id, url: fotoUrl, ordem: 0 });
@@ -102,7 +102,7 @@ export async function adicionarFotoEventoAdmin(id: string, formData: FormData): 
     .limit(1);
   const ordem = (ultima?.ordem ?? -1) + 1;
 
-  const url = await carregarFoto(`eventos/${id}/${Date.now()}-${validacao.ficheiro.name}`, validacao.ficheiro);
+  const url = await carregarFoto(`eventos/${id}/${Date.now()}`, validacao.ficheiro);
   await db.insert(eventoFotos).values({ eventoId: id, url, ordem });
 
   revalidarEventos(id);
