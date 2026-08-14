@@ -8,6 +8,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users, accounts, verificationTokens } from "@/lib/db/schema";
 
+// Hash bcrypt fixo, sem password real associada — só para igualar o tempo
+// de resposta do login quando a conta não existe (ver comentário em authorize).
+const DUMMY_PASSWORD_HASH = "$2b$10$irRWPuYMbGgiFIUEaSDMGuTZoeQF0QxbGRtdExJ4tkeLH3rgxhRkS";
+
 // O objeto profile que chega ao callback jwt é o formato em bruto de cada
 // provider, não o já mapeado para {id,name,email,image} que o Auth.js usa
 // internamente para criar utilizadores — por isso tem de se ler o campo
@@ -58,10 +62,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (typeof email !== "string" || typeof password !== "string") return null;
 
         const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-        if (!user?.passwordHash) return null;
-
-        const valid = await compare(password, user.passwordHash);
-        if (!valid) return null;
+        // compare() corre sempre, mesmo sem conta/password (contra um hash
+        // sem password real associada) — sem isto, "conta não existe" responde
+        // quase instantaneamente e "conta existe" demora o tempo do bcrypt,
+        // um timing side-channel que permite enumerar emails registados.
+        // Mesmo princípio já usado em registar() (app/actions/auth.ts).
+        const valid = await compare(password, user?.passwordHash ?? DUMMY_PASSWORD_HASH);
+        if (!user?.passwordHash || !valid) return null;
 
         return { id: user.id, name: user.name, email: user.email, image: user.image, role: user.role };
       },
