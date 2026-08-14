@@ -15,44 +15,8 @@ import {
   apagarProdutoAdmin,
 } from "@/app/actions/admin-produtos";
 import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { Campo, CampoEditavel } from "@/components/admin/shared";
 
-function Campo({ legenda, valor }: { legenda: string; valor: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1 min-w-0">
-      <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</span>
-      <span className="text-sm text-white/90 break-words">{valor}</span>
-    </div>
-  );
-}
-
-function CampoEditavel({
-  legenda,
-  value,
-  onChange,
-  multiline = false,
-  type = "text",
-  className = "",
-}: {
-  legenda: string;
-  value: string;
-  onChange: (valor: string) => void;
-  multiline?: boolean;
-  type?: string;
-  className?: string;
-}) {
-  const classeCampo =
-    "w-full rounded-md bg-white/5 border border-white/15 px-2.5 py-1.5 text-sm text-white/90 focus:outline-none focus:border-primary";
-  return (
-    <div className={`flex flex-col gap-1 min-w-0 ${className}`}>
-      <label className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</label>
-      {multiline ? (
-        <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={2} className={classeCampo} />
-      ) : (
-        <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={classeCampo} />
-      )}
-    </div>
-  );
-}
 
 // Tag-input simples: escrever + Enter adiciona, × remove. Usado para as
 // variantes de cor/tamanho — só aparece quando o checkbox correspondente
@@ -358,7 +322,7 @@ export default function ProdutosAdminList({ produtos }: { produtos: Produto[] })
                           <CampoEditavel legenda="Categoria" value={form.categoria} onChange={(v) => setForm({ ...form, categoria: v })} />
                           <CampoEditavel legenda="Preço (€)" value={form.preco} onChange={(v) => setForm({ ...form, preco: v })} />
                         </div>
-                        <CampoEditavel legenda="Descrição" value={form.descricao} onChange={(v) => setForm({ ...form, descricao: v })} multiline />
+                        <CampoEditavel legenda="Descrição" value={form.descricao} onChange={(v) => setForm({ ...form, descricao: v })} multiline rows={2} />
 
                         <VariantesEditor
                           temCores={editTemCores}

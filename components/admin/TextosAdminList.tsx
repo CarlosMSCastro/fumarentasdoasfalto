@@ -10,40 +10,7 @@ import {
   apagarSeccaoLegalAdmin,
 } from "@/app/actions/admin-textos";
 import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
-
-function Campo({ legenda, valor }: { legenda: string; valor: string }) {
-  return (
-    <div className="flex flex-col gap-1 min-w-0">
-      <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</span>
-      <span className="text-sm text-white/90 break-words whitespace-pre-line">{valor}</span>
-    </div>
-  );
-}
-
-function CampoInput({
-  legenda,
-  value,
-  onChange,
-  multiline = false,
-}: {
-  legenda: string;
-  value: string;
-  onChange: (valor: string) => void;
-  multiline?: boolean;
-}) {
-  const classeCampo =
-    "w-full rounded-md bg-white/5 border border-white/15 px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-primary";
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</label>
-      {multiline ? (
-        <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className={classeCampo} />
-      ) : (
-        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={classeCampo} />
-      )}
-    </div>
-  );
-}
+import { Campo, CampoEditavel as CampoInput } from "@/components/admin/shared";
 
 // Grupo (Homepage/Sobre/cada página legal) — fechado por defeito, mesmo
 // padrão das outras áreas do admin (Fundadores/Eventos/Produtos, listas de

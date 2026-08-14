@@ -6,30 +6,7 @@ import { Pencil, Trash2, ImageUp, Plus } from "lucide-react";
 import type { Fundador } from "@/lib/fundadores";
 import { criarFundadorAdmin, atualizarFundadorAdmin, trocarFotoFundadorAdmin, apagarFundadorAdmin } from "@/app/actions/admin-fundadores";
 import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
-
-function CampoEditavel({
-  legenda,
-  value,
-  onChange,
-  className = "",
-}: {
-  legenda: string;
-  value: string;
-  onChange: (valor: string) => void;
-  className?: string;
-}) {
-  return (
-    <div className={`flex flex-col gap-1 min-w-0 ${className}`}>
-      <label className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md bg-white/5 border border-white/15 px-2.5 py-1.5 text-sm text-white/90 focus:outline-none focus:border-primary"
-      />
-    </div>
-  );
-}
+import { CampoEditavel } from "@/components/admin/shared";
 
 export default function FundadoresAdminList({ fundadores }: { fundadores: Fundador[] }) {
   const { confirmar, host: dialogHost } = useConfirmDialog();

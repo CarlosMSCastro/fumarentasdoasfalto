@@ -7,6 +7,7 @@ import type { orders, orderItems } from "@/lib/db/schema";
 import { formatarPreco } from "@/lib/preco";
 import { apagarEncomendaAdmin, forcarPagoAdmin, marcarEnviadoAdmin } from "@/app/actions/admin";
 import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { Campo, classePill, classePillTodos } from "@/components/admin/shared";
 
 export type EncomendaAdmin = typeof orders.$inferSelect & { items: (typeof orderItems.$inferSelect)[] };
 
@@ -52,37 +53,6 @@ function textoEntrega(encomenda: EncomendaAdmin): string {
 
 // Bloco "legenda por cima" — pequena e discreta em cima, valor maior e claro
 // por baixo. Reutilizado para todos os campos de detalhe do painel.
-function Campo({ legenda, valor }: { legenda: string; valor: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1 min-w-0">
-      <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</span>
-      {/* break-words — sem isto, um email comprido não quebra (não tem
-          espaços) e transborda por cima da célula ao lado no grid. */}
-      <span className="text-sm text-white/90 break-words">{valor}</span>
-    </div>
-  );
-}
-
-function classePill(ativo: boolean): string {
-  return `shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold transition-all cursor-pointer border whitespace-nowrap ${
-    ativo
-      ? "bg-primary border-primary text-white shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
-      : "bg-white/5 border-white/15 text-white/70 hover:border-white/30 hover:text-white"
-  }`;
-}
-
-// "Todos" tem borda tracejada quando inativo (distingue-se visualmente dos
-// valores concretos) e fica preenchido a laranja quando ativo, tal como os
-// outros — o destaque pedido é sobretudo notar-se que é a opção de "reset"
-// (limpa a seleção do grupo todo).
-function classePillTodos(ativo: boolean): string {
-  return `shrink-0 rounded-full px-2 py-0.5 text-xs font-bold transition-all cursor-pointer border whitespace-nowrap ${
-    ativo
-      ? "bg-primary border-primary text-white shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
-      : "border-dashed border-white/30 text-white/80 hover:border-white/50"
-  }`;
-}
-
 function alternar<T>(conjunto: Set<T>, valor: T): Set<T> {
   const novo = new Set(conjunto);
   if (novo.has(valor)) novo.delete(valor);

@@ -6,6 +6,7 @@ import type { users } from "@/lib/db/schema";
 import type { QuotagestSocio } from "@/lib/quotagest";
 import { atualizarUtilizadorAdmin, desvincularSocioAdmin, type AtualizarUtilizadorInput } from "@/app/actions/admin";
 import { useConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { Campo, CampoEditavel, classePill, classePillTodos } from "@/components/admin/shared";
 
 // Nunca inclui passwordHash — a query em app/admin/(painel)/utilizadores/
 // page.tsx já seleciona só os campos abaixo, de propósito, para essa coluna
@@ -21,31 +22,6 @@ function formatData(data: Date): string {
   return data.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-function classePillTodos(ativo: boolean): string {
-  return `shrink-0 rounded-full px-2 py-0.5 text-xs font-bold transition-all cursor-pointer border whitespace-nowrap ${
-    ativo
-      ? "bg-primary border-primary text-white shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
-      : "border-dashed border-white/30 text-white/80 hover:border-white/50"
-  }`;
-}
-
-function classePill(ativo: boolean): string {
-  return `shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold transition-all cursor-pointer border whitespace-nowrap ${
-    ativo
-      ? "bg-primary border-primary text-white shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
-      : "bg-white/5 border-white/15 text-white/70 hover:border-white/30 hover:text-white"
-  }`;
-}
-
-function Campo({ legenda, valor }: { legenda: string; valor: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1 min-w-0">
-      <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</span>
-      <span className="text-sm text-white/90 break-words">{valor}</span>
-    </div>
-  );
-}
-
 type FormUser = {
   nome: string;
   email: string;
@@ -54,35 +30,6 @@ type FormUser = {
   codigoPostal: string;
   cidade: string;
 };
-
-function CampoEditavel({
-  legenda,
-  value,
-  onChange,
-  type = "text",
-  required = false,
-  className = "",
-}: {
-  legenda: string;
-  value: string;
-  onChange: (valor: string) => void;
-  type?: string;
-  required?: boolean;
-  className?: string;
-}) {
-  return (
-    <div className={`flex flex-col gap-1 min-w-0 ${className}`}>
-      <label className="text-[11px] font-semibold uppercase tracking-widest text-white/40">{legenda}</label>
-      <input
-        type={type}
-        value={value}
-        required={required}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md bg-white/5 border border-white/15 px-2.5 py-1.5 text-sm text-white/90 focus:outline-none focus:border-primary"
-      />
-    </div>
-  );
-}
 
 export default function UtilizadoresAdminList({ utilizadores }: { utilizadores: UtilizadorAdmin[] }) {
   const { confirmar, host: dialogHost } = useConfirmDialog();
