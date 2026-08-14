@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { users, quotaPagamentos } from "@/lib/db/schema";
 import { getSocioByEmail, getSocioById } from "@/lib/quotagest";
 import { gerarReferenciaMultibanco, pedirPagamentoMbway } from "@/lib/eupago";
+import { telemovelMbwayValido } from "@/lib/validacao";
 
 export type QuotaPagamentoResultado =
   | { error: string }
@@ -42,7 +43,7 @@ export async function pedirPagamentoQuota(
 
   const telemovel = telemovelMbway?.trim() ?? "";
   if (metodoPagamento === "mbway") {
-    if (!/^9\d{8}$/.test(telemovel)) return { error: "Indica um número MB WAY válido." };
+    if (!telemovelMbwayValido(telemovel)) return { error: "Indica um número MB WAY válido." };
     // Mesma regra de criarEncomenda — a dívida de quota é sempre 12€ hoje,
     // mas a guarda fica por segurança se isso mudar.
     if (socio.divida < 1) return { error: "O valor mínimo para pagamento por MB WAY é 1€." };

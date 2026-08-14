@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { users, verificationTokens, emailChangeRequests } from "@/lib/db/schema";
 import { signIn, signOut } from "@/auth";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendNotificacaoNovoRegisto } from "@/lib/email";
+import { emailValido } from "@/lib/validacao";
 
 export type AuthFormState = { error?: string } | undefined;
 export type ResetRequestState = { error?: string; success?: boolean } | undefined;
@@ -28,7 +29,7 @@ export async function registar(_prevState: RegistarFormState, formData: FormData
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
   if (!name) return { error: "Indica o teu nome." };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Email inválido." };
+  if (!emailValido(email)) return { error: "Email inválido." };
   if (password.length < 8) return { error: "A password tem de ter pelo menos 8 caracteres." };
   if (password !== confirmPassword) return { error: "As passwords não coincidem." };
 
@@ -75,7 +76,7 @@ export async function entrarComFacebook() {
 // sirva para descobrir quais emails têm conta (enumeração de utilizadores).
 export async function pedirResetPassword(_prevState: ResetRequestState, formData: FormData): Promise<ResetRequestState> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Email inválido." };
+  if (!emailValido(email)) return { error: "Email inválido." };
 
   const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
   if (user) {

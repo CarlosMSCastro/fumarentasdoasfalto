@@ -8,6 +8,7 @@ import { PORTES_EUROS } from "@/lib/encomendas";
 import { getProdutoById } from "@/lib/produtos";
 import { gerarReferenciaMultibanco, pedirPagamentoMbway, gerarLinkPagamentoCartao } from "@/lib/eupago";
 import { sendReferenciaMultibanco, sendConfirmacaoMbway } from "@/lib/email";
+import { emailValido, telemovelMbwayValido } from "@/lib/validacao";
 
 const MAX_QUANTIDADE_POR_ITEM = 20;
 
@@ -71,9 +72,9 @@ export async function criarEncomenda(
 
   if (itens.length === 0) return { error: "O carrinho está vazio." };
   if (!dados.nome.trim()) return { error: "Indica o teu nome." };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) return { error: "Email inválido." };
+  if (!emailValido(dados.email)) return { error: "Email inválido." };
   if (!dados.telefone.trim()) return { error: "Indica um contacto telefónico." };
-  if (dados.metodoPagamento === "mbway" && !/^9\d{8}$/.test(dados.telemovelMbway?.trim() ?? "")) {
+  if (dados.metodoPagamento === "mbway" && !telemovelMbwayValido(dados.telemovelMbway?.trim() ?? "")) {
     return { error: "Indica um número MB WAY válido." };
   }
 

@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { gerarReciboPdf } from "@/lib/recibo-pdf";
+import { formatarPreco } from "@/lib/preco";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -103,7 +104,7 @@ export async function sendOrderConfirmation(
     totalCentimos: number;
   }
 ) {
-  const formatar = (centimos: number) => `${(centimos / 100).toFixed(2).replace(".", ",")} €`;
+  const formatar = (centimos: number) => formatarPreco(centimos / 100);
   const linhas = encomenda.itens
     .map((item) => `<li>${item.quantidade}× ${item.nome} — ${formatar(item.precoCentimos * item.quantidade)}</li>`)
     .join("");
@@ -142,7 +143,7 @@ export async function sendReferenciaMultibanco(
   to: string,
   encomenda: { id: string; entidade: string; referencia: string; valor: number; dataFim: string }
 ) {
-  const valorFormatado = `${encomenda.valor.toFixed(2).replace(".", ",")} €`;
+  const valorFormatado = formatarPreco(encomenda.valor);
   const dataFimFormatada = new Date(`${encomenda.dataFim}T00:00:00`).toLocaleDateString("pt-PT", {
     day: "numeric",
     month: "long",
@@ -235,7 +236,7 @@ export async function sendNotificacaoEncomendaPaga(encomenda: {
   cidade: string | null;
   itens: { nome: string; quantidade: number }[];
 }) {
-  const total = `${(encomenda.totalCentimos / 100).toFixed(2).replace(".", ",")} €`;
+  const total = formatarPreco(encomenda.totalCentimos / 100);
   const entrega = encomenda.metodoEntrega === "levantamento" ? "levantamento em mão" : "envio";
   const linhas = encomenda.itens.map((item) => `<li>${item.quantidade}× ${item.nome}</li>`).join("");
 
@@ -265,7 +266,7 @@ export async function sendNotificacaoEncomendaPaga(encomenda: {
 // mandava nada até ao pagamento ser confirmado. Corrigido a pedido do
 // utilizador, 2026-08-11.
 export async function sendConfirmacaoMbway(to: string, encomenda: { id: string; valor: number; telemovel: string }) {
-  const valorFormatado = `${encomenda.valor.toFixed(2).replace(".", ",")} €`;
+  const valorFormatado = formatarPreco(encomenda.valor);
   await resend.emails.send({
     from: FROM,
     to,
@@ -316,7 +317,7 @@ export async function sendEncomendaEnviada(
 // automaticamente, o Sr. Joaquim atualiza à mão (mesma janela de até 48h já
 // avisada em /perfil).
 export async function sendConfirmacaoQuotaPaga(to: string, dados: { nome: string; valor: number; dataPagamento: Date }) {
-  const valorFormatado = `${dados.valor.toFixed(2).replace(".", ",")} €`;
+  const valorFormatado = formatarPreco(dados.valor);
   const dataFormatada = dados.dataPagamento.toLocaleDateString("pt-PT", { day: "numeric", month: "long", year: "numeric" });
 
   await resend.emails.send({
@@ -336,7 +337,7 @@ export async function sendConfirmacaoQuotaPaga(to: string, dados: { nome: string
 // de uma encomenda normal, isto exige uma ação manual do Sr. Joaquim
 // (marcar a quota como paga no Quotagest).
 export async function sendNotificacaoQuotaPaga(dados: { nome: string; email: string; valor: number; metodoPagamento: string }) {
-  const valorFormatado = `${dados.valor.toFixed(2).replace(".", ",")} €`;
+  const valorFormatado = formatarPreco(dados.valor);
 
   await resend.emails.send({
     from: FROM,

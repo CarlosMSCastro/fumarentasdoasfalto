@@ -7,6 +7,7 @@ import { orders, orderItems, users } from "@/lib/db/schema";
 import { sendOrderConfirmation, sendNotificacaoEncomendaPaga, sendEncomendaEnviada } from "@/lib/email";
 import { atualizarSocio, type AtualizarSocioInput } from "@/lib/quotagest";
 import { exigirAdmin } from "@/lib/admin-auth";
+import { emailValido } from "@/lib/validacao";
 
 export async function apagarEncomendaAdmin(id: string) {
   await exigirAdmin();
@@ -116,7 +117,7 @@ export async function atualizarUtilizadorAdmin(id: string, dados: AtualizarUtili
   await exigirAdmin();
 
   const email = dados.email.trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Email inválido." };
+  if (!emailValido(email)) return { error: "Email inválido." };
 
   const [existente] = await db
     .select({ id: users.id })

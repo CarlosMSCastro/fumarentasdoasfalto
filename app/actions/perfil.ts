@@ -10,6 +10,7 @@ import { users, emailChangeRequests, socioLinkRequests } from "@/lib/db/schema";
 import { sendEmailChangeConfirmation, sendSocioLinkConfirmation } from "@/lib/email";
 import { findSocioByCodigoOuNif } from "@/lib/quotagest";
 import { validarFoto, carregarFoto } from "@/lib/upload";
+import { emailValido } from "@/lib/validacao";
 
 export type PerfilFormState = { error?: string; success?: boolean } | undefined;
 
@@ -59,7 +60,7 @@ export async function pedirAlteracaoEmail(_prevState: PerfilFormState, formData:
   if (!session?.user) return { error: "Sessão expirada. Entra novamente." };
 
   const novoEmail = String(formData.get("novoEmail") ?? "").trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(novoEmail)) return { error: "Email inválido." };
+  if (!emailValido(novoEmail)) return { error: "Email inválido." };
 
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, novoEmail)).limit(1);
   if (existing) return { error: "Já existe uma conta com este email." };
