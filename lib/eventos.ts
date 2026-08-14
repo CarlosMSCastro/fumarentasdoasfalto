@@ -44,21 +44,13 @@ export async function getTodosEventos(): Promise<Evento[]> {
 }
 
 // mostrar=false esconde tanto da timeline como da própria página
-// /eventos/[id] — chamadas públicas usam esta função (filtra), o admin usa
-// getEventoByIdAdmin (não filtra).
+// /eventos/[id] — o admin não usa esta função, vê tudo via getTodosEventos().
 export async function getEventoById(id: string): Promise<Evento | undefined> {
   const [linha] = await db
     .select()
     .from(eventos)
     .where(and(eq(eventos.id, id), eq(eventos.mostrar, true)))
     .limit(1);
-  if (!linha) return undefined;
-  const [evento] = await comFotos([linha]);
-  return evento;
-}
-
-export async function getEventoByIdAdmin(id: string): Promise<Evento | undefined> {
-  const [linha] = await db.select().from(eventos).where(eq(eventos.id, id)).limit(1);
   if (!linha) return undefined;
   const [evento] = await comFotos([linha]);
   return evento;

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import { mesDe, formatarDataCompleta } from "@/lib/eventos-formato";
 import type { Evento } from "@/lib/eventos";
@@ -32,8 +32,8 @@ const CARD_DOG_EARS = [
   "absolute w-7 h-7 bottom-0 right-0 [clip-path:polygon(100%_100%,0_100%,100%_0)] bg-[linear-gradient(to_top_left,rgba(255,255,255,0.4),rgba(0,0,0,0.28))]",
 ];
 export default function EventosTimeline({ eventos }: { eventos: Evento[] }) {
-  const grupos = agruparPorAno(eventos);
-  const anos = Object.keys(grupos).sort();
+  const grupos = useMemo(() => agruparPorAno(eventos), [eventos]);
+  const anos = useMemo(() => Object.keys(grupos).sort(), [grupos]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const arrowScrollRef = useRef<number | null>(null);
   const scrollRafRef = useRef<number | null>(null);

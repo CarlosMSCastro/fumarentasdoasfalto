@@ -33,6 +33,21 @@ Site oficial da associação Fumarentas do Asfalto, desenvolvido como alternativ
 - `/confirmar-email`, `/confirmar-socio` — Confirmação de troca de email / associação de conta a um registo de sócio existente
 - `/termos`, `/privacidade`, `/cookies` — Páginas legais (mesmo template `PaginaLegal`)
 
+## Área de Administração
+
+Gated por `role: "admin"` (`app/admin/layout.tsx`) — sem UI para promover a admin, é sempre feito diretamente na base de dados. Rotas `noindex`/bloqueadas em `robots.txt`.
+
+- `/admin` — Dashboard: badges "N novos" por secção, estatísticas financeiras (via API do Quotagest)
+- `/admin/encomendas` — Gestão de encomendas (marcar pago/enviado, código de rastreio, apagar)
+- `/admin/socios` — Lista de sócios (leitura + escrita direta à API do Quotagest, campos "seguros" apenas)
+- `/admin/utilizadores` — Contas do site (editar dados, desvincular sócio)
+- `/admin/conteudo` — CMS próprio (Postgres + Drizzle, sem Sanity/headless CMS externo):
+  - `/admin/conteudo/textos` — Textos da homepage/sobre + secções das páginas legais
+  - `/admin/conteudo/fundadores` — Fundadores da associação
+  - `/admin/conteudo/objetivos` — Fotos dos 3 cards de Objetivos
+  - `/admin/conteudo/eventos` — Eventos (mostrar/esconder, fotos, capa)
+  - `/admin/conteudo/produtos` — Produtos da Loja (disponibilidade, fotos, cores/tamanhos)
+
 ## Identidade Visual
 
 - Paleta dark com laranja como cor primária (`#ff6b00`), fundo `#050505`

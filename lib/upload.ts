@@ -11,8 +11,22 @@ export const ALLOWED_FOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "ima
 // fora (sharp não anima), fica como veio.
 const LADO_MAXIMO = 1600;
 
+// GIF não passa pelo sharp (não anima), por isso é o único formato que
+// nunca tem o conteúdo verificado a sério — um Content-Type "image/gif"
+// declarado pelo cliente não garante nada sobre o ficheiro em si. Confirma
+// aqui a assinatura real (magic bytes) em vez de confiar cegamente nisso.
+const GIF_HEADER = new TextEncoder().encode("GIF8");
+
+async function ficheiroEhGifValido(ficheiro: File): Promise<boolean> {
+  const cabecalho = new Uint8Array(await ficheiro.slice(0, 4).arrayBuffer());
+  return GIF_HEADER.every((byte, i) => cabecalho[i] === byte);
+}
+
 async function redimensionarSeNecessario(ficheiro: File): Promise<File> {
-  if (ficheiro.type === "image/gif") return ficheiro;
+  if (ficheiro.type === "image/gif") {
+    if (!(await ficheiroEhGifValido(ficheiro))) throw new Error("Ficheiro não é um GIF válido.");
+    return ficheiro;
+  }
   const buffer = Buffer.from(await ficheiro.arrayBuffer());
   const redimensionado = await sharp(buffer)
     .resize(LADO_MAXIMO, LADO_MAXIMO, { fit: "inside", withoutEnlargement: true })
