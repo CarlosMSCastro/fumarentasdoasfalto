@@ -1,3 +1,4 @@
+import "server-only";
 import { Resend } from "resend";
 import { gerarReciboPdf } from "@/lib/recibo-pdf";
 import { formatarPreco } from "@/lib/preco";

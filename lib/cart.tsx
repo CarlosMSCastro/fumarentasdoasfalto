@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export interface CartItem {
   produtoId: string;
@@ -65,7 +65,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, carregado]);
 
-  const adicionar: CartContextValue["adicionar"] = (item, quantidade = 1) => {
+  const adicionar = useCallback<CartContextValue["adicionar"]>((item, quantidade = 1) => {
     const chave = chaveItem(item);
     setItems((atual) => {
       const existente = atual.find((i) => chaveItem(i) === chave);
@@ -75,30 +75,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...atual, { ...item, quantidade }];
     });
     setSheetAberta(true);
-  };
+  }, []);
 
-  const remover: CartContextValue["remover"] = (chave) => {
+  const remover = useCallback<CartContextValue["remover"]>((chave) => {
     setItems((atual) => atual.filter((i) => chaveItem(i) !== chave));
-  };
+  }, []);
 
-  const atualizarQuantidade: CartContextValue["atualizarQuantidade"] = (chave, quantidade) => {
-    if (quantidade <= 0) {
-      remover(chave);
-      return;
-    }
-    setItems((atual) => atual.map((i) => (chaveItem(i) === chave ? { ...i, quantidade } : i)));
-  };
+  const atualizarQuantidade = useCallback<CartContextValue["atualizarQuantidade"]>(
+    (chave, quantidade) => {
+      if (quantidade <= 0) {
+        remover(chave);
+        return;
+      }
+      setItems((atual) => atual.map((i) => (chaveItem(i) === chave ? { ...i, quantidade } : i)));
+    },
+    [remover]
+  );
 
-  const limpar = () => setItems([]);
+  const limpar = useCallback(() => setItems([]), []);
 
   const contagem = useMemo(() => items.reduce((soma, i) => soma + i.quantidade, 0), [items]);
   const subtotal = useMemo(() => items.reduce((soma, i) => soma + i.preco * i.quantidade, 0), [items]);
 
-  return (
-    <CartContext.Provider
-      value={{ items, adicionar, remover, atualizarQuantidade, limpar, chaveItem, contagem, subtotal, sheetAberta, setSheetAberta }}
-    >
-      {children}
-    </CartContext.Provider>
+  const value = useMemo<CartContextValue>(
+    () => ({ items, adicionar, remover, atualizarQuantidade, limpar, chaveItem, contagem, subtotal, sheetAberta, setSheetAberta }),
+    [items, adicionar, remover, atualizarQuantidade, limpar, contagem, subtotal, sheetAberta]
   );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

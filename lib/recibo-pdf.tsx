@@ -1,3 +1,4 @@
+import "server-only";
 // Image importado como PdfImage: é o componente do @react-pdf/renderer (não
 // suporta alt, não tem nada a ver com acessibilidade web), não o <Image> do
 // Next.js — renomeado para não ser apanhado pela regra jsx-a11y/alt-text.

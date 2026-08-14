@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rajdhani } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 import Navbar from "@/components/Navbar";
 import Map from "@/components/Map";
 import SharedBackground from "@/components/SharedBackground";
@@ -15,13 +16,32 @@ const rajdhani = Rajdhani({
   variable: "--font-sans",
 });
 
+const TITLE = "Fumarentas do Asfalto";
+const DESCRICAO = "Associação de apaixonados por motorizadas";
+
 export const metadata: Metadata = {
-  title: "Fumarentas do Asfalto",
-  description: "Associação de apaixonados por motorizadas",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRICAO,
   verification: {
     other: {
       "facebook-domain-verification": "9f5ktdm0h8uw3erskbxw3ur4xkk0qm",
     },
+  },
+  openGraph: {
+    title: TITLE,
+    description: DESCRICAO,
+    url: SITE_URL,
+    siteName: TITLE,
+    images: ["/logo.png"],
+    locale: "pt_PT",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: TITLE,
+    description: DESCRICAO,
+    images: ["/logo.png"],
   },
 };
 
