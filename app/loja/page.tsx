@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import LojaGrid from "@/components/LojaGrid";
 import { getProdutos } from "@/lib/produtos";
+
+export const metadata: Metadata = {
+  title: "Loja",
+  description: "Merchandise oficial da Fumarentas do Asfalto.",
+};
 
 export default async function LojaPage() {
   const produtos = await getProdutos();

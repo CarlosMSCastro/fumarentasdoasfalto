@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import ContactoSection from "@/components/ContactosSection";
 import FoundersSection from "@/components/FoundersSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import { getFundadores } from "@/lib/fundadores";
 import { getTextos } from "@/lib/textos";
+
+export const metadata: Metadata = {
+  title: "Sobre",
+  description: "A história da Fumarentas do Asfalto e os fundadores da associação.",
+};
 
 export default async function SobrePage() {
   const [fundadores, textos] = await Promise.all([getFundadores(), getTextos()]);

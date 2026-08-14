@@ -21,7 +21,7 @@ const DESCRICAO = "Associação de apaixonados por motorizadas";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: TITLE,
+  title: { default: TITLE, template: `%s | ${TITLE}` },
   description: DESCRICAO,
   verification: {
     other: {

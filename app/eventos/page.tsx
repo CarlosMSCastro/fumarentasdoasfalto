@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import ContactoSection from "@/components/ContactosSection";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import EventosTimeline from "@/components/EventosTimeline";
 import { getEventos } from "@/lib/eventos";
+
+export const metadata: Metadata = {
+  title: "Eventos",
+  description: "Timeline de eventos, passeios e encontros da Fumarentas do Asfalto.",
+};
 
 export default async function EventosPage() {
   const eventos = await getEventos();

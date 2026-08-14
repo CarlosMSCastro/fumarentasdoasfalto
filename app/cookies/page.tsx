@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import PaginaLegal from "@/components/PaginaLegal";
 import TextoComLinks from "@/components/TextoComLinks";
 import { getTextos, getSeccoesLegais } from "@/lib/textos";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const textos = await getTextos();
+  return { title: textos["legal.cookies.titulo"] };
+}
 
 export default async function CookiesPage() {
   const [textos, seccoes] = await Promise.all([getTextos(), getSeccoesLegais("cookies")]);
