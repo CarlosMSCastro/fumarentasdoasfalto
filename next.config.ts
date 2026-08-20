@@ -21,9 +21,43 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "storage.quotagest.pt" },
     ],
   },
-  // Só os headers sem risco de partir algo (CSP fica de fora — Google Maps/
-  // OAuth/Sentry precisam de exceções específicas, avaliado à parte).
   async headers() {
+    // Bloqueante (ver AUDIT.md #13) — testada primeiro em Report-Only sem
+    // nenhuma violação em todas as páginas públicas, /perfil, /checkout e
+    // /admin inteiro (autenticado como admin). Maps JS (script/tiles) e
+    // Sentry Replay (worker) carregam de fora; avatares OAuth passam sempre
+    // por /_next/image (same-origin), Sentry client usa tunnelRoute
+    // "/monitoring" (também same-origin) — por isso não precisam de entrada
+    // própria aqui. Login OAuth e pagamento Eupago não passam por aqui (são
+    // navegação/redirecionamento HTTP e chamadas server-side, respetivamente
+    // — nenhum dos dois é restringido por CSP).
+    //
+    // 'unsafe-inline' no script-src é necessário sem nonces: o Next injeta
+    // os dados de hidratação RSC (self.__next_f.push(...)) via <script>
+    // inline — sem isto a hidratação falha silenciosamente (sem nenhum erro
+    // na consola), a app fica presa no fade-in inicial (app/template.tsx) e
+    // parece "tudo preto". Confirmado por bisecção isolando cada diretiva
+    // (2026-08-17). A alternativa correta (CSP com nonce, ver docs do Next)
+    // obriga toda a app a renderização dinâmica — fora de escopo aqui. A
+    // proteção XSS específica a scripts inline fica mais fraca, mas as
+    // outras diretivas (img/connect/worker/frame-ancestors/object-src/etc.)
+    // continuam estritas. 'unsafe-eval' só em dev (exigido pelo React para
+    // reconstruir stack traces do servidor) — nunca em produção.
+    const isDev = process.env.NODE_ENV === "development";
+    const csp = [
+      "default-src 'self'",
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://maps.googleapis.com`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com",
+      "font-src 'self'",
+      "connect-src 'self' https://maps.googleapis.com",
+      "worker-src 'self' blob:",
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join("; ");
+
     return [
       {
         source: "/:path*",
@@ -32,6 +66,7 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+          { key: "Content-Security-Policy", value: csp },
         ],
       },
     ];
