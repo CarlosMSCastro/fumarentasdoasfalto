@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Mail } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { formatarPreco } from "@/lib/preco";
 import { PORTES_EUROS } from "@/lib/encomendas";
@@ -125,11 +125,18 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
 
         {"referenciaMb" in resultado && resultado.referenciaMb && (
           <div className="bg-[#f8f0d9] rounded-sm px-6 py-4 text-black/85">
-            <p className="text-xs uppercase tracking-widest text-black/50 mb-1">Referência Multibanco</p>
-            <p className="font-bold text-lg">Entidade {resultado.referenciaMb.entidade}</p>
-            <p className="font-bold text-lg">Referência {resultado.referenciaMb.referencia}</p>
-            <p className="font-bold text-lg">Valor {formatarPreco(resultado.referenciaMb.valor)}</p>
+            <p className="text-xs uppercase tracking-widest text-primary mb-1">Referência Multibanco</p>
+            <p className="font-bold text-lg">Entidade: {resultado.referenciaMb.entidade}</p>
+            <p className="font-bold text-lg">Referência: {resultado.referenciaMb.referencia}</p>
+            <p className="font-bold text-lg">Valor: {formatarPreco(resultado.referenciaMb.valor)}</p>
           </div>
+        )}
+
+        {"referenciaMb" in resultado && resultado.referenciaMb && (
+          <p className="flex items-center gap-2 text-primary text-sm font-semibold whitespace-nowrap">
+            <Mail size={16} strokeWidth={2.5} className="shrink-0" />
+            Estes dados também foram enviados para o teu email.
+          </p>
         )}
 
         {metodoPagamento === "mbway" && !("pagamentoError" in resultado && resultado.pagamentoError) && (
@@ -143,7 +150,10 @@ export default function CheckoutForm({ initial }: { initial: DadosIniciais }) {
           </p>
         )}
 
-        <Link href="/" className="text-primary text-sm font-semibold hover:underline">
+        <Link
+          href="/"
+          className="rounded-full bg-primary text-white font-bold uppercase tracking-widest text-sm px-6 py-2.5 hover:bg-[var(--primary-hover)] transition-colors mt-2"
+        >
           Voltar ao início
         </Link>
       </div>

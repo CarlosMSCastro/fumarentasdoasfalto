@@ -7,6 +7,7 @@ import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users, accounts, verificationTokens } from "@/lib/db/schema";
+import { sendWelcomeEmail, sendNotificacaoNovoRegisto } from "@/lib/email";
 
 // Hash bcrypt fixo, sem password real associada — só para igualar o tempo
 // de resposta do login quando a conta não existe (ver comentário em authorize).
@@ -107,6 +108,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.id = token.id ?? session.user.id;
       session.user.role = token.role ?? "user";
       return session;
+    },
+  },
+  events: {
+    // Só dispara para contas novas criadas pelo adapter (Google/Facebook) —
+    // o registo por password insere o user diretamente na BD (ver registar()
+    // em app/actions/auth.ts), sem passar pelo adapter, por isso já envia o
+    // email de boas-vindas lá e nunca chega aqui. Sem isto, quem entra pela
+    // primeira vez via OAuth nunca recebe boas-vindas nem gera notificação
+    // interna — foi o que aconteceu com o Sr. Joaquim 2026-08-20.
+    async createUser({ user }) {
+      if (!user.email) return;
+      const nome = user.name ?? "Sócio";
+      sendWelcomeEmail(user.email, nome).catch(() => null);
+      sendNotificacaoNovoRegisto(nome, user.email).catch(() => null);
     },
   },
 });
