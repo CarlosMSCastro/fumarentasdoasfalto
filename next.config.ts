@@ -12,6 +12,16 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "5mb",
     },
   },
+  // Sem isto, o output file tracing da Vercel por vezes não copia o binário
+  // nativo do sharp (@img/sharp-libvips-*) para a função serverless — dá
+  // ERR_DLOPEN_FAILED em runtime mesmo com o pacote certo no
+  // package-lock.json. lib/upload.ts usa sharp, e como o Next agrupa todos
+  // os Server Actions de uma rota no mesmo chunk, isto derruba até ações
+  // sem nada a ver com fotos (ex: logout em /perfil) só por partilharem o
+  // chunk. Padrão documentado em node_modules/next/dist/docs/.../output.md.
+  outputFileTracingIncludes: {
+    "/*": ["node_modules/sharp/**/*", "node_modules/@img/**/*"],
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
