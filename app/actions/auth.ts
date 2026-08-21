@@ -10,6 +10,7 @@ import { users, verificationTokens, emailChangeRequests } from "@/lib/db/schema"
 import { signIn, signOut } from "@/auth";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendNotificacaoNovoRegisto } from "@/lib/email";
 import { emailValido } from "@/lib/validacao";
+import { getSocioByEmail } from "@/lib/quotagest";
 
 export type AuthFormState = { error?: string } | undefined;
 export type ResetRequestState = { error?: string; success?: boolean } | undefined;
@@ -37,12 +38,21 @@ export async function registar(_prevState: RegistarFormState, formData: FormData
 
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
   if (!existing) {
-    await db.insert(users).values({ name, email, passwordHash });
+    const [novoUser] = await db.insert(users).values({ name, email, passwordHash }).returning({ id: users.id });
     // Sem await de propósito — só correm no ramo de conta nova, e esperar
     // por elas atrasaria só este ramo, reintroduzindo pela via do tempo de
     // resposta a mesma fuga que o resto desta função evita de propósito.
     sendWelcomeEmail(email, name).catch(() => null);
     sendNotificacaoNovoRegisto(name, email).catch(() => null);
+    // Tenta ligar já a conta ao sócio do Quotagest com o mesmo email — evita
+    // depender da primeira visita a /perfil (resolveSocio faz o mesmo
+    // fallback lá, para quem se registou antes desta alteração ou cujo
+    // email só bate certo mais tarde).
+    getSocioByEmail(email)
+      .then((socio) => {
+        if (socio) return db.update(users).set({ quotagestId: socio.id }).where(eq(users.id, novoUser.id));
+      })
+      .catch(() => null);
   }
 
   return { success: true };

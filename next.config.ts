@@ -23,6 +23,15 @@ const nextConfig: NextConfig = {
     "/*": ["node_modules/sharp/**/*", "node_modules/@img/**/*"],
   },
   images: {
+    // Desligado de propósito — a otimização de imagens da Vercel fatura por
+    // transformação (cada combinação única de imagem+largura+formato), e o
+    // tier gratuito (5.000/mês) é fácil de esgotar com o volume de fotos
+    // reais do site (eventos, produtos, fundadores, sócios). As imagens já
+    // chegam pré-redimensionadas a um máximo de 1600px no upload (sharp, ver
+    // lib/upload.ts), por isso o custo de as servir sem otimização adicional
+    // é pequeno — a alternativa (deixar ligado) é um risco de fatura sem
+    // limite superior garantido, o que não é aceitável aqui.
+    unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "platform-lookaside.fbsbx.com" },
