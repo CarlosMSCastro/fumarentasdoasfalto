@@ -5,9 +5,11 @@ import Facebook from "next-auth/providers/facebook";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
+import { waitUntil } from "@vercel/functions";
 import { db } from "@/lib/db";
 import { users, accounts, verificationTokens } from "@/lib/db/schema";
 import { sendWelcomeEmail, sendNotificacaoNovoRegisto } from "@/lib/email";
+import { getSocioByEmail } from "@/lib/quotagest";
 
 // Hash bcrypt fixo, sem password real associada — só para igualar o tempo
 // de resposta do login quando a conta não existe (ver comentário em authorize).
@@ -120,8 +122,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async createUser({ user }) {
       if (!user.email) return;
       const nome = user.name ?? "Sócio";
-      sendWelcomeEmail(user.email, nome).catch(() => null);
-      sendNotificacaoNovoRegisto(nome, user.email).catch(() => null);
+      // waitUntil obrigatório aqui — mesma causa raiz corrigida em
+      // registar() (app/actions/auth.ts) e no webhook do Eupago: sem isto a
+      // Vercel pode encerrar a function antes destas promises terminarem.
+      waitUntil(sendWelcomeEmail(user.email, nome).catch(() => null));
+      waitUntil(sendNotificacaoNovoRegisto(nome, user.email).catch(() => null));
+      // Mesma ligação automática ao Quotagest que registar() já faz para
+      // contas por password (app/actions/auth.ts) — antes só acontecia à
+      // primeira visita a /perfil, isto evita esse atraso também para quem
+      // entra pela primeira vez via Google/Facebook.
+      waitUntil(
+        getSocioByEmail(user.email)
+          .then((socio) => {
+            if (socio && user.id) return db.update(users).set({ quotagestId: socio.id }).where(eq(users.id, user.id));
+          })
+          .catch(() => null)
+      );
     },
   },
 });
