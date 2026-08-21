@@ -7,11 +7,13 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart } from "lucide-react";
+import { Menu, ShoppingCart, LogOut } from "lucide-react";
 import { scrollToContactosBypassingSnap } from "@/lib/scroll";
 import { useCart } from "@/lib/cart";
+import { terminarSessao } from "@/app/actions/auth";
 import AccountBadge from "@/components/AccountBadge";
 import CartSheet from "@/components/CartSheet";
+import SubmitButton from "@/components/SubmitButton";
 
 // lucide-react dropped brand/logo icons — these are small local stroke icons
 // (matching lucide's own visual style) so we don't need a whole extra icon
@@ -173,7 +175,25 @@ export default function Navbar({ facebookUrl, instagramUrl }: { facebookUrl: str
             <InstagramIcon size={25} />
           </a>
           {session ? (
-            <AccountBadge session={session} className="hidden lg:flex" />
+            <div className="hidden lg:flex items-center gap-3">
+              <AccountBadge session={session} />
+              {/* Pedido explícito do Sr. Joaquim: "Logout" (não "Sair", para
+                  não parecer "sair do site") sempre visível ao lado da
+                  foto+nome, na mesma linha do Navbar — não escondido atrás
+                  de um clique/dropdown. Estilo secundário (não é o CTA
+                  principal do Navbar), mas com hover a vermelho para ficar
+                  claro que é uma ação de saída, mesmo tratamento do botão
+                  maior em /perfil. */}
+              <form action={terminarSessao}>
+                <SubmitButton
+                  pendingText="A sair..."
+                  className="flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white/60 hover:text-red-400 hover:border-red-400/50 transition-all cursor-pointer"
+                >
+                  <LogOut size={14} strokeWidth={2.5} />
+                  Logout
+                </SubmitButton>
+              </form>
+            </div>
           ) : (
             <Link href="/login" className="hidden lg:block">
               <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-sm px-6 py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.8)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),3.8)] transition-all">
@@ -221,7 +241,22 @@ export default function Navbar({ facebookUrl, instagramUrl }: { facebookUrl: str
                 ))}
                 <li className={session ? "mt-3" : "w-25 mt-3"}>
                   {session ? (
-                    <AccountBadge session={session} onClick={() => setOpen(false)} vertical />
+                    <div className="flex flex-col items-center gap-3">
+                      <AccountBadge session={session} onClick={() => setOpen(false)} vertical />
+                      {/* Aqui já há espaço vertical de sobra (menu deslizante,
+                          não a linha compacta do Navbar), por isso "Logout"
+                          fica por baixo, bem separado — mesmo pedido do
+                          desktop acima, só que empilhado em vez de ao lado. */}
+                      <form action={terminarSessao} onSubmit={() => setOpen(false)}>
+                        <SubmitButton
+                          pendingText="A sair..."
+                          className="flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white/60 hover:text-red-400 hover:border-red-400/50 transition-all cursor-pointer"
+                        >
+                          <LogOut size={14} strokeWidth={2.5} />
+                          Logout
+                        </SubmitButton>
+                      </form>
+                    </div>
                   ) : (
                     <Link href="/login" onClick={() => setOpen(false)}>
                       <Button className="w-full bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold uppercase tracking-widest text-lg py-5 shadow-[0_0_6px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.8)] transition-all">

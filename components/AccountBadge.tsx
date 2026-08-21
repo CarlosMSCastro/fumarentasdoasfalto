@@ -42,7 +42,7 @@ export default function AccountBadge({ session, className = "", onClick, vertica
           </span>
         )}
       </span>
-      <span className="font-bold uppercase tracking-wide text-base">
+      <span className="font-bold uppercase tracking-wide text-sm">
         {name || "Minha Conta"}
       </span>
     </Link>
