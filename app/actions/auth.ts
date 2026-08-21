@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { hash } from "bcryptjs";
 import { AuthError } from "next-auth";
+import { waitUntil } from "@vercel/functions";
 import { db } from "@/lib/db";
 import { users, verificationTokens, emailChangeRequests } from "@/lib/db/schema";
 import { signIn, signOut } from "@/auth";
@@ -42,17 +43,25 @@ export async function registar(_prevState: RegistarFormState, formData: FormData
     // Sem await de propósito — só correm no ramo de conta nova, e esperar
     // por elas atrasaria só este ramo, reintroduzindo pela via do tempo de
     // resposta a mesma fuga que o resto desta função evita de propósito.
-    sendWelcomeEmail(email, name).catch(() => null);
-    sendNotificacaoNovoRegisto(name, email).catch(() => null);
+    // waitUntil (obrigatório aqui, não opcional): sem isto, a Vercel pode
+    // terminar a função assim que a resposta desta Server Action é enviada,
+    // matando estas promises a meio — confirmado como a causa real de um
+    // registo cujo email de boas-vindas e notificação interna nunca
+    // chegaram (2026-08-21), apesar do envio em si funcionar perfeitamente
+    // quando testado isolado (fora do ciclo de vida de uma function).
+    waitUntil(sendWelcomeEmail(email, name).catch(() => null));
+    waitUntil(sendNotificacaoNovoRegisto(name, email).catch(() => null));
     // Tenta ligar já a conta ao sócio do Quotagest com o mesmo email — evita
     // depender da primeira visita a /perfil (resolveSocio faz o mesmo
     // fallback lá, para quem se registou antes desta alteração ou cujo
     // email só bate certo mais tarde).
-    getSocioByEmail(email)
-      .then((socio) => {
-        if (socio) return db.update(users).set({ quotagestId: socio.id }).where(eq(users.id, novoUser.id));
-      })
-      .catch(() => null);
+    waitUntil(
+      getSocioByEmail(email)
+        .then((socio) => {
+          if (socio) return db.update(users).set({ quotagestId: socio.id }).where(eq(users.id, novoUser.id));
+        })
+        .catch(() => null)
+    );
   }
 
   return { success: true };

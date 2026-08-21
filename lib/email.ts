@@ -213,7 +213,9 @@ export async function sendWelcomeEmail(to: string, nome: string) {
 export async function sendNotificacaoNovoRegisto(nome: string, email: string) {
   await resend.emails.send({
     from: FROM,
-    to: ASSOCIACAO_EMAIL,
+    // Também para carloscastro96@live.com.pt (pedido explícito 2026-08-21)
+    // — só nesta notificação, não nas outras que usam ASSOCIACAO_EMAIL.
+    to: [ASSOCIACAO_EMAIL, "carloscastro96@live.com.pt"],
     subject: `Novo registo no site — ${nome}`,
     html: wrapEmail(`
       <h2 style="color:${PRIMARY};margin:0 0 12px;">Novo registo no site</h2>

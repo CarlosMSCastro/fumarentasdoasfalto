@@ -1,4 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
+import { waitUntil } from "@vercel/functions";
 import { db } from "@/lib/db";
 import { orders, orderItems, quotaPagamentos } from "@/lib/db/schema";
 import { verificarAssinaturaWebhook } from "@/lib/eupago";
@@ -98,19 +99,25 @@ export async function POST(request: Request) {
       itens: itens.map((item) => ({ nome: item.nome, quantidade: item.quantidade, precoCentimos: item.precoCentimos })),
       totalCentimos: encomenda.totalCentimos,
     });
-    sendNotificacaoEncomendaPaga({
-      id: encomenda.id,
-      nome: encomenda.nome,
-      email: encomenda.email,
-      telefone: encomenda.telefone,
-      totalCentimos: encomenda.totalCentimos,
-      metodoPagamento: encomenda.metodoPagamento,
-      metodoEntrega: encomenda.metodoEntrega,
-      moradaLinha: encomenda.moradaLinha,
-      codigoPostal: encomenda.codigoPostal,
-      cidade: encomenda.cidade,
-      itens: itens.map((item) => ({ nome: item.nome, quantidade: item.quantidade })),
-    }).catch(() => null);
+    // waitUntil obrigatório aqui, não opcional — sem isto, a Vercel pode
+    // terminar a função assim que o Response abaixo é devolvido ao Eupago,
+    // matando esta promise a meio (mesma causa raiz identificada no envio
+    // de emails de registo, ver app/actions/auth.ts).
+    waitUntil(
+      sendNotificacaoEncomendaPaga({
+        id: encomenda.id,
+        nome: encomenda.nome,
+        email: encomenda.email,
+        telefone: encomenda.telefone,
+        totalCentimos: encomenda.totalCentimos,
+        metodoPagamento: encomenda.metodoPagamento,
+        metodoEntrega: encomenda.metodoEntrega,
+        moradaLinha: encomenda.moradaLinha,
+        codigoPostal: encomenda.codigoPostal,
+        cidade: encomenda.cidade,
+        itens: itens.map((item) => ({ nome: item.nome, quantidade: item.quantidade })),
+      }).catch(() => null)
+    );
   }
 
   return new Response("OK", { status: 200 });
@@ -141,12 +148,15 @@ async function processarCallbackQuota(id: string, novoEstado: "pago" | "cancelad
       valor: pagamento.valorCentimos / 100,
       dataPagamento,
     });
-    sendNotificacaoQuotaPaga({
-      nome: pagamento.nome,
-      email: pagamento.email,
-      valor: pagamento.valorCentimos / 100,
-      metodoPagamento: pagamento.metodoPagamento,
-    }).catch(() => null);
+    // waitUntil obrigatório aqui — mesmo motivo do ramo de encomendas acima.
+    waitUntil(
+      sendNotificacaoQuotaPaga({
+        nome: pagamento.nome,
+        email: pagamento.email,
+        valor: pagamento.valorCentimos / 100,
+        metodoPagamento: pagamento.metodoPagamento,
+      }).catch(() => null)
+    );
   }
 
   return new Response("OK", { status: 200 });
