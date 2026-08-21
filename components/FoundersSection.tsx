@@ -30,7 +30,7 @@ export default function FoundersSection({ fundadores }: { fundadores: Fundador[]
           <h2 className="text-4xl md:text-6xl font-bold text-[#f8f0d9]">Fundadores</h2>
         </div>
 
-        <div className="w-[80%] mx-auto flex-1 min-h-[6.4rem] md:min-h-[10.4rem] md:max-h-[27.2rem] grid grid-cols-3 auto-rows-fr gap-2.5 md:grid-cols-7 md:gap-4">
+        <div className="w-[80%] mx-auto grid grid-cols-3 gap-2.5 md:grid-cols-7 md:gap-4">
           {fundadores.map((fundador, i) => {
             const rotate = i % 2 === 0 ? "-rotate-2" : "rotate-1.5";
             const hoverRotate = i % 2 === 0 ? "group-hover:rotate-2" : "group-hover:-rotate-1.5";
@@ -38,9 +38,18 @@ export default function FoundersSection({ fundadores }: { fundadores: Fundador[]
               <div
                 key={i}
                 onClick={() => handleCardTap(i)}
-                className={`group relative h-full w-full flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] cursor-pointer transition-all duration-700 ease-out hover:z-10 ${rotate} ${hoverRotate}`}
+                className={`group relative w-full flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] cursor-pointer transition-all duration-700 ease-out hover:z-10 ${rotate} ${hoverRotate}`}
               >
-                <div className="relative flex-1 min-h-0 m-1 md:m-1.5 overflow-hidden rounded-sm">
+                {/* aspect-square (não flex-1/min-h-0 a esticar até preencher
+                    o h-dvh da secção, como era antes) — o tamanho do cartão
+                    passa a vir só da largura da coluna, igual à técnica já
+                    usada em LojaGrid.tsx. Deixou de depender de a secção ter
+                    (por acaso) espaço vertical a mais — foi isso que
+                    encolheu os fundadores quando a secção passou a
+                    `min-h-dvh` (correção do overflow, 2026-08-21): sem
+                    altura fixa a esticar a grid, o `flex-1` deixava de ter
+                    espaço "livre" para crescer e a grid caía para o mínimo. */}
+                <div className="relative aspect-square m-1 md:m-1.5 overflow-hidden rounded-sm">
                   <Image
                     src={fundador.fotoUrl}
                     alt={fundador.nome}
