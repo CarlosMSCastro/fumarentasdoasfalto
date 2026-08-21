@@ -26,6 +26,10 @@ export const TEXTOS_PADRAO = {
   "legal.termos.titulo": "Termos e Condições",
   "legal.privacidade.titulo": "Política de Privacidade",
   "legal.cookies.titulo": "Política de Cookies",
+  // Usados no Navbar (ícones de redes sociais, todas as páginas) — valores
+  // atuais como seed, para nada mudar até serem editados no admin.
+  "social.facebook.url": "https://www.facebook.com/profile.php?id=61569646445995",
+  "social.instagram.url": "https://www.instagram.com/fumarentas_do_asfalto/#",
 } as const;
 
 export type TextoChave = keyof typeof TEXTOS_PADRAO;

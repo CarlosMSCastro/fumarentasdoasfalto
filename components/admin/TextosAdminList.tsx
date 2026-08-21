@@ -34,7 +34,9 @@ type CampoDef = { chave: TextoChave; legenda: string; multiline?: boolean };
 // entidade desbloqueia os seus campos todos juntos. "Homepage" por exemplo
 // tem 2 blocos (Hero, Objetivos) dentro do mesmo Grupo — cada um com o seu
 // próprio Editar independente.
-function BlocoTextoEditavel({
+// Exportado — reaproveitado por SocialsAdminPanel.tsx (mesmo mecanismo de
+// edição de chave/valor, para os links de redes sociais).
+export function BlocoTextoEditavel({
   titulo,
   campos,
   textos,

@@ -9,6 +9,7 @@ import RotateDevicePrompt from "@/components/RotateDevicePrompt";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import { CartProvider } from "@/lib/cart";
 import { auth } from "@/auth";
+import { getTextos } from "@/lib/textos";
 
 const rajdhani = Rajdhani({
   weight: ["400", "600", "700"],
@@ -53,6 +54,7 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   const session = await auth();
+  const textos = await getTextos();
 
   return (
     <html
@@ -66,7 +68,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <SessionProviderWrapper session={session}>
           <CartProvider>
-            <Navbar />
+            <Navbar facebookUrl={textos["social.facebook.url"]} instagramUrl={textos["social.instagram.url"]} />
             <div className="fixed top-0 left-0 w-full h-87.5 opacity-0 -z-50 pointer-events-none" aria-hidden="true">
               <Map />
             </div>

@@ -42,7 +42,7 @@ const links = [
   { href: "/", label: "Contacto", isContacto: true },
 ];
 
-export default function Navbar() {
+export default function Navbar({ facebookUrl, instagramUrl }: { facebookUrl: string; instagramUrl: string }) {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const { contagem: cartCount, setSheetAberta } = useCart();
@@ -166,10 +166,10 @@ export default function Navbar() {
             )}
           </button>
           <CartSheet />
-          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="hidden lg:block text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
+          <a href={facebookUrl} target="_blank" className="hidden lg:block text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <FacebookIcon size={25} />
           </a>
-          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="hidden lg:block text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
+          <a href={instagramUrl} target="_blank" className="hidden lg:block text-[#f8f0d9] hover:text-primary transition-all hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.7)]">
             <InstagramIcon size={25} />
           </a>
           {session ? (
@@ -181,10 +181,10 @@ export default function Navbar() {
               </Button>
             </Link>
           )}
-          <a href="https://www.facebook.com/profile.php?id=61569646445995" target="_blank" className="lg:hidden text-[#f8f0d9] hover:text-primary transition-all">
+          <a href={facebookUrl} target="_blank" className="lg:hidden text-[#f8f0d9] hover:text-primary transition-all">
             <FacebookIcon size={28} />
           </a>
-          <a href="https://www.instagram.com/fumarentas_do_asfalto/#" target="_blank" className="lg:hidden text-[#f8f0d9] hover:text-primary transition-all">
+          <a href={instagramUrl} target="_blank" className="lg:hidden text-[#f8f0d9] hover:text-primary transition-all">
             <InstagramIcon size={28} />
           </a>
           <Sheet open={open} onOpenChange={setOpen}>

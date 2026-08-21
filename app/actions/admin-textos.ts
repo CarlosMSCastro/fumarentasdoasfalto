@@ -9,9 +9,13 @@ import { exigirAdmin } from "@/lib/admin-auth";
 
 // Todas as páginas públicas que leem texto/secções legais — mais simples e
 // barato revalidar tudo do que tentar adivinhar exatamente qual mudou por
-// cada chave/secção.
+// cada chave/secção. O "layout" no primeiro revalidatePath cobre o Navbar
+// (renderizado no layout raiz, chaves social.*) — sem isto, editar um link
+// de rede social só atualizava nas páginas listadas abaixo, não em todas.
 function revalidarTextos() {
+  revalidatePath("/", "layout");
   revalidatePath("/admin/conteudo/textos");
+  revalidatePath("/admin/conteudo/socials");
   revalidatePath("/");
   revalidatePath("/sobre");
   revalidatePath("/termos");

@@ -7,6 +7,7 @@ const AREAS = [
   { href: "/admin/conteudo/fundadores", label: "Fundadores" },
   { href: "/admin/conteudo/objetivos", label: "Objetivos" },
   { href: "/admin/conteudo/textos", label: "Textos" },
+  { href: "/admin/conteudo/socials", label: "Socials" },
   { href: "/admin/conteudo/eventos", label: "Eventos" },
   { href: "/admin/conteudo/produtos", label: "Produtos" },
 ] as const;
