@@ -36,10 +36,7 @@ export default function ComunicadosAdminList({
 
   const [pesquisa, setPesquisa] = useState("");
   const [filtroQuota, setFiltroQuota] = useState<FiltroQuota>("todos");
-  // Por omissão, todos os sócios com email válido ficam selecionados — é um
-  // envio para a associação toda, o caso comum é desmarcar alguns, não
-  // marcar do zero.
-  const [selecionados, setSelecionados] = useState<Set<string>>(() => new Set(socios.map((s) => s.email)));
+  const [selecionados, setSelecionados] = useState<Set<string>>(() => new Set());
 
   const [assunto, setAssunto] = useState("");
   const [corpo, setCorpo] = useState("");
@@ -50,6 +47,8 @@ export default function ComunicadosAdminList({
 
   const pesquisaNormalizada = pesquisa.trim().toLowerCase();
 
+  // Quem já corresponde à pesquisa/filtro atual — é isto que "selecionar/
+  // limpar visíveis" usa, para nunca mexer em quem está fora do filtro.
   const sociosFiltrados = useMemo(() => {
     return socios.filter((s) => {
       if (filtroQuota === "emDia" && !s.quotaEmDia) return false;
@@ -58,6 +57,23 @@ export default function ComunicadosAdminList({
       return true;
     });
   }, [socios, filtroQuota, pesquisaNormalizada]);
+
+  // Para a lista que aparece no ecrã: quem já está selecionado fica sempre
+  // visível, mesmo que a pesquisa/filtro atual não o apanhe — sem isto,
+  // mudar a pesquisa para encontrar a próxima pessoa fazia a seleção
+  // anterior "desaparecer" da vista (não da seleção em si), dando a sensação
+  // de ter sido perdida. Os já selecionados aparecem primeiro, para serem
+  // fáceis de confirmar sem precisar de scroll.
+  const emailsNoFiltro = useMemo(() => new Set(sociosFiltrados.map((s) => s.email)), [sociosFiltrados]);
+
+  const sociosParaMostrar = useMemo(() => {
+    const selecionadosForaDoFiltro = socios.filter((s) => selecionados.has(s.email) && !emailsNoFiltro.has(s.email));
+    // Dentro do próprio filtro, os já selecionados sobem para o topo — sort
+    // estável, por isso quem não está selecionado mantém a ordem relativa
+    // que já tinha entre si.
+    const filtradosOrdenados = [...sociosFiltrados].sort((a, b) => Number(selecionados.has(b.email)) - Number(selecionados.has(a.email)));
+    return [...selecionadosForaDoFiltro, ...filtradosOrdenados];
+  }, [socios, sociosFiltrados, selecionados, emailsNoFiltro]);
 
   const alternar = (email: string) => {
     setSelecionados((prev) => {
@@ -68,17 +84,8 @@ export default function ComunicadosAdminList({
     });
   };
 
-  // As duas ações abaixo só tocam no subconjunto atualmente visível
-  // (filtrado/pesquisado) — não mexem na seleção de quem está fora do
-  // filtro, para dar para combinar "selecionar todos os em atraso" com uma
-  // escolha manual já feita antes.
-  const selecionarVisiveis = () => {
-    setSelecionados((prev) => new Set([...prev, ...sociosFiltrados.map((s) => s.email)]));
-  };
-  const limparVisiveis = () => {
-    const visiveisEmails = new Set(sociosFiltrados.map((s) => s.email));
-    setSelecionados((prev) => new Set([...prev].filter((email) => !visiveisEmails.has(email))));
-  };
+  const selecionarTodos = () => setSelecionados(new Set(socios.map((s) => s.email)));
+  const limparTodos = () => setSelecionados(new Set());
 
   const destinatariosFinal = useMemo(() => socios.filter((s) => selecionados.has(s.email)), [socios, selecionados]);
   const previewHtml = useMemo(() => formatarComunicadoHtml(corpo), [corpo]);
@@ -191,25 +198,25 @@ export default function ComunicadosAdminList({
 
             <button
               type="button"
-              onClick={selecionarVisiveis}
+              onClick={selecionarTodos}
               className="rounded-full border border-white/15 px-2.5 py-0.5 text-xs font-semibold text-white/70 hover:text-white hover:border-white/30 transition-all cursor-pointer"
             >
-              Selecionar visíveis
+              Selecionar todos
             </button>
             <button
               type="button"
-              onClick={limparVisiveis}
+              onClick={limparTodos}
               className="rounded-full border border-white/15 px-2.5 py-0.5 text-xs font-semibold text-white/70 hover:text-white hover:border-white/30 transition-all cursor-pointer"
             >
-              Limpar visíveis
+              Limpar tudo
             </button>
 
             <span className="text-xs text-white/50 ml-auto">{selecionados.size} selecionado(s)</span>
           </div>
 
           <ul className="max-h-64 overflow-y-auto flex flex-col gap-1 rounded-md border border-white/10 p-2">
-            {sociosFiltrados.length === 0 && <li className="text-sm text-white/40 px-2 py-1">Nenhum sócio encontrado.</li>}
-            {sociosFiltrados.map((s) => (
+            {sociosParaMostrar.length === 0 && <li className="text-sm text-white/40 px-2 py-1">Nenhum sócio encontrado.</li>}
+            {sociosParaMostrar.map((s) => (
               <li key={s.id}>
                 <label className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-white/[0.04] cursor-pointer">
                   <input
@@ -220,6 +227,9 @@ export default function ComunicadosAdminList({
                   />
                   <span className="text-sm text-white/90 truncate">{s.nome}</span>
                   <span className="text-xs text-white/40 truncate">{s.email}</span>
+                  {!emailsNoFiltro.has(s.email) && (
+                    <span className="ml-auto shrink-0 text-[10px] uppercase tracking-wide text-primary/70">fora da pesquisa</span>
+                  )}
                 </label>
               </li>
             ))}
@@ -248,21 +258,35 @@ export default function ComunicadosAdminList({
         ) : (
           <ul className="flex flex-col gap-2">
             {historico.map((c) => (
-              <li
-                key={c.id}
-                className="rounded-xl border border-white/10 bg-white/[0.03] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white/90 truncate">{c.assunto}</p>
-                  <p className="text-xs text-white/40">
-                    {formatarData(c.createdAt)} · {c.enviadoPorNome} · {c.destinatariosEnviados}/{c.destinatariosTotal} entregues
-                  </p>
-                </div>
-                <span
-                  className={`shrink-0 self-start sm:self-auto rounded-full border px-2.5 py-0.5 text-xs font-semibold ${STATUS_INFO[c.status].classe}`}
-                >
-                  {STATUS_INFO[c.status].label}
-                </span>
+              <li key={c.id} className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+                <details className="group">
+                  <summary className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 sm:px-5 py-4 cursor-pointer list-none hover:bg-white/[0.03] transition-colors">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-white/90 truncate">{c.assunto}</p>
+                      <p className="text-xs text-white/40">
+                        {formatarData(c.createdAt)} · {c.enviadoPorNome} · {c.destinatariosEnviados}/{c.destinatariosTotal} entregues
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 self-start sm:self-auto rounded-full border px-2.5 py-0.5 text-xs font-semibold ${STATUS_INFO[c.status].classe}`}
+                    >
+                      {STATUS_INFO[c.status].label}
+                    </span>
+                  </summary>
+                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-1 border-t border-white/10">
+                    {c.destinatariosEmails.length === 0 ? (
+                      <p className="text-xs text-white/40 pt-3">Nenhum destinatário registado.</p>
+                    ) : (
+                      <ul className="flex flex-wrap gap-1.5 pt-3">
+                        {c.destinatariosEmails.map((email) => (
+                          <li key={email} className="rounded-full bg-white/5 border border-white/10 px-2.5 py-0.5 text-xs text-white/70">
+                            {email}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </details>
               </li>
             ))}
           </ul>
