@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useActionState } from "react";
-import { registar, entrarComGoogle } from "@/app/actions/auth";
+import { registar, entrarComGoogle, entrarComFacebook } from "@/app/actions/auth";
 import GoogleIcon from "@/components/GoogleIcon";
 import FacebookLoginIcon from "@/components/FacebookLoginIcon";
 import AuthPageBackground from "@/components/AuthPageBackground";
@@ -27,17 +27,13 @@ export default function RegistoPage() {
                   Continuar com Google
                 </button>
               </form>
-              <div>
-                <button
-                  type="button"
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-2.5 font-semibold text-white opacity-50 cursor-not-allowed"
-                >
+              <form action={entrarComFacebook}>
+                <button type="submit"
+                  className="w-full flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-2.5 font-semibold text-white hover:bg-white/10 transition-all cursor-pointer">
                   <FacebookLoginIcon />
                   Continuar com Facebook
                 </button>
-                <p className="mt-1.5 text-center text-xs text-white/40">Login por Facebook temporariamente indisponível.</p>
-              </div>
+              </form>
             </div>
             <div className="flex items-center gap-3 my-6">
               <div className="h-px flex-1 bg-white/15" />

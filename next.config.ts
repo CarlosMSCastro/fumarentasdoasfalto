@@ -44,12 +44,21 @@ const nextConfig: NextConfig = {
     // Bloqueante (ver AUDIT.md #13) — testada primeiro em Report-Only sem
     // nenhuma violação em todas as páginas públicas, /perfil, /checkout e
     // /admin inteiro (autenticado como admin). Maps JS (script/tiles) e
-    // Sentry Replay (worker) carregam de fora; avatares OAuth passam sempre
-    // por /_next/image (same-origin), Sentry client usa tunnelRoute
-    // "/monitoring" (também same-origin) — por isso não precisam de entrada
-    // própria aqui. Login OAuth e pagamento Eupago não passam por aqui (são
+    // Sentry Replay (worker) carregam de fora; Sentry client usa tunnelRoute
+    // "/monitoring" (same-origin) — por isso não precisa de entrada própria
+    // aqui. Login OAuth e pagamento Eupago não passam por aqui (são
     // navegação/redirecionamento HTTP e chamadas server-side, respetivamente
     // — nenhum dos dois é restringido por CSP).
+    //
+    // img-src precisa de uma entrada por domínio de imagem externo (avatares
+    // OAuth, Vercel Blob, fotos do Quotagest) — a assunção original era que
+    // todas passavam por /_next/image (same-origin), o que só era verdade
+    // com a otimização de imagens ligada. Deixou de ser verdade quando
+    // `images.unoptimized` foi ligado acima (2026-08-21, para eliminar risco
+    // de fatura) — sem isto, o browser bloqueia essas imagens em silêncio
+    // (nenhum erro na consola óbvio, só a imagem parte), confirmado em
+    // produção logo a seguir a essa alteração: avatar na navbar, /perfil, e
+    // todas as fotos no admin (fundadores/eventos/produtos/sócios).
     //
     // 'unsafe-inline' no script-src é necessário sem nonces: o Next injeta
     // os dados de hidratação RSC (self.__next_f.push(...)) via <script>
@@ -67,7 +76,7 @@ const nextConfig: NextConfig = {
       "default-src 'self'",
       `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://maps.googleapis.com`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com",
+      "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://lh3.googleusercontent.com https://platform-lookaside.fbsbx.com https://graph.facebook.com https://*.public.blob.vercel-storage.com https://storage.quotagest.pt",
       "font-src 'self'",
       "connect-src 'self' https://maps.googleapis.com",
       "worker-src 'self' blob:",
