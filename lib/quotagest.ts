@@ -218,6 +218,21 @@ export async function getTodosSocios(): Promise<QuotagestSocio[]> {
   return rows.map(mapSocio);
 }
 
+// O Quotagest não garante um email preenchido/válido em todos os sócios
+// (registos antigos podem ter o campo em branco) — usado por
+// /admin/comunicados para nunca tentar enviar para um endereço inútil.
+export function filtrarSociosComEmailValido(socios: QuotagestSocio[]): {
+  validos: QuotagestSocio[];
+  invalidos: QuotagestSocio[];
+} {
+  const validos: QuotagestSocio[] = [];
+  const invalidos: QuotagestSocio[] = [];
+  for (const s of socios) {
+    (s.email && s.email.includes("@") ? validos : invalidos).push(s);
+  }
+  return { validos, invalidos };
+}
+
 export async function getSocioByEmail(email: string): Promise<QuotagestSocio | null> {
   const normalized = email.trim().toLowerCase();
   const rows = await getSocios();

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, IdCard, Users, PenSquare } from "lucide-react";
+import { LayoutDashboard, Package, IdCard, Users, Mail, PenSquare } from "lucide-react";
 
 const links = [
   { href: "/admin", label: "Início", icon: LayoutDashboard, disabled: false },
   { href: "/admin/encomendas", label: "Encomendas", icon: Package, disabled: false },
   { href: "/admin/socios", label: "Sócios", icon: IdCard, disabled: false },
   { href: "/admin/utilizadores", label: "Utilizadores", icon: Users, disabled: false },
+  { href: "/admin/comunicados", label: "Comunicados", icon: Mail, disabled: false },
   { href: "/admin/conteudo", label: "Editar Conteúdo", icon: PenSquare, disabled: false },
 ] as const;
 

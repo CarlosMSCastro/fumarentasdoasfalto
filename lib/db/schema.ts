@@ -316,3 +316,29 @@ export const quotaPagamentos = pgTable("quota_pagamento", {
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   paidAt: timestamp("paid_at", { mode: "date" }),
 });
+
+// Histórico de emails em massa enviados a sócios (/admin/comunicados).
+// corpoTexto/corpoHtml são snapshot do que foi enviado nesse momento — nunca
+// se reconstrói a partir de nada, para o histórico continuar correto mesmo
+// que formatarComunicadoHtml mude no futuro. destinatariosEmails guarda só
+// quem recebeu com sucesso (não a lista de tentativa).
+export const comunicadoStatusEnum = pgEnum("comunicado_status", ["sucesso", "parcial", "falhou"]);
+
+export const comunicados = pgTable("comunicado", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  assunto: text("assunto").notNull(),
+  corpoTexto: text("corpo_texto").notNull(),
+  corpoHtml: text("corpo_html").notNull(),
+  destinatariosTotal: integer("destinatarios_total").notNull(),
+  destinatariosEnviados: integer("destinatarios_enviados").notNull(),
+  destinatariosFalhados: integer("destinatarios_falhados").notNull().default(0),
+  destinatariosInvalidos: integer("destinatarios_invalidos").notNull().default(0),
+  destinatariosEmails: text("destinatarios_emails").array().notNull(),
+  status: comunicadoStatusEnum("status").notNull(),
+  // set null (não cascade) — o histórico continua a ter valor mesmo que a
+  // conta do admin que enviou seja apagada depois; enviadoPorNome é o
+  // snapshot que garante isso na prática.
+  enviadoPorId: uuid("enviado_por_id").references(() => users.id, { onDelete: "set null" }),
+  enviadoPorNome: text("enviado_por_nome").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});

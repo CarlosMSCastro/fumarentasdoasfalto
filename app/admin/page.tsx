@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { count, gt } from "drizzle-orm";
-import { PenSquare, Package, IdCard, Users, ChevronRight } from "lucide-react";
+import { PenSquare, Package, IdCard, Users, Mail, ChevronRight } from "lucide-react";
 import { db } from "@/lib/db";
 import { orders, users } from "@/lib/db/schema";
 import { obterUltimasVisitas } from "@/lib/admin-notificacoes";
@@ -133,6 +133,15 @@ export default async function AdminPage() {
             <Users className="w-6 h-6 sm:w-8 sm:h-8 text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)] shrink-0" />
             <span className="flex-1 text-sm sm:text-lg font-bold uppercase tracking-widest text-[#f8f0d9] text-left">Utilizadores</span>
             <Badge n={novosUtilizadores} />
+            <ChevronRight className="w-5 h-5 text-white/30 shrink-0" />
+          </Link>
+
+          <Link
+            href="/admin/comunicados"
+            className="flex items-center gap-3 sm:gap-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:px-6 sm:py-5 hover:border-primary/60 hover:bg-white/10 hover:shadow-[0_0_24px_rgba(var(--primary-rgb),0.25)] transition-all"
+          >
+            <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)] shrink-0" />
+            <span className="flex-1 text-sm sm:text-lg font-bold uppercase tracking-widest text-[#f8f0d9] text-left">Comunicados</span>
             <ChevronRight className="w-5 h-5 text-white/30 shrink-0" />
           </Link>
         </div>

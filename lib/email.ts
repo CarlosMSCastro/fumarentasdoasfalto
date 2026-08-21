@@ -5,9 +5,12 @@ import { formatarPreco } from "@/lib/preco";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Domínio temporário (quizdabola.fun) até à migração para o domínio
-// definitivo da associação — ver CLAUDE.md / troca é só esta linha.
-const FROM = "Fumarentas do Asfalto <naoresponder@quizdabola.fun>";
+// fumarentasdoasfalto.pt (não .com) porque o DNS deste domínio está na
+// Amen, que suporta o registo MX exigido pela verificação de "Enable
+// Sending" do Resend — a Wix (onde o .com está) não suporta MX em
+// subdomínios, por isso o .com nunca passou de "Pending" (ver histórico
+// desta migração). Confirmado com um envio de teste real 2026-08-21.
+const FROM = "Fumarentas do Asfalto <naoresponder@fumarentasdoasfalto.pt>";
 
 // Caixa de correio da própria associação, para onde vão as notificações
 // internas (novo registo, nova encomenda) — não é segredo, não precisa de
@@ -350,4 +353,62 @@ export async function sendNotificacaoQuotaPaga(dados: { nome: string; email: str
       <p style="color:#666666;font-size:13px;">Não esquecer de marcar como paga no Quotagest.</p>
     `),
   });
+}
+
+export type ResultadoEnvioComunicado = { enviados: string[]; falhados: string[] };
+
+// resend.batch.send não documenta um máximo oficial no pacote instalado
+// (^6.18.1) — historicamente a Resend limitou lotes a 100, por isso
+// fragmentamos de forma defensiva em lotes de 50 em vez de confiar nesse
+// número exato.
+const TAMANHO_LOTE_COMUNICADO = 50;
+
+function dividirEmLotes<T>(itens: T[], tamanho: number): T[][] {
+  const lotes: T[][] = [];
+  for (let i = 0; i < itens.length; i += tamanho) lotes.push(itens.slice(i, i + tamanho));
+  return lotes;
+}
+
+// Envio em massa a sócios (/admin/comunicados). bodyHtml já vem transformado
+// por formatarComunicadoHtml (lib/comunicado-formato.ts) — esta função só
+// embrulha em wrapEmail e envia, tal como todas as outras send* deste
+// ficheiro; não sabe nada de Quotagest nem da BD (isso fica no server
+// action que a chama).
+//
+// Lotes em paralelo via Promise.all, não sequencial — mesmo padrão já usado
+// no projeto para "muitas chamadas a uma API externa numa só ação" (ver
+// apagarEventoAdmin em app/actions/admin-eventos.ts).
+//
+// Em modo "strict" (o default do SDK), resend.batch.send não dá granularidade
+// por destinatário: ou o lote inteiro passa, ou a chamada falha por inteiro.
+// Passamos "permissive" e usamos data.errors (índices relativos ao lote)
+// para saber exatamente que endereços falharam dentro de um lote que teve
+// sucesso parcial — nunca assumir que um item de data.data pode ser "falsy"
+// para marcar falha, o tipo garante que é sempre { id: string }.
+export async function sendComunicadoSocios(
+  destinatarios: string[],
+  assunto: string,
+  bodyHtml: string
+): Promise<ResultadoEnvioComunicado> {
+  const html = wrapEmail(bodyHtml);
+  const lotes = dividirEmLotes(destinatarios, TAMANHO_LOTE_COMUNICADO);
+
+  const resultadosPorLote = await Promise.all(
+    lotes.map(async (lote) => {
+      const { data, error } = await resend.batch.send(
+        lote.map((to) => ({ from: FROM, to, subject: assunto, html })),
+        { batchValidation: "permissive" }
+      );
+      if (error || !data) return { enviados: [], falhados: lote };
+      const indicesFalhados = new Set((data.errors ?? []).map((e) => e.index));
+      const enviados = lote.filter((_, i) => !indicesFalhados.has(i));
+      const falhados = lote.filter((_, i) => indicesFalhados.has(i));
+      return { enviados, falhados };
+    })
+  );
+
+  return resultadosPorLote.reduce(
+    (acc, r) => ({ enviados: [...acc.enviados, ...r.enviados], falhados: [...acc.falhados, ...r.falhados] }),
+    { enviados: [], falhados: [] } as ResultadoEnvioComunicado
+  );
 }
