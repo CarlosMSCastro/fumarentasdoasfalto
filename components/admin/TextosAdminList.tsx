@@ -27,7 +27,7 @@ function Grupo({ titulo, children }: { titulo: string; children: React.ReactNode
   );
 }
 
-type CampoDef = { chave: TextoChave; legenda: string; multiline?: boolean };
+type CampoDef = { chave: TextoChave; legenda: string; multiline?: boolean; maxLength?: number };
 
 // Um "Editar" desbloqueia TODOS os campos deste bloco de uma vez (não um por
 // campo) — mesmo espírito de Fundadores/Eventos/Produtos, onde editar uma
@@ -84,6 +84,7 @@ export function BlocoTextoEditavel({
               value={valores[c.chave] ?? ""}
               onChange={(v) => setValores((prev) => ({ ...prev, [c.chave]: v }))}
               multiline={c.multiline}
+              maxLength={c.maxLength}
             />
           ))}
           {erro && <p className="text-red-400 text-xs">{erro}</p>}
@@ -353,9 +354,18 @@ export default function TextosAdminList({
           isPending={isPending}
           startTransition={startTransition}
           campos={[
-            { chave: "home.hero.label", legenda: "Label" },
-            { chave: "home.hero.titulo", legenda: "Título" },
-            { chave: "home.hero.descricao", legenda: "Descrição", multiline: true },
+            // Limites de caracteres nestes 3 campos (e nos 5 do bloco "Sobre"
+            // mais abaixo) são de propósito — esta secção usa h-dvh fixo (não
+            // cresce como Loja/Fundadores, decisão explícita do utilizador
+            // 2026-08-21 de manter o Hero sempre "num ecrã só", sem scroll
+            // interno nem a secção a esticar). Valores calibrados por medição
+            // real no site (ver memória pos-lancamento-roadmap): com o texto
+            // atual sobra ~390-700px de margem mesmo em ecrãs baixos — os
+            // limites ficam a ~2x o comprimento atual, generosos mas com
+            // garantia de nunca estourar essa margem.
+            { chave: "home.hero.label", legenda: "Label", maxLength: 40 },
+            { chave: "home.hero.titulo", legenda: "Título", maxLength: 40 },
+            { chave: "home.hero.descricao", legenda: "Descrição", multiline: true, maxLength: 250 },
           ]}
         />
         <BlocoTextoEditavel
@@ -378,11 +388,13 @@ export default function TextosAdminList({
           isPending={isPending}
           startTransition={startTransition}
           campos={[
-            { chave: "sobre.label", legenda: "Label" },
-            { chave: "sobre.titulo", legenda: "Título" },
-            { chave: "sobre.paragrafo1", legenda: "Parágrafo 1", multiline: true },
-            { chave: "sobre.paragrafo2", legenda: "Parágrafo 2", multiline: true },
-            { chave: "sobre.paragrafo3", legenda: "Parágrafo 3", multiline: true },
+            // Ver nota sobre limites de caracteres no bloco "Hero" acima —
+            // mesma razão, mesma calibração por medição real.
+            { chave: "sobre.label", legenda: "Label", maxLength: 40 },
+            { chave: "sobre.titulo", legenda: "Título", maxLength: 40 },
+            { chave: "sobre.paragrafo1", legenda: "Parágrafo 1", multiline: true, maxLength: 250 },
+            { chave: "sobre.paragrafo2", legenda: "Parágrafo 2", multiline: true, maxLength: 700 },
+            { chave: "sobre.paragrafo3", legenda: "Parágrafo 3", multiline: true, maxLength: 350 },
           ]}
         />
       </Grupo>

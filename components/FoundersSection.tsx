@@ -23,7 +23,7 @@ export default function FoundersSection({ fundadores }: { fundadores: Fundador[]
   };
 
   return (
-    <section id="fundadores" className="relative h-dvh w-full overflow-hidden snap-start">
+    <section id="fundadores" className="relative min-h-dvh w-full overflow-visible snap-start">
       {/* Fundo partilhado com a secção "História" — ver <SharedBackground /> no layout raiz */}
       <div className="relative z-10 flex h-full flex-col justify-start px-[8%] md:px-[13%] [@media(min-width:768px)_and_(max-width:1728px)]:px-[10%] pt-[clamp(6.5rem,12dvh,9.5rem)] md:pt-[clamp(7.5rem,9dvh,10rem)] pb-[clamp(4.5rem,8dvh,7rem)]">
         <div className="shrink-0 mb-10 md:mb-16 ml-[10%]">

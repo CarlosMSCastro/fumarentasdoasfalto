@@ -15,7 +15,7 @@ export default async function LojaPage() {
 
   return (
     <div id="snap-container" className="snap-y snap-mandatory overflow-y-scroll h-dvh">
-      <section id="loja" className="relative h-dvh w-full overflow-visible snap-start">
+      <section id="loja" className="relative min-h-dvh w-full overflow-visible snap-start">
         {/* Fundo partilhado com a Home, Sobre e Eventos — ver <SharedBackground /> no layout raiz */}
         <div className="relative z-10 flex h-full flex-col justify-start px-[8%] md:px-[13%] [@media(min-width:768px)_and_(max-width:1728px)]:px-[10%] pt-[clamp(9.5rem,17dvh,11.5rem)] md:pt-[clamp(12rem,19dvh,17rem)] pb-[clamp(2.5rem,5dvh,4rem)] md:pb-[clamp(4.5rem,8dvh,7rem)]">
           <div className="shrink-0 mb-8 md:mb-10 relative text-center">
