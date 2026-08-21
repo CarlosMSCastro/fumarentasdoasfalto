@@ -40,16 +40,18 @@ export default function FoundersSection({ fundadores }: { fundadores: Fundador[]
                 onClick={() => handleCardTap(i)}
                 className={`group relative w-full flex flex-col rounded-sm overflow-hidden bg-[#f8f0d9] shadow-[0_18px_35px_rgba(0,0,0,100)] cursor-pointer transition-all duration-700 ease-out hover:z-10 ${rotate} ${hoverRotate}`}
               >
-                {/* aspect-square (não flex-1/min-h-0 a esticar até preencher
+                {/* aspect-[4/5] (não flex-1/min-h-0 a esticar até preencher
                     o h-dvh da secção, como era antes) — o tamanho do cartão
                     passa a vir só da largura da coluna, igual à técnica já
-                    usada em LojaGrid.tsx. Deixou de depender de a secção ter
-                    (por acaso) espaço vertical a mais — foi isso que
-                    encolheu os fundadores quando a secção passou a
+                    usada em LojaGrid.tsx (mesmo rácio). Deixou de depender de
+                    a secção ter (por acaso) espaço vertical a mais — foi
+                    isso que encolheu os fundadores quando a secção passou a
                     `min-h-dvh` (correção do overflow, 2026-08-21): sem
                     altura fixa a esticar a grid, o `flex-1` deixava de ter
-                    espaço "livre" para crescer e a grid caía para o mínimo. */}
-                <div className="relative aspect-square m-1 md:m-1.5 overflow-hidden rounded-sm">
+                    espaço "livre" para crescer e a grid caía para o mínimo.
+                    4/5 em vez de square (pedido explícito 2026-08-22, mais
+                    alto que largo, mantendo a largura). */}
+                <div className="relative aspect-[4/5] m-1 md:m-1.5 overflow-hidden rounded-sm">
                   <Image
                     src={fundador.fotoUrl}
                     alt={fundador.nome}
