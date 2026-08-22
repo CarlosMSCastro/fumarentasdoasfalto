@@ -124,7 +124,11 @@ function ProdutoCard({
               }`}
             >
               <div className="overflow-hidden">
-                <div className="flex flex-col gap-1 pt-1 md:gap-1.5 md:pt-2">
+                {/* gap-2.5 (não gap-1) e py-1.5 no botão, só no mobile —
+                    pedido explícito 2026-08-22: dedos gordos erravam entre
+                    o seletor de cor/tamanho e "Adicionar ao carrinho" por
+                    estarem demasiado colados/pequenos no toque. */}
+                <div className="flex flex-col gap-2.5 pt-1 md:gap-1.5 md:pt-2">
                   {temOpcoes && (
                     <div className="flex items-center justify-center gap-1 flex-wrap md:gap-1.5 md:pb-0.5">
                       {produto.cores?.map((cor) => (
@@ -168,7 +172,7 @@ function ProdutoCard({
                       e.stopPropagation();
                       adicionar(itemCarrinho);
                     }}
-                    className="w-full rounded-full bg-primary text-white text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-0.5 md:py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer"
+                    className="w-full rounded-full bg-primary text-white text-[8px] md:text-[11px] font-bold uppercase tracking-wide py-1.5 hover:bg-[var(--primary-hover)] transition-colors cursor-pointer"
                   >
                     Adicionar ao carrinho
                   </button>
