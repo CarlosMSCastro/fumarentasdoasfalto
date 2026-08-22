@@ -25,19 +25,18 @@ export default async function LojaPage() {
             <h1 className="text-3xl md:text-6xl font-bold text-[#f8f0d9]">Loja</h1>
 
             {/* Mobile: alinhado ao topo (com "A nossa"), não ao fundo (com
-                "Loja") como no desktop — pedido explícito 2026-08-22, e
-                logos maiores (h-7 em vez de h-4) para não ficarem
-                perdidos/pequenos demais no ecrã pequeno. rounded-2xl (não
-                rounded-full) + mais padding no mobile — com os logos
-                maiores, rounded-full ficava com curva a mais para o
-                padding que tinha, chegava a cortar os cantos dos logos. */}
-            <div className="absolute right-4 top-0 md:right-8 md:top-auto md:bottom-0 inline-flex items-center gap-1 md:gap-1.5 bg-[#f8f0d9] rounded-2xl md:rounded-full px-2.5 py-2 md:pl-2.5 md:pr-1.5 md:py-1 shadow-[0_8px_20px_rgba(0,0,0,60)]">
+                "Loja") como no desktop — pedido explícito 2026-08-22.
+                rounded-2xl (não rounded-full) — proporção certa confirmada
+                pelo utilizador, só faltava encolher: h-6 (não h-7) e menos
+                padding (px-1.5 py-1, não px-2.5 py-2). Mantém-se ancorado a
+                right-4 (encolhe para a direita, nunca para o centro/título). */}
+            <div className="absolute right-4 top-0 md:right-8 md:top-auto md:bottom-0 inline-flex items-center gap-1 md:gap-1.5 bg-[#f8f0d9] rounded-2xl md:rounded-full px-1.5 py-1 md:pl-2.5 md:pr-1.5 md:py-1 shadow-[0_8px_20px_rgba(0,0,0,60)]">
               <span className="hidden md:inline text-black/70 text-[9px] font-bold uppercase tracking-widest whitespace-nowrap">
                 Pagamento fácil por
               </span>
               <div className="flex items-center gap-1">
-                <Image src="/pagamento/Multibanco.png" alt="Multibanco" width={1920} height={2268} className="h-7 md:h-5 w-auto object-contain" />
-                <Image src="/pagamento/Mbway.png" alt="MB WAY" width={1280} height={622} className="h-7 md:h-5 w-auto object-contain" />
+                <Image src="/pagamento/Multibanco.png" alt="Multibanco" width={1920} height={2268} className="h-6 md:h-5 w-auto object-contain" />
+                <Image src="/pagamento/Mbway.png" alt="MB WAY" width={1280} height={622} className="h-6 md:h-5 w-auto object-contain" />
               </div>
             </div>
           </div>
