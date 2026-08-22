@@ -24,13 +24,17 @@ export default async function LojaPage() {
             <p className="text-white/90 text-lg md:text-xl uppercase tracking-widest mb-0">A nossa</p>
             <h1 className="text-3xl md:text-6xl font-bold text-[#f8f0d9]">Loja</h1>
 
-            <div className="absolute right-4 md:right-8 bottom-0 inline-flex items-center gap-1 md:gap-1.5 bg-[#f8f0d9] rounded-full pl-1.5 pr-1 py-0.5 md:pl-2.5 md:pr-1.5 md:py-1 shadow-[0_8px_20px_rgba(0,0,0,60)]">
+            {/* Mobile: alinhado ao topo (com "A nossa"), não ao fundo (com
+                "Loja") como no desktop — pedido explícito 2026-08-22, e
+                logos maiores (h-7 em vez de h-4) para não ficarem
+                perdidos/pequenos demais no ecrã pequeno. */}
+            <div className="absolute right-4 top-0 md:right-8 md:top-auto md:bottom-0 inline-flex items-center gap-1 md:gap-1.5 bg-[#f8f0d9] rounded-full pl-1.5 pr-1 py-0.5 md:pl-2.5 md:pr-1.5 md:py-1 shadow-[0_8px_20px_rgba(0,0,0,60)]">
               <span className="hidden md:inline text-black/70 text-[9px] font-bold uppercase tracking-widest whitespace-nowrap">
                 Pagamento fácil por
               </span>
               <div className="flex items-center gap-1">
-                <Image src="/pagamento/Multibanco.png" alt="Multibanco" width={1920} height={2268} className="h-4 md:h-5 w-auto object-contain" />
-                <Image src="/pagamento/Mbway.png" alt="MB WAY" width={1280} height={622} className="h-4 md:h-5 w-auto object-contain" />
+                <Image src="/pagamento/Multibanco.png" alt="Multibanco" width={1920} height={2268} className="h-7 md:h-5 w-auto object-contain" />
+                <Image src="/pagamento/Mbway.png" alt="MB WAY" width={1280} height={622} className="h-7 md:h-5 w-auto object-contain" />
               </div>
             </div>
           </div>

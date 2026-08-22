@@ -19,7 +19,10 @@ export default function CartSheet() {
       <SheetContent
         side="right"
         overlayClassName="z-[90] bg-transparent supports-backdrop-filter:backdrop-blur-none"
-        className="z-[90] data-[side=right]:w-[65%] data-[side=right]:sm:max-w-sm bg-black/95 backdrop-blur-md border-white/10 p-0 gap-0 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3"
+        // w-[75%] (não w-[65%]) só até ao breakpoint sm — pedido explícito
+        // 2026-08-22: no mobile a linha do stepper "-1+" + preço não tinha
+        // largura para caber ao lado do ícone do lixo, ficavam sobrepostos.
+        className="z-[90] data-[side=right]:w-[75%] data-[side=right]:sm:max-w-sm bg-black/95 backdrop-blur-md border-white/10 p-0 gap-0 [&>button]:text-orange-500 [&>button]:scale-150 [&>button]:stroke-3"
       >
         <SheetTitle className="sr-only">Carrinho</SheetTitle>
         <SheetDescription className="sr-only">Itens no carrinho de compras</SheetDescription>
