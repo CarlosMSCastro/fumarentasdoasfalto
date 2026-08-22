@@ -27,8 +27,11 @@ export default async function LojaPage() {
             {/* Mobile: alinhado ao topo (com "A nossa"), não ao fundo (com
                 "Loja") como no desktop — pedido explícito 2026-08-22, e
                 logos maiores (h-7 em vez de h-4) para não ficarem
-                perdidos/pequenos demais no ecrã pequeno. */}
-            <div className="absolute right-4 top-0 md:right-8 md:top-auto md:bottom-0 inline-flex items-center gap-1 md:gap-1.5 bg-[#f8f0d9] rounded-full pl-1.5 pr-1 py-0.5 md:pl-2.5 md:pr-1.5 md:py-1 shadow-[0_8px_20px_rgba(0,0,0,60)]">
+                perdidos/pequenos demais no ecrã pequeno. rounded-2xl (não
+                rounded-full) + mais padding no mobile — com os logos
+                maiores, rounded-full ficava com curva a mais para o
+                padding que tinha, chegava a cortar os cantos dos logos. */}
+            <div className="absolute right-4 top-0 md:right-8 md:top-auto md:bottom-0 inline-flex items-center gap-1 md:gap-1.5 bg-[#f8f0d9] rounded-2xl md:rounded-full px-2.5 py-2 md:pl-2.5 md:pr-1.5 md:py-1 shadow-[0_8px_20px_rgba(0,0,0,60)]">
               <span className="hidden md:inline text-black/70 text-[9px] font-bold uppercase tracking-widest whitespace-nowrap">
                 Pagamento fácil por
               </span>
