@@ -2,6 +2,9 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Achado pelo scan OWASP ZAP 2026-08-22 — o Next envia isto por omissão,
+  // denuncia a framework usada sem nenhum benefício para nós.
+  poweredByHeader: false,
   allowedDevOrigins: ["192.168.1.180", "192.168.1.*"],
   // Por omissão o Next limita o corpo de uma Server Action a 1MB — o upload
   // de foto de perfil (atualizarFoto) valida até 5MB no próprio código, por
