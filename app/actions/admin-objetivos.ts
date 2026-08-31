@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { objetivoFotos } from "@/lib/db/schema";
@@ -20,6 +20,7 @@ export async function trocarFotoObjetivoAdmin(cardId: ObjetivoCardId, formData: 
   await db.update(objetivoFotos).set({ fotoUrl: novaFotoUrl }).where(eq(objetivoFotos.cardId, cardId));
   if (atual) await apagarFoto(atual.fotoUrl);
 
+  updateTag("objetivos");
   revalidatePath("/admin/conteudo/objetivos");
   revalidatePath("/");
   return {};

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { eq, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conteudoTexto, paginaLegalSeccoes } from "@/lib/db/schema";
@@ -30,6 +30,7 @@ const LIMITES_CARACTERES: Partial<Record<TextoChave, number>> = {
 };
 
 function revalidarTextos() {
+  updateTag("textos");
   revalidatePath("/", "layout");
   revalidatePath("/admin/conteudo/textos");
   revalidatePath("/admin/conteudo/socials");

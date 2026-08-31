@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conteudoTexto, paginaLegalSeccoes } from "@/lib/db/schema";
@@ -34,15 +35,23 @@ export const TEXTOS_PADRAO = {
 
 export type TextoChave = keyof typeof TEXTOS_PADRAO;
 
-export async function getTextos(): Promise<Record<TextoChave, string>> {
-  const rows = await db.select().from(conteudoTexto);
-  const mapa = new Map(rows.map((r) => [r.chave, r.valor]));
-  const resultado = {} as Record<TextoChave, string>;
-  for (const chave of Object.keys(TEXTOS_PADRAO) as TextoChave[]) {
-    resultado[chave] = mapa.get(chave) ?? TEXTOS_PADRAO[chave];
-  }
-  return resultado;
-}
+// Chamado em app/layout.tsx (todas as páginas, via Navbar) e outra vez em
+// HeroSection/ObjetivosSection/etc — sem cache, cada visita fazia várias
+// idas repetidas à mesma tabela. Invalidado via revalidateTag("textos") nas
+// server actions de admin-textos.ts, a par do revalidatePath já existente.
+export const getTextos = unstable_cache(
+  async (): Promise<Record<TextoChave, string>> => {
+    const rows = await db.select().from(conteudoTexto);
+    const mapa = new Map(rows.map((r) => [r.chave, r.valor]));
+    const resultado = {} as Record<TextoChave, string>;
+    for (const chave of Object.keys(TEXTOS_PADRAO) as TextoChave[]) {
+      resultado[chave] = mapa.get(chave) ?? TEXTOS_PADRAO[chave];
+    }
+    return resultado;
+  },
+  ["textos"],
+  { tags: ["textos"], revalidate: false }
+);
 
 export type PaginaLegalId = "termos" | "privacidade" | "cookies";
 export type SeccaoLegal = { id: string; ordem: number; subtitulo: string; corpo: string };
