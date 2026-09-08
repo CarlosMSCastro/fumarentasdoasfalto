@@ -30,6 +30,24 @@ function extractProviderImage(profile: unknown): string | undefined {
   return undefined;
 }
 
+// Ao contrário do Google (lh3.googleusercontent.com, URL permanente), o
+// Facebook assina os URLs de foto com um parâmetro "ext" (timestamp de
+// expiração) — passadas semanas, o CDN passa a devolver erro para esse URL
+// específico e a foto aparece partida em todo o site, mesmo a conta e a foto
+// continuando a existir. Detetado em produção 2026-09-08, ~10 dias após o
+// URL guardado ter expirado. Se o que está guardado já é um URL do Facebook,
+// vale sempre a pena pedir um fresco a cada login em vez de assumir que está
+// bom para sempre.
+function isFacebookImageUrl(url?: string | null): boolean {
+  if (!url) return false;
+  try {
+    const hostname = new URL(url).hostname;
+    return hostname === "platform-lookaside.fbsbx.com" || hostname === "graph.facebook.com";
+  } catch {
+    return false;
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {
     usersTable: users,
@@ -99,8 +117,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // agora para preencher o que falta. Corre em todo login OAuth (não só
       // no momento da primeira ligação), por isso resolve-se sozinho no
       // login seguinte, mesmo para contas já ligadas antes deste código existir.
+      // Também refresca sempre que o que já está guardado é um URL do
+      // Facebook (ver isFacebookImageUrl) — esses expiram, ao contrário de
+      // fotos carregadas manualmente (Vercel Blob) ou do Google, que nunca
+      // são tocadas aqui.
       const providerImage = extractProviderImage(profile);
-      if (token.id && !token.picture && providerImage) {
+      if (token.id && providerImage && (!token.picture || isFacebookImageUrl(token.picture as string))) {
         await db.update(users).set({ image: providerImage }).where(eq(users.id, token.id as string));
         token.picture = providerImage;
       }
