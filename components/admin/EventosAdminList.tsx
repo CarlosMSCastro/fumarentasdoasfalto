@@ -65,13 +65,25 @@ export default function EventosAdminList({ eventos }: { eventos: Evento[] }) {
     startTransition(() => definirMostrarEventoAdmin(evento.id, !evento.mostrar));
   };
 
-  const onAdicionarFoto = (id: string, ficheiro: File) => {
-    const fd = new FormData();
-    fd.set("foto", ficheiro);
+  // Aceita vários ficheiros, mas envia-os um a um (await sequencial, não
+  // Promise.all) — adicionarFotoEventoAdmin calcula a próxima "ordem" a
+  // partir da última que existe na BD; em paralelo, vários pedidos podiam
+  // ler a mesma "última ordem" antes de qualquer um gravar, e ficarem com
+  // ordens repetidas. Sequencial é mais lento com muitas fotos, mas correto.
+  // Para no primeiro erro (ex: SVG bloqueado) — as fotos já enviadas antes
+  // dessa ficam guardadas, só as restantes da leva atual não sobem.
+  const onAdicionarFotos = (id: string, ficheiros: File[]) => {
     setErro(null);
     startTransition(async () => {
-      const resultado = await adicionarFotoEventoAdmin(id, fd);
-      if (resultado.error) setErro(resultado.error);
+      for (const ficheiro of ficheiros) {
+        const fd = new FormData();
+        fd.set("foto", ficheiro);
+        const resultado = await adicionarFotoEventoAdmin(id, fd);
+        if (resultado.error) {
+          setErro(`${ficheiro.name}: ${resultado.error}`);
+          return;
+        }
+      }
     });
   };
 
@@ -286,11 +298,12 @@ export default function EventosAdminList({ eventos }: { eventos: Evento[] }) {
                           }}
                           type="file"
                           accept="image/*"
+                          multiple
                           className="hidden"
                           onChange={(e) => {
-                            const ficheiro = e.target.files?.[0];
+                            const ficheiros = Array.from(e.target.files ?? []);
                             e.target.value = "";
-                            if (ficheiro) onAdicionarFoto(evento.id, ficheiro);
+                            if (ficheiros.length > 0) onAdicionarFotos(evento.id, ficheiros);
                           }}
                         />
                         <button
@@ -298,7 +311,7 @@ export default function EventosAdminList({ eventos }: { eventos: Evento[] }) {
                           disabled={isPending}
                           onClick={() => addFotoRefs.current[evento.id]?.click()}
                           className="aspect-square rounded-md border border-dashed border-white/25 text-white/50 hover:text-white hover:border-white/40 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center"
-                          title="Adicionar foto"
+                          title="Adicionar fotos"
                         >
                           <ImagePlus size={20} />
                         </button>
