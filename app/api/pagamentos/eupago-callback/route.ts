@@ -10,17 +10,16 @@ import { sendOrderConfirmation, sendNotificacaoEncomendaPaga, sendConfirmacaoQuo
 // correspondente como paga. Configurar este URL no backoffice do Eupago,
 // no canal → secção "Webhooks 2.0" → "Webhook Endpoint".
 //
-// Corpo esperado: { transactions: { identifier, status, entity, reference,
-// method, amount, fees, date, trid }, channel: { name } }. `status` pode
-// ser "Paid" | "Refund" | "Error" | "Cancel" | "Expired" (doc geral) — mas o
-// MB WAY parece devolver o vocabulário da sua própria API de criação
-// (`transactionStatus: "Success"`, ver lib/eupago.ts pedirPagamentoMbway) em
-// vez de "Paid" no callback. Confirmado em produção 2026-08-12: um pagamento
-// MB WAY real disparou este endpoint (200, assinatura válida) mas a
-// encomenda ficou presa em "pendente" — o mapeamento abaixo não reconhecia
-// o status recebido. "success"/"rejected" adicionados por precaução; não
-// ainda confirmado o valor exato porque o payload não fica registado nos
-// logs de acesso da Vercel (só depois deste console.error).
+// Corpo REAL (confirmado com um payload real capturado em produção a
+// 2026-09-24, pagamento MB WAY de 1€): { transaction: { identifier, status,
+// entity, reference, method, amount, fees, date, trid, local }, channel:
+// { account, name } }. A doc pública do Eupago mostra a chave no plural
+// ("transactions") — está errada/desatualizada; o payload real usa o
+// singular ("transaction"). Isto (não o vocabulário do `status`, que já
+// vinha corretamente como "Paid") foi a causa de todas as encomendas
+// ficarem presas em "pendente" durante semanas: `payload.transactions`
+// era sempre undefined, por isso caía sempre no ramo "não reconhecido"
+// abaixo. Não repetir o erro da doc se este ficheiro for revisto outra vez.
 //
 // AVISO: se o canal tiver "Encriptar Webhook" = "Sim", o corpo pode vir
 // como { data: "<encriptado>" } em vez da estrutura acima — a doc pública
@@ -55,7 +54,7 @@ export async function POST(request: Request) {
     return new Response("OK", { status: 200 });
   }
 
-  const transacao = (payload as { transactions?: Record<string, unknown> })?.transactions;
+  const transacao = (payload as { transaction?: Record<string, unknown> })?.transaction;
   const identificador = transacao?.identifier;
   const novoEstado = MAPA_ESTADO[String(transacao?.status ?? "").toLowerCase()];
 
