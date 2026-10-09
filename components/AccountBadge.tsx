@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Session } from "next-auth";
@@ -27,6 +30,9 @@ interface AccountBadgeProps {
 export default function AccountBadge({ session, className = "", onClick, vertical = false }: AccountBadgeProps) {
   const { name, email, image } = session.user;
   const initials = getInitials(name, email);
+  // Uma foto que deixa de carregar (ex. URL do Facebook expirado, ver
+  // auth.ts) cai para as iniciais em vez de mostrar uma imagem partida.
+  const [fotoFalhou, setFotoFalhou] = useState(false);
 
   return (
     <Link href="/perfil" onClick={onClick}
@@ -34,8 +40,9 @@ export default function AccountBadge({ session, className = "", onClick, vertica
         vertical ? "flex-col items-center text-center gap-1.5" : "items-center gap-2.5"
       } ${className}`}>
       <span className="relative shrink-0 w-10 h-10 rounded-full overflow-hidden border border-white/20 group-hover:border-primary transition-all">
-        {image ? (
-          <Image src={getHighResAvatarUrl(image, 100)!} alt="" fill sizes="40px" className="object-cover" />
+        {image && !fotoFalhou ? (
+          <Image src={getHighResAvatarUrl(image, 100)!} alt="" fill sizes="40px" className="object-cover"
+            onError={() => setFotoFalhou(true)} />
         ) : (
           <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-sm font-bold">
             {initials}

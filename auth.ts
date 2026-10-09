@@ -6,6 +6,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { waitUntil } from "@vercel/functions";
+import { put, del } from "@vercel/blob";
 import { db } from "@/lib/db";
 import { users, accounts, verificationTokens } from "@/lib/db/schema";
 import { sendWelcomeEmail, sendNotificacaoNovoRegisto } from "@/lib/email";
@@ -45,6 +46,51 @@ function isFacebookImageUrl(url?: string | null): boolean {
     return hostname === "platform-lookaside.fbsbx.com" || hostname === "graph.facebook.com";
   } catch {
     return false;
+  }
+}
+
+// Refrescar o URL a cada login (acima) não chega: quem nunca perde a sessão
+// nunca volta a fazer login, e o URL guardado expira na mesma — foi o que
+// voltou a acontecer em 2026-10-09. Por isso a foto do Facebook é copiada
+// para o Vercel Blob no momento do login (enquanto o URL ainda é válido) e
+// é o URL do Blob, permanente, que fica guardado. Prefixo próprio
+// (avatares-facebook/) para distinguir estas cópias de fotos carregadas à
+// mão no /perfil (avatares/), que nunca são substituídas.
+const PREFIXO_COPIA_FACEBOOK = "avatares-facebook/";
+const TIPOS_FOTO_FACEBOOK: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
+function isCopiaFacebook(url?: string | null): boolean {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.endsWith(".public.blob.vercel-storage.com") && parsed.pathname.startsWith(`/${PREFIXO_COPIA_FACEBOOK}`);
+  } catch {
+    return false;
+  }
+}
+
+// Devolve o URL da cópia no Blob, ou null se o download/upload falhar — nesse
+// caso o login segue na mesma (nunca bloquear um login por causa da foto).
+async function copiarFotoFacebook(userId: string, url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
+    const tipo = res.headers.get("content-type")?.split(";")[0].trim() ?? "";
+    const extensao = TIPOS_FOTO_FACEBOOK[tipo];
+    if (!extensao) return null;
+    const buffer = await res.arrayBuffer();
+    if (buffer.byteLength === 0 || buffer.byteLength > 5 * 1024 * 1024) return null;
+    const blob = await put(`${PREFIXO_COPIA_FACEBOOK}${userId}-${Date.now()}.${extensao}`, buffer, {
+      access: "public",
+      contentType: tipo,
+    });
+    return blob.url;
+  } catch {
+    return null;
   }
 }
 
@@ -96,7 +142,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, profile, trigger }) {
+    async jwt({ token, user, account, profile, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -117,12 +163,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // agora para preencher o que falta. Corre em todo login OAuth (não só
       // no momento da primeira ligação), por isso resolve-se sozinho no
       // login seguinte, mesmo para contas já ligadas antes deste código existir.
-      // Também refresca sempre que o que já está guardado é um URL do
-      // Facebook (ver isFacebookImageUrl) — esses expiram, ao contrário de
-      // fotos carregadas manualmente (Vercel Blob) ou do Google, que nunca
-      // são tocadas aqui.
+      // No login com Facebook, a foto é sempre copiada para o Blob (ver
+      // copiarFotoFacebook) e substitui o que estiver guardado se for vazio,
+      // um URL do Facebook (contas anteriores a esta mudança) ou uma cópia
+      // anterior — assim uma foto trocada no Facebook chega ao site no login
+      // seguinte. Fotos carregadas à mão ou do Google nunca são tocadas.
       const providerImage = extractProviderImage(profile);
-      if (token.id && providerImage && (!token.picture || isFacebookImageUrl(token.picture as string))) {
+      const atual = token.picture as string | null | undefined;
+      if (token.id && providerImage && account?.provider === "facebook") {
+        if (!atual || isFacebookImageUrl(atual) || isCopiaFacebook(atual)) {
+          const copia = await copiarFotoFacebook(token.id as string, providerImage);
+          // Se a cópia falhar, fica o URL direto do Facebook (comportamento
+          // antigo) — melhor que nada, e o próximo login tenta de novo.
+          const nova = copia ?? providerImage;
+          await db.update(users).set({ image: nova }).where(eq(users.id, token.id as string));
+          token.picture = nova;
+          if (copia && isCopiaFacebook(atual)) waitUntil(del(atual!).catch(() => null));
+        }
+      } else if (token.id && providerImage && !atual) {
         await db.update(users).set({ image: providerImage }).where(eq(users.id, token.id as string));
         token.picture = providerImage;
       }

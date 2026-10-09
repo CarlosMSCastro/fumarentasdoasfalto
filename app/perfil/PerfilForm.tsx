@@ -86,6 +86,7 @@ export default function PerfilForm({
   const [apagarState, apagarAction] = useActionState(apagarConta, undefined);
   const [apagarConfirmacao, setApagarConfirmacao] = useState("");
   const initials = getInitials(user.name, user.email);
+  const [fotoFalhou, setFotoFalhou] = useState(false);
   const { update: updateSession } = useSession();
 
   // O JWT da sessão fica preso à foto do login (ver auth.ts) — depois de um
@@ -104,8 +105,16 @@ export default function PerfilForm({
           border-b substitui os border-t que cada coluna tinha antes. */}
       <div className="flex flex-col items-center text-center gap-2 pb-6 border-b border-white/10">
         <span className="group/avatar relative shrink-0 w-20 h-20 rounded-full overflow-hidden border border-white/20">
-          {user.image ? (
-            <Image src={getHighResAvatarUrl(user.image)!} alt="" fill sizes="80px" className="object-cover" />
+          {user.image && fotoFalhou ? (
+            // Foto guardada mas que não carrega (ex. URL do Facebook
+            // expirado, ver auth.ts) — só as iniciais, sem "Carregar foto",
+            // porque atualizarFoto recusa quando já há foto guardada.
+            <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-2xl font-bold">
+              {initials}
+            </span>
+          ) : user.image ? (
+            <Image src={getHighResAvatarUrl(user.image)!} alt="" fill sizes="80px" className="object-cover"
+              onError={() => setFotoFalhou(true)} />
           ) : (
             <>
               <span className="w-full h-full flex items-center justify-center bg-white/10 text-white text-2xl font-bold">
